@@ -21,11 +21,15 @@
     <script src="/p5.min.js"></script>
     <script src="/p5.dom.min.js"></script>
     <script src="/p5.sound.min.js"></script>
+    <script src="/js/helpers.js"></script>
 
-    <script src="/CCapture.all.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
 
-    <link rel="stylesheet" href="/style.css">
-    <script src="/client.js" defer></script>
+    <script src="/js/objects.js"></script>
+    <script src="/js/drawing.js"></script>
+    <script src="/js/capture.js"></script>
+
+    <script src="/js/main.js" defer></script>
   </head>
   
   <body>
@@ -51,11 +55,8 @@
       </section>
       
       <video id="video" src="https://cdn.glitch.com/7d80c306-8f9d-443a-88d4-62b7d14049a7%2FSV5_MT_FINAL_v28_EMAILABLE.mp4?v=1568312096276" loop muted crossorigin="anonymous"></video> <!-- Hide video element, draw frames to canvas -->
-      <!--<video id="videoMask" src="https://cdn.glitch.com/7d80c306-8f9d-443a-88d4-62b7d14049a7%2FSpinCubeAlpha.mp4?v=1568073365541" autoplay="true" loop muted crossorigin="anonymous"></video>-->
       
       <section class="preview">
-        <!--<canvas id="canvasMask" width="1280" height="720"></canvas>-->
-        <!--<canvas id="canvas" width="1280" height="720"></canvas>-->
         <button id="saveButton">Save!</button>
       </section>
       
