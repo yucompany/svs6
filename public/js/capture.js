@@ -1,43 +1,68 @@
 "use strict";
 
-var capturing = false;
-var captureArr = [];
-var captureTime = 10;
+class Capture {
 
-var frames = 0;
-var totalFrames = 0;
+  constructor(name, duration, format){
+    this.name = name;
 
-const capture = function(){
-  if(capturing)
-    return;
+    if(duration)
+      this.duration = duration;
+    else
+      this.duration = 1;
+
+    if(format)
+      this.format = format;
+    else
+      this.format = 'jpg';
+
+    this.capturing = false;
+
+    this.frames = 0;
+    this.totalFrames = 0;
+  }
+
+  capture(fps){
+    let capturing = this.capturing;
+    if(capturing)
+      return;
+    
+    this.capturing = true;    
+    
+    let f = this.format; let d = this.duration;
+    saveFrames('frame', f, d, fps, function(arr) {
+      this.frames = 0; 
+      let tf = this.totalFrames = arr.length;
   
-  capturing = true;    
-  saveFrames('frame', 'jpg', captureTime, framerate, function(arr) {
-    frames = 0; totalFrames = arr.length;
-    captureArr = arr;
-
-    for(let i = 0; i < totalFrames; i++)
-      sendFrame(arr[i].imageData);
-  });
-}
+      for(let i = 0; i < tf; i++)
+        this.sendFrame(arr[i].imageData);
+    }.bind(this));
+  }
 
 
-const sendFrame = function(frame){
-    ++frames;
+  sendFrame(frame){
+    ++this.frames;
+
+    let format = this.format;
+    let frames = this.frames;
+    let totalFrames = this.totalFrames;
+
+    let encode = this.encode;
+    let capturing = this.capturing;
     
     $.ajax({
       type: 'POST',
       url: '/addFrame',
       data: {
-        jpg: frame,
-        frame: frames
+        dat: frame,
+        frame: (frames-1),
+        format: format
       },
       
       success: function(){
         console.log("frames uploaded: ", frames, "/", totalFrames);
         
-        if(frames >= captureArr.length-1){
-          encode("svs6");
+        if(frames >= totalFrames){
+          encode(name);
           capturing = false;
         }
       },
@@ -48,13 +73,9 @@ const sendFrame = function(frame){
     });
   }
   
-  var encoded = false;
-  const encode = function(filename){
-    filename = filename || "unnamed";
   
-    if(encoded)
-      return;
-    encoded = true;
+  encode(filename){
+    filename = filename || "unnamed";
     
     $.ajax({
       type: 'POST',
@@ -68,3 +89,4 @@ const sendFrame = function(frame){
       }
     })
   }
+}

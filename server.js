@@ -30,6 +30,7 @@ var outputDir = __dirname + "/output";
 // Using
 
 app.use(express.static('public'))
+   .use(express.static('assets'))
    .use(express.static('lib'))
    .use(express.static('output'));
 
@@ -74,8 +75,8 @@ app.post('/submit-name', (req, res) => {
 });
 
 app.post('/addFrame', (req, res) => {
-  let frame = req.body.jpg.replace(/^data:image\/(png|jpg);base64,/, "");
-  let fName = sprintf('frame-%03d.jpg', parseInt(req.body.frame));
+  let frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
+  let fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
   let dir = tempDir.name + "/" + fName;
 
   console.log('received frame: ' + fName);
