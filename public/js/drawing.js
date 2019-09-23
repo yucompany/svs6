@@ -28,7 +28,11 @@ class Drawing {
             let layer = layers[i];
 
             let buffer = camera.render(layer);   
-                image(buffer, 0, 0);
+            if(layer.blend == "DEFAULT")
+                image(buffer, 0, 0);   
+            else 
+                blend(buffer, 0, 0, layer.width, layer.height, 0, 0, layer.width, layer.height, blends[layer.blend]);
+                
         }
     }
 }

@@ -36,7 +36,35 @@ var canvas; var canvasHolder = 'canvas-holder';
 var objects = [];
 
 const drawing = new Drawing();
+      var blends = {}
+
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
+
+var assets = {
+  background : "",
+  letters: {
+    "A" : [],
+    "C" : [],
+    "O" : []
+  }
+}
+
+function preload(){
+  let bg = assets.background = createVideo(['/videos/bg.mp4'], () => {
+      bg.loop();
+      bg.volume(0);
+  });
+  bg.hide();
+
+  let letterPath = "images/letters";
+  let letters = assets.letters;
+
+  let letterFramePath = "";
+  for(let i = 0; i < 42; i++){
+    letterFramePath = "A/A_512_" + (i+"").padStart(5, "0") + ".png";
+    letters["A"].push(loadImage(letterPath + "/" + letterFramePath));
+  }
+}
 
 function setup(){
   canvas = createCanvas(camera.width, camera.height);
@@ -44,6 +72,7 @@ function setup(){
     canvas.class('mw-100 h-auto');
 
   build();
+  blending();
 
   background(0);
   stroke(255);
@@ -51,22 +80,43 @@ function setup(){
   frameRate(framerate);
 }
 
+var mesh;
+    let meshOrigin = {x: 480, y:-360};
+    let meshOffset = .67;
+
 function build(){
+    let bgLayer = new SceneLayer(camera);
+      let bg = new SceneVideo(0, 0, 1, camera.width, camera.height, assets.background, scene);
+      objects.push(bg);
+      bgLayer.add(bg);
+
     let objectLayer = new SceneLayer(camera);
 
-    for(let i = 0; i < 50; i++){
-      let o = new SceneObject(Math.floor(Math.random() * scene.width), Math.floor(Math.random() * scene.height), scene);
-      objects.push(o);
-      objectLayer.add(o);
-    }
+    let letters = assets.letters;
+    let A = mesh = new SceneImageSequence(0, 0, 1, -1, -1, letters["A"], scene);
+        objects.push(A);
+        objectLayer.add(A);
 
+    /*let o = mesh = new SceneImage(0, 0, 5, -1, -1, assets.letter, scene);
+            objects.push(o);
+            objectLayer.add(o);*/
+
+    drawing.addLayer(bgLayer);
     drawing.addLayer(objectLayer);
-
-    let opticLayer = new SceneLayer(camera);
 }
+
+function blending(){
+    blends["MULTIPLY"] = MULTIPLY;
+    blends["DIFFERENCE"] = DIFFERENCE;
+}
+
+
+var sequence = 0;
 
 var t0 = Date.now();
 function update(dt) {
+    dt /= 1000;
+
     let dx = 0;
     if(r) dx += 1;
     if(l) dx -= 1;
@@ -81,7 +131,16 @@ function update(dt) {
     let z = 0;
     if(zi) z += (dt);
     if(zo) z -= (dt);
-    camera.zoom(z * .01);
+    camera.zoom(z);
+
+    let bg = assets.background;
+    
+    let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
+            meshOffset = lerp(.66, .97, seq);
+    
+    mesh.x = (meshOffset * meshOrigin.x) + lerp(744, 117, seq) ;
+    mesh.y = (meshOffset * meshOrigin.y) + lerp(262, 713, seq) ;
+    mesh.scale = meshOffset*.67;
 
     drawing.render(camera);
 };
@@ -98,9 +157,3 @@ function render(){
 }
 // Trigger render loop here, split fps between draw and update
 var init = false; function draw() { if(!init){render();init=true;} }
-
-
-const saveButton = document.getElementById("saveButton");
-      saveButton.addEventListener("click", () => capture.capture(framerate));
-
-const submitButton = document.getElementById()

@@ -32,13 +32,18 @@ class Scene {
 
 class SceneLayer {
 
-  constructor(camera){
+  constructor(camera, blend){
     let w = this.width = camera.width;
     let h = this.height = camera.height;
     
     this.objects = [];
     this.buffer = createGraphics(w, h)
-  }
+    
+    if(blend)
+      this.blend = blend;
+    else 
+      this.blend = "DEFAULT";
+    }
 
   add(object){
     if(!(object instanceof SceneObject)) return;
@@ -61,18 +66,18 @@ class SceneLayer {
 
   render(){
     let buffer = this.buffer;
-        buffer.background(255, 204, 0);
+        buffer.clear();
   }
 }
 
 class SceneObject { 
   
-  constructor(x, y, scene){
+  constructor(x, y, scale, scene){
     this.x = x;
     this.y = y;
 
-    this.width = 5;
-    this.height = 5;
+    if(scale >= 0) this.scale = scale;
+    else this.scale = 1;
     
     this.scene = scene;
     this.init();
@@ -84,27 +89,25 @@ class SceneObject {
   }
   
   render(x, y, multiplier, layer){
-    let w = this.width;
-    let h = this.height;
+    let scale = this.scale;
 
-    if(multiplier){
-      w *= multiplier;
-      h *= multiplier;
-    }
+    if(multiplier) scale *= multiplier;
 
-    if(layer){ //Check if drawing object within layer
-      layer.buffer.ellipse(x, y, w, h);
-      return;
-    }
+    this.display(x, y, scale, layer);
+  }
 
-    ellipse(x, y, w, h);
+  display(x, y, sc, layer) {
+    if(layer)
+      layer.buffer.ellipse(x, y, sc, sc);
+    else
+      ellipse(x, y, sc, sc);
   }
 }
 
 class Camera extends SceneObject {
   
   constructor(x, y, width, height, scene){
-    super(x, y, scene);
+    super(x, y, 1, scene);
     
     this.width = width;
     this.height = height;
@@ -153,34 +156,77 @@ class Camera extends SceneObject {
 
 class SceneImage extends SceneObject {
   
-  constructor(x, y, width, height, image, scene){
-    super(x, y, scene);
+  constructor(x, y, scale, width, height, image, scene){
+    super(x, y, scale, scene);
+
+    let img = this.image = image;
     
     if(width > 0 && height > 0){
       this.width = width;
       this.height = height;
     }
-    
-    this.image = image;
+    else{
+      this.width = img.width;
+      this.height = img.height;
+    }
   }
   
-  render(x, y, multiplier){
+  render(x, y, multiplier, layer){
     let img = this.image;
     if(!img)
       return;
     
     let w = this.width; let h = this.height;
-    
-    if(w && h){
-      if(multiplier){
-        w *= multiplier;
-        h *= multiplier;
-      }
 
-      image(img, x, y, w, h);
-      return;
-    }
+    let m = multiplier;
+    let s = this.scale;
     
-    image(img, x, y);
+    this.display(x, y, Math.floor(w*s*m), Math.floor(h*s*m), img, layer);
   }
+
+  display(x, y, w, h, img, layer){
+    if(layer)
+      layer.buffer.image(img, x, y, w, h);
+    else
+      image(img, x, y, w, h);
+  }
+}
+
+class SceneVideo extends SceneImage {
+  constructor(x, y, scale, width, height, video, scene){
+    super(x, y, scale, width, height, video, scene);
+  }
+  
+  render(x, y, multiplier, layer){
+    super.render(x, y, multiplier, layer);
+  }
+
+  display(x, y, w, h, img, layer){
+    super.display(x, y, w, h, img, layer);
+  }
+}
+
+class SceneImageSequence extends SceneImage {
+
+  constructor(x, y, scale, width, height, images, scene){
+    super(x, y, scale, width, height, images[0], scene);
+
+    this.frames = images;
+    this.index = -1;
+  }
+
+  render(x, y, multiplier, layer){
+    let images = this.frames;
+    let index = this.index;
+
+    if(index >= (images.length-1))
+      this.index = 0;
+    else
+      ++this.index;
+
+    this.image = images[this.index];
+
+    super.render(x, y, multiplier, layer);
+  }
+
 }
