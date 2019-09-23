@@ -1,11 +1,8 @@
 "use strict";
 
-const saveButton = document.getElementById("saveButton");
-saveButton.addEventListener("click", () => capture);
-
 // CONTROLS
 
-var l = false, r = false, u = false, d = false;
+var l = false, r = false, u = false, d = false, zi = false, zo = false;
 window.addEventListener("keydown", function(e){
   let key = e.key;
   
@@ -13,6 +10,8 @@ window.addEventListener("keydown", function(e){
   if(key == "d") r = true;
   if(key == "s") d = true;
   if(key == "w") u = true;
+  if(key == "z") zo = true;
+  if(key == "x") zi = true;
 });
 
 window.addEventListener("keyup", function(e){
@@ -22,38 +21,102 @@ window.addEventListener("keyup", function(e){
   if(key == "d") r = false;
   if(key == "s") d = false;
   if(key == "w") u = false;
+  if(key == "z") zo = false;
+  if(key == "x") zi = false;
 });
 
+/* * * ** * * * * * * * *  * * * * * * * * * * * * * * *  */
 
 const framerate = 24;
 
-const scene = new Scene(1080, 1080);
-const camera = new Camera(0, 0, 640, 640, scene);
+const scene = new Scene(2667, 1500);
+const camera = new Camera(0, 0, 1280, 720, scene);
 
-var canvas;
+var canvas; var canvasHolder = 'canvas-holder';
 var objects = [];
 
 const drawing = new Drawing();
+      var blends = {}
 
-function init(){
-    //drawing.init(camera, scene, framerate);
-    build();
+const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
+
+var assets = {
+  background : "",
+  letters: {
+    "A" : [],
+    "C" : [],
+    "O" : []
+  }
+}
+
+function preload(){
+  let bg = assets.background = createVideo(['/videos/bg.mp4'], () => {
+      bg.loop();
+      bg.volume(0);
+  });
+  bg.hide();
+
+  let letterPath = "images/letters";
+  let letters = assets.letters;
+
+  let letterFramePath = "";
+  for(let i = 0; i < 42; i++){
+    letterFramePath = "A/A_512_" + (i+"").padStart(5, "0") + ".png";
+    letters["A"].push(loadImage(letterPath + "/" + letterFramePath));
+  }
 }
 
 function setup(){
   canvas = createCanvas(camera.width, camera.height);
+    canvas.parent(canvasHolder);
+    canvas.class('mw-100 h-auto');
+
+  build();
+  blending();
+
+  background(0);
+  stroke(255);
+
   frameRate(framerate);
 }
 
+var mesh;
+    let meshOrigin = {x: 480, y:-360};
+    let meshOffset = .67;
+
 function build(){
-    for(let i = 0; i < 50; i++){
-      let o = new SceneObject(Math.floor(Math.random() * scene.width), Math.floor(Math.random() * scene.height), scene);
-      objects.push(o);
-    }
+    let bgLayer = new SceneLayer(camera);
+      let bg = new SceneVideo(0, 0, 1, camera.width, camera.height, assets.background, scene);
+      objects.push(bg);
+      bgLayer.add(bg);
+
+    let objectLayer = new SceneLayer(camera);
+
+    let letters = assets.letters;
+    let A = mesh = new SceneImageSequence(0, 0, 1, -1, -1, letters["A"], scene);
+        objects.push(A);
+        objectLayer.add(A);
+
+    /*let o = mesh = new SceneImage(0, 0, 5, -1, -1, assets.letter, scene);
+            objects.push(o);
+            objectLayer.add(o);*/
+
+    drawing.addLayer(bgLayer);
+    drawing.addLayer(objectLayer);
 }
+
+function blending(){
+    blends["MULTIPLY"] = MULTIPLY;
+    blends["DIFFERENCE"] = DIFFERENCE;
+}
+
+
+var sequence = 0;
 
 var t0 = Date.now();
 function update(dt) {
+    dt /= 1000;
+
     let dx = 0;
     if(r) dx += 1;
     if(l) dx -= 1;
@@ -65,6 +128,20 @@ function update(dt) {
     camera.x = clamp(camera.x + (dx * 10), 0, scene.width - camera.width); 
     camera.y = clamp(camera.y + (dy * 10), 0, scene.height - camera.height);
     
+    let z = 0;
+    if(zi) z += (dt);
+    if(zo) z -= (dt);
+    camera.zoom(z);
+
+    let bg = assets.background;
+    
+    let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
+            meshOffset = lerp(.66, .97, seq);
+    
+    mesh.x = (meshOffset * meshOrigin.x) + lerp(744, 117, seq) ;
+    mesh.y = (meshOffset * meshOrigin.y) + lerp(262, 713, seq) ;
+    mesh.scale = meshOffset*.67;
+
     drawing.render(camera);
 };
 
@@ -73,118 +150,10 @@ function render(){
   requestAnimationFrame(render);
   
   var t1 = Date.now();
-  var dt = (t1 - t0);
+  let dt = (t1 - t0);
 
   update(dt);
+  t0 = t1;
 }
-
-init();
-render();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* * * * * * * * * * *
-
-      Drawing
-
-* * * * * * * * * * */
-
-/*var x = 0, y = 0;
-
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext('2d');
-      ctx.font = "30px Arial";
-
-const video = document.getElementById("video");
-      video.play();
-
-const maskCanvas = document.getElementById("canvasMask");
-const maskCtx = maskCanvas.getContext('2d');
-const maskVideo = document.getElementById("videoMask");
-
-const w = canvas.width, h = canvas.height;
-  
-
-var draw = function(){ 
-  ctx.clearRect(0, 0, w, h);
-  
-  maskCtx.drawImage(maskVideo, x, y); 
-  
-  ctx.drawImage(video, x, y);
-  ctx.fillText("Hi there", 500, 200);
-  
-  let frame = maskCtx.getImageData(0, 0, w, h);
-  let l = frame.data.length / 4;
-  
-  let cols = ctx.getImageData(0, 0, w, h);
-  
-  for (let i = 0; i < l; i++) {
-    let r = frame.data[i * 4 + 0];
-    let g = frame.data[i * 4 + 1];
-    let b = frame.data[i * 4 + 2];
-    if (g > 250 && r > 250 && b > 250)
-      cols.data[i * 4 + 3] = 0;
-  }
-  
-  ctx.putImageData(cols, 0, 0);
-}*/
-
-
-// client-side js
-// run by the browser each time your view template is loaded
-
-// our default array of dreams
-/*const dreams = [
-  'Find and count some sheep',
-  'Climb a really tall mountain',
-  'Wash the dishes'
-];
-
-// define variables that reference elements on our page
-const dreamsList = document.getElementById('dreams');
-const dreamsForm = document.forms[0];
-const dreamInput = dreamsForm.elements['dream'];
-
-const nameForm = document.forms[0];
-const nameInput = nameForm.elements['name'];
-
-// a helper function that creates a list item for a given dream
-const appendNewDream = function(dream) {
-  const newListItem = document.createElement('li');
-  newListItem.innerHTML = dream;
-  dreamsList.appendChild(newListItem);
-}
-
-// iterate through every dream and add it to our page
-dreams.forEach( function(dream) {
-  appendNewDream(dream);
-});
-
-// listen for the form to be submitted and add a new dream when it is
-nameForm.onsubmit = function(event) {
-  // stop our form submission from refreshing the page
-  event.preventDefault();
-
-  // get dream value and add it to the list
-  dreams.push(nameInput.value);
-  appendNewDream(nameInput.value);
-
-  // reset form 
-  nameInput.value = '';
-  nameInput.focus();
-};*/
+// Trigger render loop here, split fps between draw and update
+var init = false; function draw() { if(!init){render();init=true;} }

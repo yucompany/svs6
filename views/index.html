@@ -10,19 +10,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Welcome to Glitch!</title>
-    <meta name="description" content="A cool thing made with Glitch">
+    <title>BE THE VALLEY</title>
+    <meta name="description" content="[Your name here] in the intro for Silicon Valley">
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous" defer></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous" defer></script>
+
     <script src="/p5.min.js"></script>
     <script src="/p5.dom.min.js"></script>
     <script src="/p5.sound.min.js"></script>
     <script src="/js/helpers.js"></script>
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/style.css">
 
     <script src="/js/objects.js"></script>
@@ -33,34 +37,46 @@
   </head>
   
   <body>
-    <header>
-      <h1>
-        svs6 test
-      </h1>
-    </header>
 
-    <main>
-      <form method="POST" action="/submit-name">
-        <input name="username" type="text" maxlength="15" placeholder="John Appleseed">
+    <div id="header" class="container-fluid mt-5">
+      <h1 class="text-center"> BE THE VALLEY </h1>
+    </div>
+
+    <!--<form method="POST" action="/submit-name">
+      <div class="form-group">
+        <input name="fisrstname" type="text" maxlength="7" placeholder="Jeff">
+        <input name="lastname" type="text" maxlength="7" placeholder="Bezos">
         <input type="submit">
-      </form>
+      </div>
+    </form>
       
-      <form id="file-form" action="handler.php" method="POST">
-        <input type="file" id="file-select" name="photos[]" multiple/>
-        <button type="submit" id="upload-button">Upload</button>
-      </form>
+      <div class="container">
+      <video id="video" src="https://cdn.glitch.com/7d80c306-8f9d-443a-88d4-62b7d14049a7%2FSV5_MT_FINAL_v28_EMAILABLE.mp4?v=1568312096276" loop muted crossorigin="anonymous"></video>
+      </div>
 
-      <section class="dreams">
-        <ul id="dreams"></ul>
-      </section>
-      
-      <video id="video" src="https://cdn.glitch.com/7d80c306-8f9d-443a-88d4-62b7d14049a7%2FSV5_MT_FINAL_v28_EMAILABLE.mp4?v=1568312096276" loop muted crossorigin="anonymous"></video> <!-- Hide video element, draw frames to canvas -->
-      
-      <section class="preview">
+      <div class="container">
         <button id="saveButton">Save!</button>
-      </section>
-      
-    </main>
+      </div>-->
+    <div id="canvas-holder" class="d-flex justify-content-center p-3"><!-- p5 canvas goes here --></div>
+
+    <div class="d-flex justify-content-center py-5">
+      <form method="POST" action="/submit-name">
+        <div class="form-group">
+          <input id="firstinput" class="form-control" name="fisrstname" type="text" maxlength="7" placeholder="Jeff">
+          <small if="firstInputHelp" class="form-text text-muted text-right">Line 1</small>
+        </div>
+        <div class="form-group">
+          <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7" placeholder="Bezos">
+          <small if="lastInputHelp" class="form-text text-muted text-right">Line 2</small>
+        </div>
+        <input type="submit" class="btn btn-primary">
+      </form>
+    </div>
+
+    <div class="d-flex justify-content-center py-5">
+      <button class="btn btn-primary mx-3">Download Photo</button>
+      <button class="btn btn-primary mx-3">Download Video</button>
+    </div>
 
   </body>
 </html>
