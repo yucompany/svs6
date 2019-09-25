@@ -209,6 +209,7 @@ class SceneMask extends SceneImage {
   }
 
   render(x, y, multiplier, layer){
+    
     if(layer){
       let image = this.image;
           image.loadPixels();
@@ -228,7 +229,11 @@ class SceneMask extends SceneImage {
 
       buffer.updatePixels();
     }
+    
+    //super.render(x, y, multiplier, layer);
   }
+
+  
 }
 
 class SceneImageSequence extends SceneImage {

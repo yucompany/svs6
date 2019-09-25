@@ -168,9 +168,9 @@ function construct(first, last){
 
  let bg = assets.background;
  let matte = assets.matte;
- 
-     bg.play();
-     matte.play();
+
+    bg.stop(); bg.play();
+     
 
   built = 0;
 }
@@ -179,29 +179,12 @@ function construct(first, last){
 var sequence = 0;
 var built = 0;
 
-var t0 = Date.now();
 function update(dt) {
     dt /= 1000;
 
-    /*let dx = 0;
-    if(r) dx += 1;
-    if(l) dx -= 1;
-    
-    let dy = 0;
-    if(u) dy -= 1;
-    if(d) dy += 1;
-    
-    camera.x = clamp(camera.x + (dx * 10), 0, scene.width - camera.width); 
-    camera.y = clamp(camera.y + (dy * 10), 0, scene.height - camera.height);
-    
-    let z = 0;
-    if(zi) z += (dt);
-    if(zo) z -= (dt);
-    camera.zoom(z);*/
-
     let bg = assets.background;
     let matte = assets.matte;
-       // matte.time(bg.time());
+        matte.time(bg.time());
     
     let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
             offset = lerp(.66, .97, seq);
@@ -219,12 +202,18 @@ function update(dt) {
         built++;
       }
     }
-    
-    
 
     drawing.render(camera);
 };
 
+var t0 = Date.now();
+function draw(){  // Our tick function imported from p5.js
+  var t1 = Date.now();
+  let dt = (t1 - t0);
+
+  update(dt);
+  t0 = t1;
+}
 
 function render(){
   requestAnimationFrame(render);
@@ -236,4 +225,4 @@ function render(){
   t0 = t1;
 }
 // Trigger render loop here, split fps between draw and update
-var init = false; function draw() { if(!init){render();init=true;} }
+//var init = false; function draw() { if(!init){render();init=true;} }
