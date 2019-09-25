@@ -42,31 +42,60 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 
 var assets = {
   background : "",
+  matte: "",
   letters: {
-    "A" : [],
-    "C" : [],
-    "O" : []
+
   }
 }
 
 function preload(){
-  let bg = assets.background = createVideo(['/videos/bg.mp4'], () => {
-      bg.loop();
+  let bg = assets.background = createVideo(['/videos/bg222.mp4'], () => {
+      bg.time(0);
       bg.volume(0);
+
+      bg.onended(function(){
+        console.log("Video has ended. Try again?");
+      });
   });
   bg.hide();
 
-  let letterPath = "images/letters";
-  let letters = assets.letters;
+  let matte = assets.matte = createVideo(['/videos/mat222.mp4'], () => {
+    matte.time(0);
+    matte.volume(0);
 
-  let letterFramePath = "";
-  for(let i = 0; i < 42; i++){
-    letterFramePath = "A/A_512_" + (i+"").padStart(5, "0") + ".png";
-    letters["A"].push(loadImage(letterPath + "/" + letterFramePath));
+    matte.onended(function(){
+      console.log("Video has ended. Try again?");
+    });
+  });
+  matte.hide();
+
+  
+  function fetchLetters(letter){
+    let letterPath = "images/letters/" + letter;
+  
+    let letterImages = [];
+    for(let i = 0; i < 12; i++)
+      letterImages.push(loadImage(letterPath + "/" + i + ".png"));
+    
+    return letterImages;
+  }
+
+  var letters = assets.letters;
+  for(let i = 0; i < VALID_CHARS.length; i++){
+    let char = VALID_CHARS[i];
+
+    if(char != " ")
+      assets.letters[char] = fetchLetters(char);
   }
 }
 
+var lineA = { origin: {x: 240, y:-620}, object: {} }
+var lineB = { origin: {x: 100, y:-560}, object: {} }
+var lines = [ lineA, lineB ];
+
 function setup(){
+  pixelDensity(1);
+
   canvas = createCanvas(camera.width, camera.height);
     canvas.parent(canvasHolder);
     canvas.class('mw-100 h-auto');
@@ -80,9 +109,9 @@ function setup(){
   frameRate(framerate);
 }
 
-var mesh;
-    let meshOrigin = {x: 480, y:-360};
-    let meshOffset = .67;
+
+
+var offset = .67;
 
 function build(){
     let bgLayer = new SceneLayer(camera);
@@ -92,14 +121,13 @@ function build(){
 
     let objectLayer = new SceneLayer(camera);
 
-    let letters = assets.letters;
-    let A = mesh = new SceneImageSequence(0, 0, 1, -1, -1, letters["A"], scene);
-        objects.push(A);
-        objectLayer.add(A);
+    let ao = lineA.object = new Line(0, 0, 550, 275, 1, scene);
+    let bo = lineB.object = new Line(0, 0, 550, 275, 1, scene);
+    let matte = new SceneMask(0, 0, 1, camera.width, camera.height, assets.matte, [255, 255, 255], scene);
 
-    /*let o = mesh = new SceneImage(0, 0, 5, -1, -1, assets.letter, scene);
-            objects.push(o);
-            objectLayer.add(o);*/
+    objectLayer.add(ao);
+    objectLayer.add(bo);
+    objectLayer.add(matte);
 
     drawing.addLayer(bgLayer);
     drawing.addLayer(objectLayer);
@@ -110,14 +138,52 @@ function blending(){
     blends["DIFFERENCE"] = DIFFERENCE;
 }
 
+function construct(first, last){
+  console.log(first, last);
+  let letters = assets.letters;
+  
+  let char = "";
+  let letter;
+  let container;
+  
+  container = lineA.object;
+  container.clear();
+  for(let i = 0; i < first.length; i++){
+     char = first[i];
+     letter = new Letter(letters[char], scene);
+
+     container.add(letter);
+  }
+  container.reset();
+
+  container = lineB.object;
+  container.clear();
+  for(let i = 0; i < last.length; i++){
+    char = last[i];
+    letter = new Letter(letters[char], scene);
+
+    container.add(letter);
+ }
+ container.reset();
+
+ let bg = assets.background;
+ let matte = assets.matte;
+ 
+     bg.play();
+     matte.play();
+
+  built = 0;
+}
+
 
 var sequence = 0;
+var built = 0;
 
 var t0 = Date.now();
 function update(dt) {
     dt /= 1000;
 
-    let dx = 0;
+    /*let dx = 0;
     if(r) dx += 1;
     if(l) dx -= 1;
     
@@ -131,16 +197,30 @@ function update(dt) {
     let z = 0;
     if(zi) z += (dt);
     if(zo) z -= (dt);
-    camera.zoom(z);
+    camera.zoom(z);*/
 
     let bg = assets.background;
+    let matte = assets.matte;
+       // matte.time(bg.time());
     
     let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
-            meshOffset = lerp(.66, .97, seq);
+            offset = lerp(.66, .97, seq);
+
+    let line;
+    for(let i = 0; i < lines.length; i++){
+      line = lines[i];
+
+      line.object.x = (offset * line.origin.x) + lerp(744, 117, seq) ;
+      line.object.y = (offset * line.origin.y) + lerp(262, 713, seq) ;
+      line.object.scale = offset*.67;
+
+      if(bg.time() > 3.625 && built <= 1){
+        line.object.build();
+        built++;
+      }
+    }
     
-    mesh.x = (meshOffset * meshOrigin.x) + lerp(744, 117, seq) ;
-    mesh.y = (meshOffset * meshOrigin.y) + lerp(262, 713, seq) ;
-    mesh.scale = meshOffset*.67;
+    
 
     drawing.render(camera);
 };

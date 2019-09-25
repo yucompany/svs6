@@ -71,7 +71,7 @@ var name = '';
 
 app.post('/submit-name', (req, res) => {
    name = req.body.username;
-   res.end();
+   res.send("shit");
 });
 
 app.post('/addFrame', (req, res) => {
