@@ -64,12 +64,12 @@
     <div class="d-flex justify-content-center py-5">
       <form id="nameform" name="nameform">
         <div class="form-group">
+          <small if="firstInputHelp" class="form-text text-muted text-left">Line 1:</small>
           <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7" placeholder="Jeff">
-          <small if="firstInputHelp" class="form-text text-muted text-right">Line 1</small>
         </div>
         <div class="form-group">
+          <small if="lastInputHelp" class="form-text text-muted text-left">Line 2:</small>
           <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7" placeholder="Bezos">
-          <small if="lastInputHelp" class="form-text text-muted text-right">Line 2</small>
         </div>
         <input type="submit" class="btn btn-primary">
       </form>
