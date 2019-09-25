@@ -70,7 +70,7 @@ function preload(){
   });
   matte.hide();
 
-  let flares = assets.flares = createVideo(['/videos/flares.mp4'], () => {
+  /*let flares = assets.flares = createVideo(['/videos/flares.mp4'], () => {
     flares.time(0);
     flares.volume(0);
 
@@ -78,11 +78,12 @@ function preload(){
       console.log("Video has ended. Try again?");
     });
   });
-  flares.hide();
+  flares.hide();*/
+  let flares = assets.flares = loadImage("images/optics.png");
 
   
   function fetchLetters(letter){
-    let letterPath = "images/letters/" + letter;
+    let letterPath = "images/letters_optim/" + letter;
   
     let letterImages = [];
     for(let i = 0; i < 12; i++)
@@ -112,7 +113,7 @@ function setup(){
     canvas.class('mw-100 h-auto');
 
   build();
-  blending();
+  defineBlends();
 
   background(0);
   stroke(255);
@@ -126,30 +127,33 @@ var offset = .67;
 
 function build(){
     let bgLayer = new SceneLayer(camera);
-      let bg = new SceneVideo(0, 0, 1, camera.width, camera.height, assets.background, scene);
-      objects.push(bg);
-      bgLayer.add(bg);
+    let bg = new SceneVideo(0, 0, 1, camera.width, camera.height, assets.background, scene);
+        bgLayer.add(bg);
 
     let objectLayer = new SceneLayer(camera);
 
-    let ao = lineA.object = new Line(0, 0, 550, 275, 1, scene);
-    let bo = lineB.object = new Line(0, 0, 550, 275, 1, scene);
+    let ao = lineA.object = new Line(0, 0, 525, 262, 1, scene);
+    let bo = lineB.object = new Line(0, 0, 525, 262, 1, scene);
     let matte = new SceneMask(0, 0, 1, camera.width, camera.height, assets.matte, [255, 255, 255], scene);
 
-    objectLayer.add(ao);
-    objectLayer.add(bo);
-    objectLayer.add(matte);
+        objectLayer.add(ao);
+        objectLayer.add(bo);
+        objectLayer.add(matte);
     
-    let fxLayer = new SceneLayer(camera);
-    
+    let fxLayer = new SceneLayer(camera,"SCREEN");
+    let flares = new SceneImage(0, 0, 1, camera.width, camera.height, assets.flares, scene);
+
+      fxLayer.add(flares);
 
     drawing.addLayer(bgLayer);
     drawing.addLayer(objectLayer);
+    drawing.addLayer(fxLayer);
 }
 
-function blending(){
+function defineBlends(){
     blends["MULTIPLY"] = MULTIPLY;
     blends["DIFFERENCE"] = DIFFERENCE;
+    blends["SCREEN"] = SCREEN;
 }
 
 function construct(first, last){
@@ -198,9 +202,9 @@ function update(dt) {
 
     let bg = assets.background;
     let matte = assets.matte;
-    let flares = assets.flares;
+   // let flares = assets.flares;
         matte.time(bg.time());
-        flares.time(bg.time());
+      //  flares.time(bg.time());
     
     let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
             offset = lerp(.66, .97, seq);
@@ -213,7 +217,11 @@ function update(dt) {
       line.object.y = (offset * line.origin.y) + lerp(262, 713, seq) ;
       line.object.scale = offset*.67;
 
-      if(bg.time() > 3.625 && built <= 1){
+      if(i == 0 && bg.time() > 3.625 && built <= 0){
+        line.object.build();
+        built++;
+      }
+      else if(i == 1 && bg.time() > 5.08 && built <= 1){
         line.object.build();
         built++;
       }
@@ -223,9 +231,12 @@ function update(dt) {
 };
 
 var t0 = Date.now();
+var timeDelta = 0;
 function draw(){  // Our tick function imported from p5.js
   var t1 = Date.now();
   let dt = (t1 - t0);
+      timeDelta = (dt / 1000);
+
 
   update(dt);
   t0 = t1;
@@ -236,6 +247,7 @@ function render(){
   
   var t1 = Date.now();
   let dt = (t1 - t0);
+      timeDelta = (dt / 1000);
 
   update(dt);
   t0 = t1;

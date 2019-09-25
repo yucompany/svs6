@@ -377,15 +377,22 @@ class Letter extends SceneImageSequence {
     super(0, 0, 1, -1, -1, images, scene, false);
 
     this.building = false;
+    this.buildTime = 0.0; this.buildDuration = (2 - 1.67)*Math.random() + 1.67;
+
     this.index = -1;
   }
 
   build(){ super.next(); }
 
-  reset(){ this.index = -1; this.building = false; }
+  reset(){ this.index = -1; this.building = false; this.buildTime = 0; }
 
   render(x, y, multiplier, layer){
-    if(this.building) this.build();
+    if(this.building && this.index < (this.frames.length-1)){
+      let r = Math.random();
+      if(r <= clamp(this.buildTime / this.buildDuration, 0, 1)) this.build();
+
+      this.buildTime += timeDelta;
+    }
 
     super.render(x, y, multiplier, layer);
   }
