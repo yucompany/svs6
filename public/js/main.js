@@ -43,6 +43,7 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 var assets = {
   background : "",
   matte: "",
+  flares: "",
   letters: {
 
   }
@@ -68,6 +69,16 @@ function preload(){
     });
   });
   matte.hide();
+
+  let flares = assets.flares = createVideo(['/videos/flares.mp4'], () => {
+    flares.time(0);
+    flares.volume(0);
+
+    flares.onended(function(){
+      console.log("Video has ended. Try again?");
+    });
+  });
+  flares.hide();
 
   
   function fetchLetters(letter){
@@ -128,6 +139,9 @@ function build(){
     objectLayer.add(ao);
     objectLayer.add(bo);
     objectLayer.add(matte);
+    
+    let fxLayer = new SceneLayer(camera);
+    
 
     drawing.addLayer(bgLayer);
     drawing.addLayer(objectLayer);
@@ -184,7 +198,9 @@ function update(dt) {
 
     let bg = assets.background;
     let matte = assets.matte;
+    let flares = assets.flares;
         matte.time(bg.time());
+        flares.time(bg.time());
     
     let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
             offset = lerp(.66, .97, seq);
