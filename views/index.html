@@ -20,9 +20,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="../public/css/style.css">
 
-    <script src="../public/js/objects.js"></script>
-    <script src="../public/js/drawing.js"></script>
-    <script src="../public/js/capture.js"></script>
+    <script src="/js/objects.js"></script>
+    <script src="/js/drawing.js"></script>
+    <script src="/js/capture.js"></script>
+    
+    <script src="/js/forms.js" defer></script>
+    <script src="/js/buttons.js" defer></script>
 
     <script src="../public/js/main.js" defer></script>
   </head>
@@ -55,14 +58,14 @@
     <div id="canvas-holder" class="d-flex justify-content-center p-3"><!-- p5 canvas goes here --></div>
 
     <div class="d-flex justify-content-center py-5">
-      <form method="POST" action="/submit-name">
+      <form id="nameform" name="nameform">
         <div class="form-group">
-          <input id="firstinput" class="form-control" name="fisrstname" type="text" maxlength="7" placeholder="Jeff">
-          <small if="firstInputHelp" class="form-text text-muted text-right">Line 1</small>
+          <small if="firstInputHelp" class="form-text text-muted text-left">Line 1:</small>
+          <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7" placeholder="Jeff">
         </div>
         <div class="form-group">
+          <small if="lastInputHelp" class="form-text text-muted text-left">Line 2:</small>
           <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7" placeholder="Bezos">
-          <small if="lastInputHelp" class="form-text text-muted text-right">Line 2</small>
         </div>
         <input type="submit" class="btn btn-primary">
       </form>
