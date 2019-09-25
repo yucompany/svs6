@@ -50,13 +50,13 @@ var assets = {
 }
 
 function preload(){
-  let bg = assets.background = createVideo(['/videos/bg.mp4'], () => {
+  let bg = assets.background = createVideo(['../../assets/videos/bg.mp4'], () => {
       bg.loop();
       bg.volume(0);
   });
   bg.hide();
 
-  let letterPath = "images/letters";
+  let letterPath = "../../assets/images/letters";
   let letters = assets.letters;
 
   let letterFramePath = "";
