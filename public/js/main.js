@@ -50,7 +50,7 @@ var assets = {
 }
 
 function preload(){
-  let bg = assets.background = createVideo(['/videos/bg222.mp4'], () => {
+  let bg = assets.background = createVideo(['../../assets/videos/bg222.mp4'], () => {
       bg.time(0);
       bg.volume(0);
 
@@ -60,7 +60,7 @@ function preload(){
   });
   bg.hide();
 
-  let matte = assets.matte = createVideo(['/videos/mat222.mp4'], () => {
+  let matte = assets.matte = createVideo(['../../assets/videos/mat222.mp4'], () => {
     matte.time(0);
     matte.volume(0);
 
@@ -79,11 +79,11 @@ function preload(){
     });
   });
   flares.hide();*/
-  let flares = assets.flares = loadImage("images/optics.png");
+  let flares = assets.flares = loadImage("../../assets/images/optics.png");
 
   
   function fetchLetters(letter){
-    let letterPath = "images/letters_optim/" + letter;
+    let letterPath = "../../assets/images/letters_optim/" + letter;
   
     let letterImages = [];
     for(let i = 0; i < 12; i++)
@@ -157,7 +157,8 @@ function defineBlends(){
 }
 
 function construct(first, last){
-  console.log(first, last);
+  console.log("Building " + first + " " + last);
+
   let letters = assets.letters;
   
   let char = "";
@@ -185,11 +186,8 @@ function construct(first, last){
  container.reset();
 
  let bg = assets.background;
- let matte = assets.matte;
-
-    bg.stop(); bg.play();
-     
-
+    bg.stop(); 
+    bg.play();
   built = 0;
 }
 
@@ -202,9 +200,7 @@ function update(dt) {
 
     let bg = assets.background;
     let matte = assets.matte;
-   // let flares = assets.flares;
         matte.time(bg.time());
-      //  flares.time(bg.time());
     
     let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
             offset = lerp(.66, .97, seq);
@@ -241,16 +237,3 @@ function draw(){  // Our tick function imported from p5.js
   update(dt);
   t0 = t1;
 }
-
-function render(){
-  requestAnimationFrame(render);
-  
-  var t1 = Date.now();
-  let dt = (t1 - t0);
-      timeDelta = (dt / 1000);
-
-  update(dt);
-  t0 = t1;
-}
-// Trigger render loop here, split fps between draw and update
-//var init = false; function draw() { if(!init){render();init=true;} }
