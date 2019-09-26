@@ -52,7 +52,7 @@ app.get('/', function(request, response) {
 });
 
 app.get('/view', (req, res) => {
-  res.sendFile(__dirname + '/output/svs6.mp4');
+  res.sendFile(__dirname + '/output/unnamed.mp4');
 });
 
 
@@ -84,6 +84,8 @@ app.post('/addFrame', (req, res) => {
 app.post('/encode', (req, res) => {
   let oldTemp = tempDir;
   console.log(outputDir + "/" + req.body.path + ".mp4");
+
+  res.setHeader("Content-Type", "video/mp4");
   
   var proc = new ffmpeg()
       .input(tempDir.name + '/frame-%03d.jpg')
@@ -97,6 +99,7 @@ app.post('/encode', (req, res) => {
         '-b:v 1024',
         '-b:a 128k'
       ])
+      .output(outputDir + '/' + req.body.path + '.mp4')
       .on('start', function(){
         console.log("Begin render!");
       })
@@ -106,11 +109,12 @@ app.post('/encode', (req, res) => {
       .on('end', function() {
         console.log('End render!');
         oldTemp.removeCallback();
+
+        res.send('/view');
       })
-      .save(outputDir + '/' + req.body.path + '.mp4')
+      .run()
 
   tempDir = tmp.dirSync({unsafeCleanup: true});
-  res.end();
 });
 
 // listen for requests :)

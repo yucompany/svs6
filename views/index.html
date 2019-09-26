@@ -1,3 +1,12 @@
+<!-- This is a static file -->
+<!-- served from your routes in server.js -->
+
+<!-- You might want to try something fancier: -->
+<!-- html/nunjucks docs: https://mozilla.github.io/nunjucks/ -->
+<!-- pug: https://pugjs.org/ -->
+<!-- haml: http://haml.info/ -->
+<!-- hbs(handlebars): http://handlebarsjs.com/ -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,13 +21,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous" defer></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous" defer></script>
 
-    <script src="../lib/p5.min.js"></script>
-    <script src="../lib/p5.dom.min.js"></script>
-    <script src="../lib/p5.sound.min.js"></script>
-    <script src="../public/js/helpers.js"></script>
+    <script src="/p5.min.js"></script>
+    <script src="/p5.dom.min.js"></script>
+    <script src="/p5.sound.min.js"></script>
+    <script src="/js/helpers.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
     <script src="../public/js/objects.js"></script>
     <script src="../public/js/drawing.js"></script>
@@ -27,53 +36,33 @@
     <script src="../public/js/forms.js" defer></script>
     <script src="../public/js/buttons.js" defer></script>
 
-    <script src="../public/js/main.js" defer></script>
+    <script src="/js/main.js" defer></script>
   </head>
   
   <body>
-
-    <div id="header" class="container-fluid mt-5">
+    <!--<div id="header" class="container-fluid mt-5">
       <h1 class="text-center"> BE THE VALLEY </h1>
-    </div>
+    </div>-->
 
-	<div id="disclaimer" class="container-fluid mt-3">
-      <h3 class="text-center"> For technical testing only - not reflective of design. </h3>
-    </div>
+    <div id="canvas-holder" class="d-flex justify-content-center py-5"><!-- p5 canvas goes here --></div>
 
-    <!--<form method="POST" action="/submit-name">
-      <div class="form-group">
-        <input name="fisrstname" type="text" maxlength="7" placeholder="Jeff">
-        <input name="lastname" type="text" maxlength="7" placeholder="Bezos">
-        <input type="submit">
-      </div>
-    </form>
-      
-      <div class="container">
-      <video id="video" src="https://cdn.glitch.com/7d80c306-8f9d-443a-88d4-62b7d14049a7%2FSV5_MT_FINAL_v28_EMAILABLE.mp4?v=1568312096276" loop muted crossorigin="anonymous"></video>
-      </div>
-
-      <div class="container">
-        <button id="saveButton">Save!</button>
-      </div>-->
-    <div id="canvas-holder" class="d-flex justify-content-center p-3"><!-- p5 canvas goes here --></div>
-
-    <div class="d-flex justify-content-center py-5">
+    <div class="d-flex justify-content-center p-3">
       <form id="nameform" name="nameform">
         <div class="form-group">
           <small if="firstInputHelp" class="form-text text-muted text-left">Line 1:</small>
-          <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7" placeholder="Jeff">
+          <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7">
         </div>
         <div class="form-group">
           <small if="lastInputHelp" class="form-text text-muted text-left">Line 2:</small>
-          <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7" placeholder="Bezos">
+          <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7">
         </div>
-        <input type="submit" class="btn btn-primary">
+        <input type="submit" class="btn btn-primary" value="Generate">
       </form>
     </div>
 
     <div class="d-flex justify-content-center py-5">
-      <button class="btn btn-primary mx-3">Download Photo</button>
-      <button class="btn btn-primary mx-3">Download Video</button>
+      <button id="dlPhoto" class="btn btn-primary mx-3">Download Photo</button>
+      <button id="dlVideo" class="btn btn-primary mx-3">Download Video</button>
     </div>
 
   </body>
