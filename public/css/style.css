@@ -3,12 +3,12 @@
 
 @font-face {
   font-family: "Helvetica Condensed";
-  src: url("/fonts/HelveticaNeueLTStd-BlkCn.otf");
+  src: url("../../assets/fonts/HelveticaNeueLTStd-BlkCn.otf");
 }
 
 @font-face {
   font-family: "Open Sans";
-  src: url("/fonts/OpenSans-Regular.ttf");
+  src: url("../../assets/fonts/OpenSans-Regular.ttf");
 }
 
 h1 {

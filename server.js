@@ -1,8 +1,4 @@
 
-'use strict';
-
-
-
 // init project
 const express = require('express');
 
@@ -29,10 +25,10 @@ var outputDir = __dirname + "/output";
 
 // Using
 
-app.use(express.static('public'))
-   .use(express.static('assets'))
-   .use(express.static('lib'))
-   .use(express.static('output'));
+app.use('/public', express.static('public'))
+   .use('/assets', express.static('assets'))
+   .use('/lib', express.static('lib'))
+   .use('/output', express.static('output'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
@@ -57,10 +53,6 @@ app.get('/', function(request, response) {
 
 app.get('/view', (req, res) => {
   res.sendFile(__dirname + '/output/unnamed.mp4');
-});
-
-app.get('/test', (req, res) => {
-  res.send("test");
 });
 
 
