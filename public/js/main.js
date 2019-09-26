@@ -50,7 +50,7 @@ var assets = {
 }
 
 function preload(){
-  let bg = assets.background = createVideo(['/videos/bg222.mp4'], () => {
+  let bg = assets.background = createVideo(['/videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(0);
 
@@ -58,7 +58,8 @@ function preload(){
         console.log("Video has ended. Try again?");
       });
   });
-  bg.hide();
+  bg.hide(); 
+  bg.hideControls();
 
   let matte = assets.matte = createVideo(['/videos/mat222.mp4'], () => {
     matte.time(0);
@@ -68,37 +69,10 @@ function preload(){
       console.log("Video has ended. Try again?");
     });
   });
-  matte.hide();
+  matte.hide(); 
+  matte.hideControls();
 
-  /*let flares = assets.flares = createVideo(['/videos/flares.mp4'], () => {
-    flares.time(0);
-    flares.volume(0);
-
-    flares.onended(function(){
-      console.log("Video has ended. Try again?");
-    });
-  });
-  flares.hide();*/
-  let flares = assets.flares = loadImage("images/optics.png");
-
-  
-  function fetchLetters(letter){
-    let letterPath = "images/letters_optim/" + letter;
-  
-    let letterImages = [];
-    for(let i = 0; i < 12; i++)
-      letterImages.push(loadImage(letterPath + "/" + i + ".png"));
-    
-    return letterImages;
-  }
-
-  var letters = assets.letters;
-  for(let i = 0; i < VALID_CHARS.length; i++){
-    let char = VALID_CHARS[i];
-
-    if(char != " ")
-      assets.letters[char] = fetchLetters(char);
-  }
+  let flares = assets.flares = loadImage("/images/optics.png");
 }
 
 var lineA = { origin: {x: 240, y:-620}, object: {} }
@@ -120,8 +94,6 @@ function setup(){
 
   frameRate(framerate);
 }
-
-
 
 var offset = .67;
 
@@ -156,41 +128,118 @@ function defineBlends(){
     blends["SCREEN"] = SCREEN;
 }
 
-function construct(first, last){
-  console.log(first, last);
+var FIRSTNAME, LASTNAME;
+
+function loadLetter(letter, callback){
   let letters = assets.letters;
-  
-  let char = "";
-  let letter;
-  let container;
-  
-  container = lineA.object;
-  container.clear();
-  for(let i = 0; i < first.length; i++){
-     char = first[i];
-     letter = new Letter(letters[char], scene);
-
-     container.add(letter);
+  if(letters.hasOwnProperty(letter)){
+    callback(letters[letter])
   }
-  container.reset();
+  else {
+    let path = "images/letters/";
+    if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/"
 
-  container = lineB.object;
-  container.clear();
-  for(let i = 0; i < last.length; i++){
-    char = last[i];
-    letter = new Letter(letters[char], scene);
+    let lt = letter;
+    if(letter == "@") lt = "AT";
+    else if(letter == "#") lt = "HASH";
+    else if(letter == "+") lt = "PLUS";
+    else if(letter == "-") lt = "SUB";
 
-    container.add(letter);
- }
- container.reset();
+    let letterPath = path + lt + "12f";
 
- let bg = assets.background;
- let matte = assets.matte;
+    let loaded = 0;
+    let letterImages = [];
+      for(let i = 0; i < 12; i++) letterImages.push(null);
+    
+    for(let i = 0; i < 12; i++) loadImage(letterPath + "/" + i + ".png", function(image){
+      pushImage(i, image);
+    });
+    
+    function pushImage(i, image){
+      console.log(image);
+      ++loaded;
+      letterImages[i] = image;
 
-    bg.stop(); bg.play();
-     
+      if(loaded >= 11){
+        letters[letter] = letterImages;
+        callback(letterImages);
+      }
+    }
+  }
+}
 
-  built = 0;
+function loadName(name, callback){
+  if(name.length <= 0)
+    callback();
+  else{
+    let loaded = 0; let len = name.length;
+
+    function onLoadLetter(){
+      ++loaded;
+      if(loaded >= len)
+        callback();
+    }
+
+    for(let i = 0; i < name.length; i++){
+      let char = name[i];
+      if(char != " ")  loadLetter(char, onLoadLetter);
+      else  onLoadLetter();
+    }
+  }
+}
+
+function construct(first, last){
+  console.log("Building " + first + " " + last);
+
+  FIRSTNAME = first;
+  LASTNAME = last;
+
+  let loaded = 0;
+
+  loadName(first, onLoadLines);
+  loadName(last, onLoadLines);
+  
+  function onLoadLines(){
+    ++loaded;
+    if(loaded <= 1)
+      return;
+
+    let letters = assets.letters;
+        console.log(letters);
+  
+    let char = "";
+    let letter;
+    let container;
+
+    container = lineA.object;
+    container.clear();
+    for(let i = 0; i < first.length; i++){
+      char = first[i];
+      letter = new Letter(letters[char], scene);
+
+      container.add(letter);
+    }
+    container.reset();
+
+    container = lineB.object;
+    container.clear();
+    for(let i = 0; i < last.length; i++){
+      char = last[i];
+      letter = new Letter(letters[char], scene);
+
+      container.add(letter);
+    }
+    container.reset();
+
+    let bg = assets.background;
+
+      bg.stop(); 
+      bg.play();
+
+      built = 0;
+
+    capture.beginCapture(framerate);
+  }
 }
 
 

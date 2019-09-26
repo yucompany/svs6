@@ -18,7 +18,6 @@ class Scene {
     if(index > -1) return;
     
     objects.push(object);
-    console.log("Added : " + object.name);
   }
   
   unregister(object){
@@ -53,7 +52,6 @@ class SceneLayer {
     if(index > -1) return;
     
     objects.push(object);
-    console.log("Added : " + object.name);
   }
   
   remove(object){
@@ -239,7 +237,7 @@ class SceneMask extends SceneImage {
 class SceneImageSequence extends SceneImage {
 
   constructor(x, y, scale, width, height, images, scene, wraps){
-    super(x, y, scale, width, height, images[0], scene);
+      super(x, y, scale, width, height, images[0], scene);
 
     this.frames = images;
     this.index = 0;
@@ -354,8 +352,9 @@ class SceneLineGroup extends SceneGroup {
 
         if(objects.length <= 1)
           interval = 0;
-        else
+        else{
           interval = (1.0*i) / (objects.length - 1);
+        }
 
         ex = x + scale*dx*interval;
         ey = y + scale*dy*interval;
@@ -402,14 +401,12 @@ class Line extends SceneLineGroup {
   
   build(){
     let objects = this.objects;
-
     for(let i = 0; i < objects.length; i++)
       objects[i].building = true;
   }
 
   reset(){
     let objects = this.objects;
-
     for(let i = 0; i < objects.length; i++)
       objects[i].reset();
   }

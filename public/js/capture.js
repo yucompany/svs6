@@ -1,5 +1,7 @@
 "use strict";
 
+var videoContainer;
+
 class Capture {
 
   constructor(name, duration, format){
@@ -16,12 +18,15 @@ class Capture {
       this.format = 'jpg';
 
     this.capturing = false;
+    this.encoding = false;
 
     this.frames = 0;
     this.totalFrames = 0;
+
+    this.captured = [];
   }
 
-  capture(fps){
+  beginCapture(fps){
     let capturing = this.capturing;
     if(capturing)
       return;
@@ -30,14 +35,34 @@ class Capture {
     
     let f = this.format; let d = this.duration;
     saveFrames('frame', f, d, fps, function(arr) {
-      this.frames = 0; 
-      let tf = this.totalFrames = arr.length;
-  
-      for(let i = 0; i < tf; i++)
-        this.sendFrame(arr[i].imageData);
+      this.captured = arr;
+      this.capturing = false;
     }.bind(this));
   }
 
+  get photo(){ 
+    let captured = this.captured;
+    if(captured.length <= 0)
+      return null;
+    else
+      return captured[captured.length-1];
+  }
+
+  get video(){
+    let encoding = this.encoding;
+    if(encoding)
+      return;
+
+    this.encoding = true;
+    
+    let captured = this.captured;
+
+    this.frames = 0; let tf = this.totalFrames = captured.length;
+  
+    for(let i = 0; i < tf; i++)
+      this.sendFrame(captured[i].imageData);
+    this.encoding = false;
+  }
 
   sendFrame(frame){
     ++this.frames;
@@ -85,7 +110,15 @@ class Capture {
       },
       
       success: function(data){
-        console.log("Succesfully triggered encoding!");
+        console.log("Received " + data);
+
+        let link = document.createElement('a');
+            link.href = data;
+            link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
       }
     })
   }

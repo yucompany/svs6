@@ -1,6 +1,17 @@
 "use strict";
 
-const saveButton = document.getElementById("saveButton");
-      saveButton.addEventListener("click", () => capture.capture(framerate));
+//const saveButton = document.getElementById("saveButton");
+ //     saveButton.addEventListener("click", () => capture.capture(framerate));
 
-const submitButton = document.getElementById("submitButton");
+
+const downloadPhoto = document.getElementById("dlPhoto");
+const downloadVideo = document.getElementById("dlVideo");
+
+    downloadPhoto.addEventListener("click", () => { save(canvas, "screen.jpg"); })
+
+    downloadVideo.addEventListener("click", () => { 
+        let vid = capture.video;
+        console.log(vid);
+
+        downloadVideo.href = vid;
+    });

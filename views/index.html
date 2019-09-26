@@ -40,44 +40,29 @@
   </head>
   
   <body>
-    <div id="header" class="container-fluid mt-5">
+    <!--<div id="header" class="container-fluid mt-5">
       <h1 class="text-center"> BE THE VALLEY </h1>
-    </div>
+    </div>-->
 
-    <!--<form method="POST" action="/submit-name">
-      <div class="form-group">
-        <input name="fisrstname" type="text" maxlength="7" placeholder="Jeff">
-        <input name="lastname" type="text" maxlength="7" placeholder="Bezos">
-        <input type="submit">
-      </div>
-    </form>
-      
-      <div class="container">
-      <video id="video" src="https://cdn.glitch.com/7d80c306-8f9d-443a-88d4-62b7d14049a7%2FSV5_MT_FINAL_v28_EMAILABLE.mp4?v=1568312096276" loop muted crossorigin="anonymous"></video>
-      </div>
+    <div id="canvas-holder" class="d-flex justify-content-center py-5"><!-- p5 canvas goes here --></div>
 
-      <div class="container">
-        <button id="saveButton">Save!</button>
-      </div>-->
-    <div id="canvas-holder" class="d-flex justify-content-center p-3"><!-- p5 canvas goes here --></div>
-
-    <div class="d-flex justify-content-center py-5">
+    <div class="d-flex justify-content-center p-3">
       <form id="nameform" name="nameform">
         <div class="form-group">
           <small if="firstInputHelp" class="form-text text-muted text-left">Line 1:</small>
-          <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7" placeholder="Jeff">
+          <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7">
         </div>
         <div class="form-group">
           <small if="lastInputHelp" class="form-text text-muted text-left">Line 2:</small>
-          <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7" placeholder="Bezos">
+          <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7">
         </div>
-        <input type="submit" class="btn btn-primary">
+        <input type="submit" class="btn btn-primary" value="Generate">
       </form>
     </div>
 
     <div class="d-flex justify-content-center py-5">
-      <button class="btn btn-primary mx-3">Download Photo</button>
-      <button class="btn btn-primary mx-3">Download Video</button>
+      <button id="dlPhoto" class="btn btn-primary mx-3">Download Photo</button>
+      <button id="dlVideo" class="btn btn-primary mx-3">Download Video</button>
     </div>
 
   </body>
