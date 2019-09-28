@@ -50,33 +50,29 @@ var assets = {
 }
 
 function preload(){
-<<<<<<< HEAD
-  let bg = assets.background = createVideo(['../../assets/videos/bg222.mp4'], () => {
-=======
-  let bg = assets.background = createVideo(['/videos/background.mp4'], () => {
->>>>>>> acf7776404a5803ed3614f4951e3f6238b4b41dd
+  let bg = assets.background = createVideo(['assets/videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(0);
 
       bg.onended(function(){
-        console.log("Video has ended. Try again?");
+
       });
   });
   bg.hide(); 
   bg.hideControls();
 
-  let matte = assets.matte = createVideo(['../../assets/videos/mat222.mp4'], () => {
+  let matte = assets.matte = createVideo(['assets/videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
 
     matte.onended(function(){
-      console.log("Video has ended. Try again?");
+
     });
   });
   matte.hide(); 
   matte.hideControls();
 
-  let flares = assets.flares = loadImage("/images/optics.png");
+  let flares = assets.flares = loadImage("assets/images/optics.png");
 }
 
 var lineA = { origin: {x: 240, y:-620}, object: {} }
@@ -140,7 +136,7 @@ function loadLetter(letter, callback){
     callback(letters[letter])
   }
   else {
-    let path = "images/letters/";
+    let path = "assets/images/letters/";
     if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/"
 
     let lt = letter;
@@ -160,7 +156,6 @@ function loadLetter(letter, callback){
     });
     
     function pushImage(i, image){
-      console.log(image);
       ++loaded;
       letterImages[i] = image;
 
@@ -193,8 +188,6 @@ function loadName(name, callback){
 }
 
 function construct(first, last){
-  console.log("Building " + first + " " + last);
-
   FIRSTNAME = first;
   LASTNAME = last;
 
@@ -209,7 +202,6 @@ function construct(first, last){
       return;
 
     let letters = assets.letters;
-        console.log(letters);
   
     let char = "";
     let letter;
@@ -237,7 +229,7 @@ function construct(first, last){
 
     let bg = assets.background;
 
-      bg.stop(); 
+      bg.stop();
       bg.play();
 
       built = 0;
@@ -246,6 +238,8 @@ function construct(first, last){
   }
 }
 
+let total = 0;
+let playing = false;
 
 var sequence = 0;
 var built = 0;
@@ -255,7 +249,9 @@ function update(dt) {
 
     let bg = assets.background;
     let matte = assets.matte;
+   // let flares = assets.flares;
         matte.time(bg.time());
+      //  flares.time(bg.time());
     
     let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
             offset = lerp(.66, .97, seq);
@@ -292,3 +288,16 @@ function draw(){  // Our tick function imported from p5.js
   update(dt);
   t0 = t1;
 }
+
+function render(){
+  requestAnimationFrame(render);
+  
+  var t1 = Date.now();
+  let dt = (t1 - t0);
+      timeDelta = (dt / 1000);
+
+  update(dt);
+  t0 = t1;
+}
+// Trigger render loop here, split fps between draw and update
+//var init = false; function draw() { if(!init){render();init=true;} }

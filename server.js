@@ -33,38 +33,17 @@ app.use('/public', express.static('public'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
 
-app.use(function(req, res, next) {
-  res.header("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.header("Pragma", "no-cache");
-  res.header("Expires", 0);
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
 
 
 // Getting
 
 app.get('/', function(request, response) {
-  console.log("hi");	
+  console.log("hello.");
   response.sendFile(__dirname + '/views/index.html');
 });
 
-app.get('/view', (req, res) => {
-  res.sendFile(__dirname + '/output/unnamed.mp4');
-});
-
-
 
 // Posting
-
-var name = '';
-
-app.post('/submit-name', (req, res) => {
-   name = req.body.username;
-   res.send("shit");
-});
 
 app.post('/addFrame', (req, res) => {
   let frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
@@ -81,9 +60,13 @@ app.post('/addFrame', (req, res) => {
   });
 });
 
+let userdir;
+
+
 app.post('/encode', (req, res) => {
   let oldTemp = tempDir;
-  console.log(outputDir + "/" + req.body.path + ".mp4");
+
+  console.log(outputDir + '/' + req.body.path + '.mp4');
 
   res.setHeader("Content-Type", "video/mp4");
   
@@ -110,7 +93,9 @@ app.post('/encode', (req, res) => {
         console.log('End render!');
         oldTemp.removeCallback();
 
-        res.send('/view');
+        console.log('/output/' + req.body.path + '.mp4');
+
+        res.send('/output/' + req.body.path + '.mp4');
       })
       .run()
 

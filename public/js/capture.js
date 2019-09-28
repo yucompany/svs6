@@ -56,6 +56,7 @@ class Capture {
     this.encoding = true;
     
     let captured = this.captured;
+	  this.name = FIRSTNAME + "_" + LASTNAME;
 
     this.frames = 0; let tf = this.totalFrames = captured.length;
   
@@ -73,6 +74,8 @@ class Capture {
 
     let encode = this.encode;
     let capturing = this.capturing;
+
+	let name = this.name;
     
     $.ajax({
       type: 'POST',
