@@ -1,6 +1,7 @@
 
 // init project
 const express = require('express');
+const port    = process.env.PORT || 8080;
 
 const bodyParser = require('body-parser');
 
@@ -9,10 +10,13 @@ const fs = require('fs');
 const sprintf = require('sprintf').sprintf;
 
 const cp = require('child_process');
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const ffmpeg = require('fluent-ffmpeg')
-      ffmpeg.setFfmpegPath(ffmpegPath);
 
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+console.log(ffmpegInstaller.path, ffmpegInstaller.version);
+
+module.exports = ffmpeg;
 
 const app = express();
 
@@ -103,6 +107,6 @@ app.post('/encode', (req, res) => {
 });
 
 // listen for requests :)
-const listener = app.listen(3000, function() {
+const listener = app.listen(port, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
