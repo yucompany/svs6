@@ -25,7 +25,7 @@ const CHARTABLE = {
   "T" : { shape: "TTR", size: 1},
   "U" : { shape: "SQ", size: 1},
   "V" : { shape: "TTR", size: 1},
-  "W" : { shape: "TTR", size: 1},
+  "W" : { shape: "TTR", size: 1.67},
   "X" : { shape: "SQ", size: 1},
   "Y" : { shape: "TTR", size: 1},
   "Z" : { shape: "SQ", size: 1},
@@ -37,8 +37,9 @@ const CHARTABLE = {
   " " : { shape: "SQ", size: .33}
 }
 
-const SPACING = 8;
-const NUMCHARS = 7.0;
+const NUMCHARS = 6.0;
+const CHARSIZE = .67 * (6.0 / NUMCHARS); 
+const SPACING = CHARSIZE * (.67);
 
 const Kerning = {
   "SQSQ"   : 1,
@@ -46,11 +47,11 @@ const Kerning = {
   "SQBTR"  : .5,
 
   "TTRSQ"  : .87,
-  "TTRBTR" : -.167,
-  "TTRTTR" : .33,
+  "TTRBTR" : .5,
+  "TTRTTR" : .9,
 
   "BTRSQ"  : .87,
-  "BTRTTR" : -.167,
+  "BTRTTR" : .5,
   "BTRBTR" : .87
 }
 

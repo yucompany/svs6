@@ -1225,8 +1225,8 @@ const verifyName = function(){
     }
 
 
-    let first = firstname.value.toUpperCase();
-    let last = lastname.value.toUpperCase();
+    let first = firstname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
+    let last = lastname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
 
     // Check for repeat from last input, don't test again
     if(first == FIRSTNAME && last == LASTNAME){

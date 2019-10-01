@@ -14,7 +14,6 @@ const ORIGIN = { x: 744, y: 117 };
 const DESTINATION = { x: 262, y: 713 };
 
 const LINEWIDTH = 240;
-const CHARSIZE = .67; 
 
 // Core elements
 
@@ -60,8 +59,8 @@ function preload(){
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
 
-var lineA = { origin: {x: 560, y:-290}, object: "" }
-var lineB = { origin: {x: 420, y:-220}, object: "" }
+var lineA = { origin: {x: 540, y:-290}, object: "" }
+var lineB = { origin: {x: 400, y:-220}, object: "" }
 var lines = [ lineA, lineB ];
 
 function setup(){
