@@ -1,245 +1,177 @@
 "use strict";
 
-// CONTROLS
+// Global variables
 
-var l = false, r = false, u = false, d = false, zi = false, zo = false;
-window.addEventListener("keydown", function(e){
-  let key = e.key;
-  
-  if(key == "a") l = true;
-  if(key == "d") r = true;
-  if(key == "s") d = true;
-  if(key == "w") u = true;
-  if(key == "z") zo = true;
-  if(key == "x") zi = true;
-});
+const framerate = 15;
 
-window.addEventListener("keyup", function(e){
-  let key = e.key;
-  
-  if(key == "a") l = false;
-  if(key == "d") r = false;
-  if(key == "s") d = false;
-  if(key == "w") u = false;
-  if(key == "z") zo = false;
-  if(key == "x") zi = false;
-});
+const WIDTH = 1280;
+const HEIGHT = 720;
 
-/* * * ** * * * * * * * *  * * * * * * * * * * * * * * *  */
+const WIDTH2 = WIDTH/2;
+const HEIGHT2 = HEIGHT/2;
 
-const framerate = 24;
+const ORIGIN = { x: 744, y: 117 };
+const DESTINATION = { x: 262, y: 713 };
 
-const scene = new Scene(2667, 1500);
-const camera = new Camera(0, 0, 1280, 720, scene);
+const LINEWIDTH = 240;
+const CHARSIZE = .67; 
+
+// Core elements
 
 var canvas; var canvasHolder = 'canvas-holder';
-var objects = [];
-
-const drawing = new Drawing();
-      var blends = {}
-
-const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
 var assets = {
   background : "",
   matte: "",
   flares: "",
-  letters: {
 
-  }
+  letters: {}
 }
 
+var elements = {
+  bg : "",
+  buffer: "",
+  mask : "",
+  shadows : "",
+  fx : "",
+
+  line1 : "",
+  line2 : ""
+}
+
+const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
+
+// Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['/videos/background.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(0);
-
-      bg.onended(function(){
-        console.log("Video has ended. Try again?");
-      });
   });
   bg.hide(); 
   bg.hideControls();
 
-  let matte = assets.matte = createVideo(['/videos/mat222.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
-
-    matte.onended(function(){
-      console.log("Video has ended. Try again?");
-    });
   });
   matte.hide(); 
   matte.hideControls();
 
-  let flares = assets.flares = loadImage("/images/optics.png");
+  let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
 
-var lineA = { origin: {x: 240, y:-620}, object: {} }
-var lineB = { origin: {x: 100, y:-560}, object: {} }
+var lineA = { origin: {x: 560, y:-290}, object: "" }
+var lineB = { origin: {x: 420, y:-220}, object: "" }
 var lines = [ lineA, lineB ];
 
 function setup(){
   pixelDensity(1);
+  background(0);
+  stroke(255);
+  imageMode(CENTER);
+  frameRate(framerate);
 
-  canvas = createCanvas(camera.width, camera.height);
+  canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
     canvas.class('mw-100 h-auto');
 
-  build();
-  defineBlends();
+  let bg = elements.bg = assets.bg;
+  let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
+  let mask = elements.mask = new Mask(WIDTH2, HEIGHT2);
+  //let shadows = elements.shadows = createGraphics(WIDTH, HEIGHT);
+  let fx = elements.fx = assets.flares;
 
-  background(0);
-  stroke(255);
-
-  frameRate(framerate);
+  let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
+  let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
 }
 
-var offset = .67;
 
-function build(){
-    let bgLayer = new SceneLayer(camera);
-    let bg = new SceneVideo(0, 0, 1, camera.width, camera.height, assets.background, scene);
-        bgLayer.add(bg);
+function draw(){  // Our tick function imported from p5.js
+  let bg = assets.background;
+  let time = bg.time();
+  let matte = assets.matte;
+      matte.time(time);
 
-    let objectLayer = new SceneLayer(camera);
+  let seq = clamp(time / 7.4583, 0, 1);
+  let offset = lerp(.66, .97, seq);
 
-    let ao = lineA.object = new Line(0, 0, 525, 262, 1, scene);
-    let bo = lineB.object = new Line(0, 0, 525, 262, 1, scene);
-    let matte = new SceneMask(0, 0, 1, camera.width, camera.height, assets.matte, [255, 255, 255], scene);
-
-        objectLayer.add(ao);
-        objectLayer.add(bo);
-        objectLayer.add(matte);
+  blendMode(BLEND);
+  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+  let buffer = elements.buffer;
+  buffer.clear();
+      let line1 = elements.line1;
+          line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
+          line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
+          line1.scale = offset;
+          line1.render(buffer, 1, time);
+      let line2 = elements.line2;
+          line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
+          line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
+          line2.scale = offset;
+          line2.render(buffer, 1, time);
+  
+  let mask = elements.mask;
+    mask.mask(matte, buffer);
     
-    let fxLayer = new SceneLayer(camera,"SCREEN");
-    let flares = new SceneImage(0, 0, 1, camera.width, camera.height, assets.flares, scene);
+  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-      fxLayer.add(flares);
+ /* * * * * * * * */
 
-    drawing.addLayer(bgLayer);
-    drawing.addLayer(objectLayer);
-    drawing.addLayer(fxLayer);
+  blendMode(SCREEN);
+  let fx = elements.fx;
+  image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 }
 
-function defineBlends(){
-    blends["MULTIPLY"] = MULTIPLY;
-    blends["DIFFERENCE"] = DIFFERENCE;
-    blends["SCREEN"] = SCREEN;
-}
 
 var FIRSTNAME, LASTNAME;
 
-function loadLetter(letter, callback){
-  let letters = assets.letters;
-  if(letters.hasOwnProperty(letter)){
-    callback(letters[letter])
-  }
-  else {
-    let path = "images/letters/";
-    if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/"
+function reset(){
+    let bg = assets.background;
+        bg.stop();
 
-    let lt = letter;
-    if(letter == "@") lt = "AT";
-    else if(letter == "#") lt = "HASH";
-    else if(letter == "+") lt = "PLUS";
-    else if(letter == "-") lt = "SUB";
+        elements.line1.reset();
+        elements.line2.reset();
 
-    let letterPath = path + lt + "12f";
-
-    let loaded = 0;
-    let letterImages = [];
-      for(let i = 0; i < 12; i++) letterImages.push(null);
-    
-    for(let i = 0; i < 12; i++) loadImage(letterPath + "/" + i + ".png", function(image){
-      pushImage(i, image);
-    });
-    
-    function pushImage(i, image){
-      console.log(image);
-      ++loaded;
-      letterImages[i] = image;
-
-      if(loaded >= 11){
-        letters[letter] = letterImages;
-        callback(letterImages);
-      }
-    }
-  }
-}
-
-function loadName(name, callback){
-  if(name.length <= 0)
-    callback();
-  else{
-    let loaded = 0; let len = name.length;
-
-    function onLoadLetter(){
-      ++loaded;
-      if(loaded >= len)
-        callback();
-    }
-
-    for(let i = 0; i < name.length; i++){
-      let char = name[i];
-      if(char != " ")  loadLetter(char, onLoadLetter);
-      else  onLoadLetter();
-    }
-  }
+    bg.play();
 }
 
 function construct(first, last){
-  console.log("Building " + first + " " + last);
-
   FIRSTNAME = first;
   LASTNAME = last;
-
-  let loaded = 0;
-
-  loadName(first, onLoadLines);
-  loadName(last, onLoadLines);
   
-  function onLoadLines(){
+  let loaded = 0;
+    loadName(first, loadedLine);
+    loadName(last, loadedLine);
+
+  function loadedLine(){
+    console.log("Loaded line " + loaded)
+
     ++loaded;
     if(loaded <= 1)
       return;
 
-    let letters = assets.letters;
-        console.log(letters);
-  
+      initialize();
+  }
+}
+
+function initialize(){
     let char = "";
     let letter;
     let container;
 
     container = lineA.object;
     container.clear();
-    for(let i = 0; i < first.length; i++){
-      char = first[i];
-      letter = new Letter(letters[char], scene);
-
-      container.add(letter);
-    }
-    container.reset();
+    container.populate(FIRSTNAME);
 
     container = lineB.object;
     container.clear();
-    for(let i = 0; i < last.length; i++){
-      char = last[i];
-      letter = new Letter(letters[char], scene);
-
-      container.add(letter);
-    }
-    container.reset();
+    container.populate(LASTNAME);
 
     let bg = assets.background;
+        bg.stop(); 
+        bg.play();
 
-      bg.stop(); 
-      bg.play();
-
-      built = 0;
-
-    capture.beginCapture(framerate);
-  }
+        capture.beginCapture(framerate);
 }
 
 
@@ -278,28 +210,3 @@ function update(dt) {
 
     drawing.render(camera);
 };
-
-var t0 = Date.now();
-var timeDelta = 0;
-function draw(){  // Our tick function imported from p5.js
-  var t1 = Date.now();
-  let dt = (t1 - t0);
-      timeDelta = (dt / 1000);
-
-
-  update(dt);
-  t0 = t1;
-}
-
-function render(){
-  requestAnimationFrame(render);
-  
-  var t1 = Date.now();
-  let dt = (t1 - t0);
-      timeDelta = (dt / 1000);
-
-  update(dt);
-  t0 = t1;
-}
-// Trigger render loop here, split fps between draw and update
-//var init = false; function draw() { if(!init){render();init=true;} }

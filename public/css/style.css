@@ -3,12 +3,12 @@
 
 @font-face {
   font-family: "Helvetica Condensed";
-  src: url("../../assets/fonts/HelveticaNeueLTStd-BlkCn.otf");
+  src: url("../fonts/HelveticaNeueLTStd-BlkCn.otf");
 }
 
 @font-face {
   font-family: "Open Sans";
-  src: url("../../assets/fonts/OpenSans-Regular.ttf");
+  src: url("../fonts/OpenSans-Regular.ttf");
 }
 
 h1 {
@@ -25,4 +25,19 @@ body {
 
 .btn {
   background-color: #231f20 !important;
+}
+
+#canvas-holder {
+  position: relative;
+}
+
+#reset {
+  background-image: url("../images/icons/reset\ arrow.svg");
+
+  position: absolute;
+  bottom:0;
+  right:0;
+
+  width: 64px;
+  height: 64px;
 }
