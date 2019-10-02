@@ -15,7 +15,7 @@ const CHARTABLE = {
   "J" : { shape: "BTR", size: 1},
   "K" : { shape: "SQ", size: 1},
   "L" : { shape: "BTR", size: .75},
-  "M" : { shape: "SQ", size: 1},
+  "M" : { shape: "SQ", size: 1.67},
   "N" : { shape: "SQ", size: 1},
   "O" : { shape: "SQ", size: 1},
   "P" : { shape: "TTR", size: 1},
@@ -30,7 +30,7 @@ const CHARTABLE = {
   "Y" : { shape: "TTR", size: 1},
   "Z" : { shape: "SQ", size: 1},
 
-  "@" : { shape: "SQ", size: 1},
+  "@" : { shape: "SQ", size: 1.5},
   "#" : { shape: "SQ", size: 1},
   "-" : { shape: "SQ", size: 1},
   "+" : { shape: "SQ", size: 1},

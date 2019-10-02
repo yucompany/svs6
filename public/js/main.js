@@ -72,7 +72,7 @@ function setup(){
 
   canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
-    canvas.class('mw-100 h-auto');
+    canvas.class('w-100 h-auto');
 
   let bg = elements.bg = assets.bg;
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
