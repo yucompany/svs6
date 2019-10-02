@@ -42,7 +42,7 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/background3.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(1);  // Ensure volume is set to 1
   });
