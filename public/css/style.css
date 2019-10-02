@@ -12,6 +12,11 @@
 }
 
 @font-face {
+  font-family: "Helvetica Medium";
+  src: url("../fonts/HelveticaNeueLTStd-Md.otf");
+}
+
+@font-face {
   font-family: "Open Sans";
   src: url("../fonts/OpenSans-Regular.ttf");
 }
@@ -84,6 +89,10 @@ small {
 
   color: white !important;
   line-height: .87rem !important;
+}
+
+button {
+  font-family: "Helvetica Medium" !important;
 }
 
 /* Portrait mobile*/
