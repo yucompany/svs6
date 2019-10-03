@@ -47,7 +47,7 @@
         <img src="../images/misc/logo.png" class="img-fluid">
       </div>
       
-      <div id="body-text" class="container py-3 w-75">
+      <div id="bodytext" class="container py-3 w-75">
           <h3 class="text-center">Don’t just watch Silicon Valley, BE the Valley.</h3>
           <p class="text-center">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want...within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
@@ -57,14 +57,14 @@
         <!-- p5 canvas goes here -->
       </div>
 
-      <div id="drivers" class="d-flex justify-content-center w-75 flex-fill">
+      <!--<div id="submission" class="d-flex justify-content-center w-75 flex-fill">
 
           <div id="namefield" class="px-5 w-50">
             <form id="nameform" name="nameform">
                       <div class="form-group row">
                           <div class="col-sm-3"></div>
                           <div class="col-sm-7 pl-0">
-                            <h2 class="text-left font-weight-bolder">Enter a name<br><span class="text-muted">(max. 7 characters per line)</span></h2>
+                            <h2 class="text-left">Enter a name<br><span class="text-muted">(max. 7 characters per line)</span></h2>
                           </div>
                       </div>
                       <div class="form-group row">
@@ -88,22 +88,27 @@
             </form>
           </div>
 
-          <div style="display: none">
-            <div id="downloading" class="d-flex flex-column align-items-center flex-shrink-2 border-right px-4">
-                <p class="text-center mb-1">Download your creation</p>
-                <button id="dlPhoto" class="btn btn-primary mt-2 w-100">Image</button>
-                <button id="dlVideo" class="btn btn-primary mt-2 w-100">Video</button>
-            </div>
+      </div>-->
 
-            <div id="sharing" class="d-flex flex-column align-items-start flex-fill px-4">
-                <p class="text-left">Share your creation</p>
-                <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
-                <div class="d-flex flex-fill mt-3">
-                  <img id="shareTwitter" src="../images/icons/twitter.png" class="socialicon">
-                  <img id="shareFacebook" src="../images/icons/facebook.png" class="socialicon ml-3">
-                </div>
-            </div>
-        </div>
+      <div id="exports" class="d-flex justify-content-center w-75 flex-fill mb-5">
+              <div id="downloading" class="flex-fill border-right px-4">
+                  <h2 class="text-left mb-1">Download your creation</h2>
+                  <button id="dlPhoto" class="btn btn-primary mt-2 w-100 text-uppercase pt-2">Image</button>
+                  <button id="dlVideo" class="btn btn-primary mt-2 w-100 text-uppercase pt-2">Video</button>
+              </div>
+  
+              <div id="sharing" class="d-flex flex-column align-items-start flex-fill border-right px-4">
+                  <h2 class="text-left">Share</h2>
+                  <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
+                  <div class="d-flex flex-fill mt-3">
+                    <img id="shareTwitter" src="../images/icons/twitter.png" class="socialicon">
+                    <img id="shareFacebook" src="../images/icons/facebook.png" class="socialicon ml-3">
+                  </div>
+              </div>
+
+              <div id="redo" class="d-flex flex-column align-items-start flex-fill px-4">
+                  <button id="redoBt" class="btn btn-primary mt-2 w-100 text-uppercase pt-2">Redo</button>
+              </div>
 
       </div>
 

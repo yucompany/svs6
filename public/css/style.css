@@ -118,18 +118,12 @@ button {
 
 /* Portrait mobile*/
 @media (max-width: 575.98px) { 
+    #header { width: 100% !important; }
+    #bodytext { width: 100% !important; }
+    #submission { width: 100% !important; }
+    #namefield { width: 100% !important; }
+
     #canvas-holder {
       display: npne
     }
-
-    #drivers {
-      flex-direction: column !important;
-    }
-}
-
-/* Landscape mobile */
-@media (max-width: 767.98px) {
-  #drivers {
-    flex-direction: row !important;
-  }
 }
