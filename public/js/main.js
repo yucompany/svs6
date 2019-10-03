@@ -43,7 +43,7 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(0);
+      bg.time(bg.duration());
       bg.volume(1);  // Ensure volume is set to 1
   });
   bg.hide(); 
@@ -167,10 +167,10 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-        bg.stop(); 
-        bg.play();
+      //  bg.stop(); 
+       // bg.play();
 
-        capture.beginCapture(framerate);
+      //  capture.beginCapture(framerate);
 }
 
 
