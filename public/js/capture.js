@@ -2,6 +2,8 @@
 
 var videoContainer;
 
+let fileName = null;
+
 class Capture {
 
   constructor(name, duration, format){
@@ -114,6 +116,7 @@ class Capture {
       
       success: function(data){
         console.log("Received " + data);
+        fileName = data;
 
         let link = document.createElement('a');
             link.href = data;
@@ -123,8 +126,12 @@ class Capture {
             link.click();
             document.body.removeChild(link);
 
-        return data;
+            return data;
       }
     })
+  }
+
+  getVideoFile(){
+    return fileName;
   }
 }

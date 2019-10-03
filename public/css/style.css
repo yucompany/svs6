@@ -3,12 +3,21 @@
 
 @font-face {
   font-family: "Helvetica Condensed";
-  src: url("../../assets/fonts/HelveticaNeueLTStd-BlkCn.otf");
+  src: url("../fonts/HelveticaNeueLTStd-BlkCn.otf");
+}
+
+@font-face {
+  font-family: "Helvetica Roman";
+  src: url("../fonts/HelveticaNeueLTStd-Roman.otf");
 }
 
 @font-face {
   font-family: "Open Sans";
-  src: url("../../assets/fonts/OpenSans-Regular.ttf");
+  src: url("../fonts/OpenSans-Regular.ttf");
+}
+
+html * {
+  font-family: "Helvetica Roman" !important;
 }
 
 h1 {
@@ -19,10 +28,78 @@ h1 {
   color: #F04933 !important;
 }
 
-body {
-  font-family: "Open Sans" !important; 
+h3 {
+  font-family: "Helvetica Condensed" !important;
+  font-size: 1.1rem !important;
+  line-height: .87em !important;
+
+  color: #231f20 !important;
+}
+
+p {
+  font-size: .87rem !important;
+}
+
+small {
+  font-size: .67rem !important;
 }
 
 .btn {
-  background-color: #231f20 !important;
+  background-color: #2e9f48 !important;
+  border: 0;
+}
+
+#canvas-holder {
+  position: relative;
+}
+
+#reset {
+  background-image: url("../images/icons/reset\ arrow.svg");
+
+  position: absolute;
+  bottom:0;
+  right:0;
+
+  width: 64px;
+  height: 64px;
+}
+
+.socialicon {
+  width: 32px;
+  height: 32px;
+}
+
+.footer {
+  height: 96px;
+  background-color: #231f20;
+}
+
+.footer #footercopy {
+  color: white !important;
+  line-height: .87rem !important;
+}
+
+.footer #footerlinks a {
+  font-size: .67rem !important;
+
+  color: white !important;
+  line-height: .87rem !important;
+}
+
+/* Portrait mobile*/
+@media (max-width: 575.98px) { 
+    #canvas-holder {
+      display: npne
+    }
+
+    #drivers {
+      flex-direction: column !important;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 767.98px) {
+  #drivers {
+    flex-direction: row !important;
+  }
 }
