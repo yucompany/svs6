@@ -37,8 +37,8 @@ const CHARTABLE = {
   " " : { shape: "SQ", size: .33}
 }
 
-const NUMCHARS = 6.0;
-const CHARSIZE = .67 * (6.0 / NUMCHARS); 
+const NUMCHARS = 7.0;
+const CHARSIZE = .7 * (6.0 / NUMCHARS); 
 const SPACING = CHARSIZE * (.67);
 
 const Kerning = {

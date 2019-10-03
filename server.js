@@ -1,33 +1,31 @@
 
-// init project
-const express = require('express');
-const port    = process.env.PORT || 8080;
+const express           = require('express');
+const port              = process.env.PORT || 8080;
+const bodyParser        = require('body-parser');
+const tmp               = require('tmp');
+const fs                = require('fs');
+const sprintf           = require('sprintf').sprintf;
+const ffmpegInstaller   = require('@ffmpeg-installer/ffmpeg');
+const ffmpeg            = require('fluent-ffmpeg');
 
-const bodyParser = require('body-parser');
-
-const tmp = require('tmp');
-const fs = require('fs');
-const sprintf = require('sprintf').sprintf;
-
-const cp = require('child_process');
-
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
-console.log(ffmpegInstaller.path, ffmpegInstaller.version);
 
 module.exports = ffmpeg;
 
-const app = express();
 
-var tempDir = tmp.dirSync({ unsafeCleanup: true });
-            console.log(tempDir.name);
-var outputDir = __dirname + "/output";
-    if(!fs.existsSync(outputDir))
-        fs.mkdirSync(outputDir);
+let tempDir = tmp.dirSync({ unsafeCleanup: true });
+console.log(tempDir.name);
+
+// Check for existence of output directory.
+const outputDir = __dirname + '/output';
+
+if(!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir);
+}
 
 
 // Using
+const app = express();
 
 app.use(express.static('public'))
    .use(express.static('assets'))
@@ -37,38 +35,28 @@ app.use(express.static('public'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
 
+/* ROUTER */
 
-
-// Getting
-
-app.get('/', function(request, response) {
-  console.log("hello.");
-  response.sendFile(__dirname + '/views/index.html');
+// GETs
+app.get('/', function(req, res) {
+    res.sendFile(__dirname + '/views/index.html');
 });
 
-app.get('/videofile', (req, res) => {
-    res.send('/output/' + req.body.path + '.mp4');
-});
-
-// Posting
-
+// POSTs
 app.post('/addFrame', (req, res) => {
-  let frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
-  let fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
-  let dir = tempDir.name + "/" + fName;
+    const frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
+    const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
+    const dir = tempDir.name + "/" + fName;
 
-  console.log('received frame: ' + fName);
-  
-  fs.writeFile(dir, frame, 'base64', function(err){
-    if(err)
-        console.log("there was an error writing file: " + err);
-    
-    res.end();
-  });
+    console.log('received frame: ' + fName);
+
+    fs.writeFile(dir, frame, 'base64', function(err) {
+        if(err) {
+            console.log("there was an error writing file: " + err);
+        }
+        res.end();
+    });
 });
-
-let userdir;
-
 
 app.post('/encode', (req, res) => {
   let oldTemp = tempDir;
@@ -76,7 +64,7 @@ app.post('/encode', (req, res) => {
   console.log(outputDir + '/' + req.body.path + '.mp4');
 
   res.setHeader("Content-Type", "video/mp4");
-  
+
   var proc = new ffmpeg()
       .input(tempDir.name + '/frame-%03d.jpg')
       .fps(24)
@@ -109,8 +97,6 @@ app.post('/encode', (req, res) => {
   tempDir = tmp.dirSync({unsafeCleanup: true});
 });
 
-
-// listen for requests :)
 const listener = app.listen(port, function() {
-  console.log('Your app is listening on port ' + listener.address().port);
+    console.log('Preview your app on port ' + listener.address().port);
 });

@@ -44,7 +44,7 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
-      bg.volume(0);
+      bg.volume(1);  // Ensure volume is set to 1
   });
   bg.hide(); 
   bg.hideControls();

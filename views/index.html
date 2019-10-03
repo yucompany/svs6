@@ -45,60 +45,78 @@
   <body>
     <div class="d-flex flex-column justify-content-center align-items-center">
 
-      <div id="header" class="m-5 w-50">
+      <div id="header" class="mt-5 mb-2 w-50">
         <img src="../images/misc/logo.png" class="img-fluid">
       </div>
       
-
-      <div id="canvas-holder" class="d-flex justify-content-center py-3 w-75">
-        <!-- p5 canvas goes here -->
-      </div>
-
-      <div id="body-text" class="container py-3 w-75">
+      <div id="bodytext" class="container py-3 w-75">
           <h3 class="text-center">Don’t just watch Silicon Valley, BE the Valley.</h3>
           <p class="text-center">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want...within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
 
-      <div id="drivers" class="d-flex justify-content-between w-75 flex-fill">
+      <div id="canvas-holder" class="d-flex justify-content-center pt-1 pb-5 w-75">
+        <div id="replay-holder"><img src=""></div>
+        <!-- p5 canvas goes here -->
+      </div>
 
-          <div id="namefield" class="flex-fill border-right px-5">
-            <p class="text-center">Enter a name <span class="text-muted">(max. 7 characters per line)</span></p>
+      <div id="submission" class="d-flex justify-content-center w-75 flex-fill">
 
-
-
-            <form id="nameform" name="nameform" class="d-flex flex-fill justify-content-between">
-                  <div class="form-group col">
-                      <div class="row">
-                          <!--<label for="firstInput" class="col-sm-3 col-form-label text-muted">Line 1</label>-->
-                          <input id="firstinput" class="form-control" name="firstname" type="text" maxlength="7" autocomplete="off">
+          <div id="namefield" class="px-5 w-50">
+            <form id="nameform" name="nameform">
+                      <div class="form-group row">
+                          <div class="col-sm-3"></div>
+                          <div class="col-sm-7 pl-0">
+                            <h2 class="text-left">Enter a name<br><span class="text-muted">(max. 7 characters per line)</span></h2>
+                          </div>
                       </div>
-                      <div class="row">
-                          <!--<label for="lastInput" class="col-sm-3 col-form-label text-muted">Line 2</label>-->
-                          <input id="lastinput" class="form-control" name="lastname" type="text" maxlength="7" autocomplete="off">
+                      <div class="form-group row">
+                          <label for="firstInput" class="col-sm-3 col-form-label text-muted">Line 1</label>
+                          <div class="col-sm-6 pl-0">
+                            <input id="firstInput" class="form-control" name="firstname" type="text" maxlength="7" autocomplete="off">
+                          </div>
+                        </div>
+                      <div class="form-group row">
+                          <label for="lastInput" class="col-sm-3 col-form-label text-muted">Line 2</label>
+                          <div class="col-sm-6 pl-0">
+                            <input id="lastInput" class="form-control" name="lastname" type="text" maxlength="7" autocomplete="off">
+                          </div>
                       </div>
-                  </div>
-                  
-                <div class="form-group col">
-                      <div class = "row"><button id="generate" class="btn btn-primary">Generate</button></div>
-                      <div class = "row"><button id="replay" class="btn btn-primary">Replay</button></div>
-                </div>
+                      <div class="form-group row">
+                          <div class="col-sm-3"></div>
+                          <div class="col-sm-6 pl-0">
+                              <button id="generate" class="btn btn-primary text-uppercase w-100 pt-2">Generate</button>
+                          </div>
+                      </div>
             </form>
           </div>
 
-          <div id="downloading" class="d-flex flex-column align-items-center flex-shrink-2 border-right px-4">
-              <p class="text-center mb-1">Download your creation</p>
-              <button id="dlPhoto" class="btn btn-primary mt-2 w-100">Image</button>
-              <button id="dlVideo" class="btn btn-primary mt-2 w-100">Video</button>
-          </div>
+      </div>
 
-          <div id="sharing" class="d-flex flex-column align-items-start flex-fill px-4">
-              <p class="text-left">Share your creation</p>
-              <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
-              <div class="d-flex flex-fill mt-3">
-                <img src="../images/icons/twitter.png" class="socialicon">
-                <img src="../images/icons/facebook.png" class="socialicon ml-3">
+      <div id="exports" class="d-flex justify-content-center w-75 flex-fill mb-5">
+              <div id="downloading" class="flex-fill border-right px-4">
+                  <h2 class="text-left mb-1">Download your creation</h2>
+                  <div class="d-flex mt-2 w-100 pt-2">
+                    <button id="dlPhoto" class="btn dlbtn btn-primary text-uppercase flex-fill">Image<div></div></button>
+                    <button id="dlVideo" class="btn dlbtn btn-primary text-uppercase flex-fill ml-3">Video<div></div></button>
+                  </div>
               </div>
-          </div>
+  
+              <div id="sharing" class="d-flex flex-column align-items-start flex-fill border-right px-4">
+                  <h2 class="text-left">Share</h2>
+                  <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
+                  <div class="d-flex flex-fill mt-3">
+                    <button id="shareTwitter">
+                        <img src="../images/icons/twitter.png" class="socialicon">
+                    </button>
+                    <button id="shareFacebook">
+                        <img src="../images/icons/facebook.png" class="socialicon ml-3">
+                    </button>
+                  </div>
+              </div>
+
+              <div id="redo" class="d-flex flex-column align-items-start flex-fill px-4">
+                  <button id="redoBt" class="btn btn-primary mt-2 w-100 text-uppercase pt-2">Redo</button>
+              </div>
 
       </div>
 
@@ -113,13 +131,9 @@
   
       </div>
 
-    </div>
+      <!--<div class = "row"><button id="replay" class="btn btn-primary">Replay</button></div>-->
 
-    <div class="d-flex justify-content-center py-5">
-        <button id="shareFacebook" class="btn btn-primary mx-3">Facebook Share</button>
-        <button id="shareTwitter" class="btn btn-primary mx-3">Twitter Share</button>
-      </div>
-    
+    </div>
 
     
     

@@ -12,6 +12,16 @@
 }
 
 @font-face {
+  font-family: "Helvetica Medium";
+  src: url("../fonts/HelveticaNeueLTStd-Md.otf");
+}
+
+@font-face {
+  font-family: "Helvetica Bold";
+  src: url("../fonts/HelveticaNeueLTStd-Bd.otf");
+}
+
+@font-face {
   font-family: "Open Sans";
   src: url("../fonts/OpenSans-Regular.ttf");
 }
@@ -26,6 +36,18 @@ h1 {
   line-height: .87em !important;
 
   color: #F04933 !important;
+}
+
+h2 {
+  font-family: "Helvetica Bold" !important;
+  font-size: 1.2rem !important;
+  line-height: 1em !important;
+
+  color: #231f20 !important;
+}
+
+h2 span {
+  font-size: .95rem !important;
 }
 
 h3 {
@@ -47,6 +69,18 @@ small {
 .btn {
   background-color: #2e9f48 !important;
   border: 0;
+}
+
+.dlbtn button div {
+  background-image: url("../images/icons/download.svg");
+}
+
+#redo .btn {
+  background-color: #F04933 !important;
+}
+
+.ctoa {
+  font-size: 1rem !important;
 }
 
 #canvas-holder {
@@ -71,7 +105,7 @@ small {
 
 .footer {
   height: 96px;
-  background-color: #231f20;
+  background-color: #4B4E4D;
 }
 
 .footer #footercopy {
@@ -86,20 +120,18 @@ small {
   line-height: .87rem !important;
 }
 
+button {
+  font-family: "Helvetica Medium" !important;
+}
+
 /* Portrait mobile*/
 @media (max-width: 575.98px) { 
+    #header { width: 100% !important; }
+    #bodytext { width: 100% !important; }
+    #submission { width: 100% !important; }
+    #namefield { width: 100% !important; }
+
     #canvas-holder {
       display: npne
     }
-
-    #drivers {
-      flex-direction: column !important;
-    }
-}
-
-/* Landscape mobile */
-@media (max-width: 767.98px) {
-  #drivers {
-    flex-direction: row !important;
-  }
 }
