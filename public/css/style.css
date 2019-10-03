@@ -71,6 +71,14 @@ small {
   border: 0;
 }
 
+.dlbtn button div {
+  background-image: url("../images/icons/download.svg");
+}
+
+#redo .btn {
+  background-color: #F04933 !important;
+}
+
 .ctoa {
   font-size: 1rem !important;
 }
