@@ -17,7 +17,7 @@ const LINEWIDTH = 240;
 
 // Core elements
 
-var canvas; var canvasHolder = 'canvas-holder';
+var canvas; var canvasHolder = document.getElementById('canvas-holder');
 
 var assets = {
   background : "",
@@ -77,9 +77,9 @@ function setup(){
   imageMode(CENTER);
   frameRate(framerate);
 
-  canvas = createCanvas(WIDTH, HEIGHT);
+  canvas = createCanvas(WIDTH, HEIGHT); console.log(canvas);
     canvas.parent(canvasHolder);
-    canvas.class('w-100 h-auto');
+    canvas.class('w-100 h-100');
 
   let bg = elements.bg = assets.bg;
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);

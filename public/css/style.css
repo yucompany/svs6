@@ -85,6 +85,7 @@ small {
 
 #canvas-holder {
   position: relative;
+  height: calc(100% * (720/1280));
 }
 
 #replay {
