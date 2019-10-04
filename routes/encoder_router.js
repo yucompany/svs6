@@ -25,7 +25,7 @@ router.post('/addFrame', (req, res) => {
     });
 });
 
-router.post('/encoder/screenshot', (req, res) => {
+router.post('/screenshot', (req, res) => {
     let blob = req.body.dat;
     fs.writeFile(outputDir + "/screenshot.jpg", blob, 'binary', function(err){
       if(err){
