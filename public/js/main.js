@@ -160,7 +160,20 @@ function restart(){
       promise.then(function() {
         console.log("video played success");
 
-        dispatchEvent(onRestart);
+        let matte = assets.matte;
+        promise = matte.elt.play();
+        if (promise !== undefined) {
+          promise.then(function() {
+            console.log("video played success");
+
+          dispatchEvent(onRestart); // Fire initialized event
+
+
+          }).catch(function(error) {
+            console.log("video played fail: " + error);
+          });
+        }
+
       }).catch(function(error) {
         console.log("video played fail: " + error);
       });
@@ -202,18 +215,29 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-
     let promise = bg.elt.play();
     if (promise !== undefined) {
       promise.then(function() {
         console.log("video played success");
 
-        capture.beginCapture(framerate);
-        dispatchEvent(onInitialized); // Fire initialized event
+        let matte = assets.matte;
+        promise = matte.elt.play();
+        if (promise !== undefined) {
+          promise.then(function() {
+            console.log("video played success");
+
+          capture.beginCapture(framerate);
+          dispatchEvent(onInitialized); // Fire initialized event
+
+
+          }).catch(function(error) {
+            console.log("video played fail: " + error);
+          });
+        }
+
       }).catch(function(error) {
         console.log("video played fail: " + error);
       });
     }
-
     
 }
