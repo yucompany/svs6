@@ -25,7 +25,7 @@ router.post('/addFrame', (req, res) => {
     });
 });
 
-router.post('/screenshot', (req, res) => {
+router.post('/encoder/screenshot', (req, res) => {
     let blob = req.body.dat;
     fs.writeFile(outputDir + "/screenshot.jpg", blob, 'binary', function(err){
       if(err){
@@ -33,7 +33,7 @@ router.post('/screenshot', (req, res) => {
         res.end();
       }
       else
-        res.send('../output/screenshot.jpg');
+        res.send('/output/screenshot.jpg');
     });
 });
 
@@ -69,7 +69,7 @@ router.post('/encode', (req, res) => {
 
           console.log('/output/' + req.body.path + '.mp4');
 
-          res.send('../output/' + req.body.path + '.mp4');
+          res.send('/output/' + req.body.path + '.mp4');
         })
         .run()
 

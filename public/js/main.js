@@ -50,10 +50,21 @@ function preload(){
 
       bg.elt.playsInline = true; // Ensure video does not maximize
   });
-  bg.hide(); 
+  bg.hide();
   bg.hideControls();
   bg.onended(function(){
-    console.log("video finished");
+    console.log('Video generated!');
+
+    // Encode video
+    console.log('Video now encoding to .mp4');
+    capture.video;
+    // Get filename
+    const fileName = capture.getFileName();
+
+    if (fileName) {
+        console.log('MS: Initiating S3 upload now that video has been generated.');
+        beginUploadToS3(fileName);
+    }
     dispatchEvent(onEnd);
   });
 
@@ -157,7 +168,7 @@ function restart(){
     dispatchEvent(onRestart);
 }
 
-function construct(first, last, callback){
+function construct(first, last){
   FIRSTNAME = first;
   LASTNAME = last;
   
@@ -172,7 +183,7 @@ function construct(first, last, callback){
     if(loaded <= 1)
       return;
 
-      initialize(callback);
+      initialize();
   }
 }
 
@@ -195,7 +206,7 @@ function initialize(){
         bg.stop(); 
         bg.play();
 
-    capture.beginCapture(framerate, callback);
+    capture.beginCapture(framerate);
     dispatchEvent(onInitialized);
 }
 
@@ -236,6 +247,29 @@ function update(dt) {
     drawing.render(camera);
 };
 
+// Begins upload to S3
+function beginUploadToS3(file) {
+    console.log('Show Loading...');
+      $.ajax({
+        type: 'POST',
+        url: '/aws/s3upload',
+        data: {
+            videoFilePath: file
+        },
+
+        success: (response) => {
+             console.log({ response });
+        },
+
+        error: (err) => {
+            throw err;
+        },
+
+        complete: () => {
+            console.log('End Loading...');
+        }
+    });
+}
 
 // Exec on page load
 $(document).ready(() => {

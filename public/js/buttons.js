@@ -66,27 +66,3 @@ function showFacebookShare() {
 function showTwitterShare() {
     window.open(`http://twitter.com/share?text=BE%20THE%20VALLEY&url=${encodeURIComponent('www.google.com')}&hashtags=#BeTheValley&via=leexperiential`, '', 'width=720,height=250');
 }
-
-// Begins upload to S3
-function beginUploadToS3(file) {
-    console.log('Show Loading...');
-      $.ajax({
-        type: 'POST',
-        url: '/aws/s3upload',
-        data: {
-            videoFilePath: file
-        },
-
-        success: (response) => {
-             console.log({ response });
-        },
-
-        error: (err) => {
-            throw err;
-        },
-
-        complete: () => {
-            console.log('End Loading...');
-        }
-    });
-}

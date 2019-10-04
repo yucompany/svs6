@@ -40,11 +40,7 @@ class Letter extends SceneElement {
     if(!empty){
       let img = this.image = images[images.length-1];
 
-<<<<<<< HEAD
-      if (img) {
-=======
       if(img != null){
->>>>>>> 2120fa9b02f716ec245d7f511d84aa0affd16491
         this.width = img.width;
         this.height = img.height;
       }

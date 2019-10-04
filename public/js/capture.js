@@ -116,7 +116,7 @@ class Capture {
   }
   
   
-  encode(filename){
+  encode(filename, download){
     filename = filename || "unnamed";
     
     $.ajax({
@@ -130,9 +130,6 @@ class Capture {
         console.log("Done generating " + data);
         fileName = data;
 
-        console.log("MS: Initiating S3 upload now that video has been generated.");
-        beginUploadToS3(fileName);
-
         let link = document.createElement('a');
             link.href = data;
             link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
@@ -144,7 +141,7 @@ class Capture {
     })
   }
 
-  getVideoFile(){
+  getFileName(){
     return fileName;
   }
 }
