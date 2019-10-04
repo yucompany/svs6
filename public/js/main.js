@@ -48,6 +48,7 @@ function preload(){
       bg.volume(1);  // Ensure volume is set to 1
 
       bg.elt.playsInline = true; // Ensure video does not maximize
+      bg.elt.WebKitPlaysInline = true;
   });
   bg.hide(); 
   bg.hideControls();
@@ -61,6 +62,7 @@ function preload(){
     matte.volume(0);
 
     matte.elt.playsInline = true;
+    matte.elt.WebKitPlaysInline = true;
   });
   matte.hide(); 
   matte.hideControls();
