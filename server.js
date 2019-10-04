@@ -6,7 +6,6 @@ const tmp               = require('tmp');
 const fs                = require('fs');
 
 global.tempDir = tmp.dirSync({ unsafeCleanup: true });
-console.log(tempDir.name);
 
 // Store all generated videos here.
 global.outputDir = __dirname + '/output';
@@ -40,5 +39,5 @@ const awsRouter = require('./routes/aws_router.js');
 app.use('/aws/', awsRouter);
 
 const listener = app.listen(port, function() {
-    console.log('Preview your app on port ' + listener.address().port);
+    console.log('Your app is running on port ' + listener.address().port);
 });
