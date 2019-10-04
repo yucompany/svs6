@@ -37,6 +37,9 @@ class Capture {
     saveFrames('frame', f, d, fps, function(arr) {
       this.captured = arr;
       this.capturing = false;
+
+      console.log("Frames have been captured => ");
+        console.log(arr);
     }.bind(this));
   }
 
