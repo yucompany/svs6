@@ -20,7 +20,7 @@ if (downloadPhoto) {
 // Download Video Button
 const downloadVideo = document.getElementById('dlVideo');
 if (downloadVideo) {
-    downloadPhoto.addEventListener("click", () => {
+    downloadVideo.addEventListener("click", () => {
         console.log('DOWNLOADING VIDEO');
         save(canvas, FIRSTNAME + "_" + LASTNAME + "_VALLEY.jpg");
     });
