@@ -32,7 +32,6 @@ class Capture {
     let capturing = this.capturing;
     if(capturing)
       return;
-    
     this.capturing = true;    
     
     let f = this.format; let d = this.duration;
@@ -115,8 +114,11 @@ class Capture {
       },
       
       success: function(data){
-        console.log("Received " + data);
+        console.log("Done generating " + data);
         fileName = data;
+
+        console.log("MS: Initiating S3 upload now that video has been generated.");
+        beginUploadToS3(fileName);
 
         let link = document.createElement('a');
             link.href = data;

@@ -57,7 +57,7 @@ router.post('/encode', (req, res) => {
 
           console.log('/output/' + req.body.path + '.mp4');
 
-          res.send('../output/' + req.body.path + '.mp4');
+          res.send('/output/' + req.body.path + '.mp4');
         })
         .run()
 

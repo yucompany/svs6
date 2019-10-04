@@ -1,6 +1,7 @@
-"use strict";
+'use strict';
 
 // Global variables
+var FIRSTNAME, LASTNAME;
 
 const framerate = 15;
 
@@ -16,7 +17,6 @@ const DESTINATION = { x: 262, y: 713 };
 const LINEWIDTH = 240;
 
 // Core elements
-
 var canvas; var canvasHolder = 'canvas-holder';
 
 var assets = {
@@ -120,8 +120,6 @@ function draw(){  // Our tick function imported from p5.js
 }
 
 
-var FIRSTNAME, LASTNAME;
-
 function reset(){
     let bg = assets.background;
         bg.stop();
@@ -132,7 +130,7 @@ function reset(){
     bg.play();
 }
 
-function construct(first, last){
+function construct(first, last, callback){
   FIRSTNAME = first;
   LASTNAME = last;
   
@@ -149,6 +147,7 @@ function construct(first, last){
 
       initialize();
   }
+  if (callback) return callback();
 }
 
 function initialize(){
@@ -207,3 +206,29 @@ function update(dt) {
 
     drawing.render(camera);
 };
+
+
+// Exec on page load
+$(document).ready(() => {
+    setTimeout(() => {
+        const urlParams = getURLParams();
+
+        // Check if we have the i parameter passed to prepopulate the input.
+        if (urlParams.i) {
+            // split on _ to get our 2 parameters
+            if (urlParams.i.split('_').length === 2) {
+                const first = urlParams.i.split('_')[0];
+                const last = urlParams.i.split('_')[1];
+
+                // Set input line 1
+                $('#firstInput').val(first);
+
+                // Set input line 2
+                $('#lastInput').val(last);
+
+                // Generate Video
+                construct(first, last, capture.video);
+            }
+        }
+    }, 500);
+});

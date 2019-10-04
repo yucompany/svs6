@@ -22,7 +22,7 @@ const downloadVideo = document.getElementById('dlVideo');
 if (downloadVideo) {
     downloadVideo.addEventListener("click", () => {
         console.log('DOWNLOADING VIDEO');
-        save(canvas, FIRSTNAME + "_" + LASTNAME + "_VALLEY.jpg");
+        let vid = capture.video;
     });
 }
 
@@ -34,7 +34,7 @@ if (facebookShare) {
 
         if (videoFilePath) {
             // Start S3 Upload.
-            await beginUploadToS3(videoFilePath);
+            beginUploadToS3(videoFilePath);
 
             // showFacebookShare(videoFilePath);
         } else {
@@ -79,7 +79,7 @@ function beginUploadToS3(file) {
         type: 'POST',
         url: '/aws/s3upload',
         data: {
-            videoFilePath: '/output/MAX_SORTO.mp4'
+            videoFilePath: file
         },
 
         success: (response) => {
