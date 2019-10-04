@@ -138,7 +138,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.time(.1);
+        bg.time(0);
 
         elements.line1.clear();
         elements.line2.clear();
@@ -150,7 +150,7 @@ const onRestart = new Event("restarted");
 
 function restart(){
   let bg = assets.background;
-    bg.time(.1);
+    bg.stop();
 
     elements.line1.reset();
     elements.line2.reset();
@@ -161,20 +161,6 @@ function restart(){
         console.log("video played success");
 
         dispatchEvent(onRestart);
-
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
-    }
-
-    let matte = assets.matte;
-    promise = matte.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
-
-      dispatchEvent(onRestart); // Fire initialized event
-
 
       }).catch(function(error) {
         console.log("video played fail: " + error);
@@ -217,6 +203,8 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
+        bg.stop();
+
     let promise = bg.elt.play();
     if (promise !== undefined) {
       promise.then(function() {
@@ -230,7 +218,7 @@ function initialize(){
       });
     }
 
-    let matte = assets.matte;
+   /* let matte = assets.matte;
     promise = matte.elt.play();
     if (promise !== undefined) {
       promise.then(function() {
@@ -242,6 +230,6 @@ function initialize(){
       }).catch(function(error) {
         console.log("video played fail: " + error);
       });
-    }
+    }*/
     
 }
