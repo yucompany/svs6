@@ -41,17 +41,13 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 
 const onEnd = new Event("ended");
 
-var playing = false;
-var T = 0;
-var T_MAX = 0;
-
-// Load all base assets heres
+// Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(1);  // Ensure volume is set to 1
 
-      T_MAX = bg.duration();
+      bg.elt.playsInline = true; // Ensure video does not maximize
   });
   bg.hide(); 
   bg.hideControls();
@@ -95,16 +91,9 @@ function setup(){
 }
 
 
-
 function draw(){  // Our tick function imported from p5.js
-  if(playing){
-    if(T < T_MAX)
-      T = clamp(T + (1.0 / 15.0), 0, T_MAX);
-  }
-
   let bg = assets.background;
-    bg.time(T);
-  let time = T;
+  let time = bg.time();
   let matte = assets.matte;
       matte.time(time);
 
@@ -145,10 +134,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-    //    bg.stop();
-        
-        T = 0;
-        playing = false;
+        bg.stop();
 
         elements.line1.clear();
         elements.line2.clear();
@@ -160,15 +146,12 @@ const onRestart = new Event("restarted");
 
 function restart(){
   let bg = assets.background;
-   // bg.stop();
-
-    T = 0;
-    playing = true;
+    bg.stop();
 
     elements.line1.reset();
     elements.line2.reset();
 
-   // bg.play();
+    bg.play();
 
     dispatchEvent(onRestart);
 }
@@ -208,11 +191,8 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-     //   bg.stop(); 
-     //   bg.play();
-
-     T = 0;
-     playing = true;
+        bg.stop(); 
+        bg.play();
 
     capture.beginCapture(framerate);
       dispatchEvent(onInitialized); // Fire initialized event
