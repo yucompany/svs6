@@ -126,12 +126,12 @@ var FIRSTNAME, LASTNAME;
 
 function reset(){
     let bg = assets.background;
-        bg.stop();
+     //   bg.stop();
 
         elements.line1.reset();
         elements.line2.reset();
 
-    bg.play();
+    //bg.play();
 }
 
 function construct(first, last){
@@ -168,7 +168,7 @@ function initialize(){
 
     let bg = assets.background;
       //  bg.stop(); 
-       // bg.play();
+    //    bg.play();
 
       //  capture.beginCapture(framerate);
 }

@@ -132,18 +132,27 @@ class Line extends SceneElement {
   populate(letters){
     let char, letter;
 
-    let len = 0.0; let s = 0;
+    let seg = this.segment;
+
+    let len = 0.0; let s = 0; let k=0;
     for(let i = 0; i < letters.length; i++){
       s = CHARTABLE[letters[i]].size;
+      this.sizes.push(s);
 
-      if(i < letters.length-1 && CHARTABLE[letters[i]].e.hasOwnProperty(letters[i+1]))
-        s *= CHARTABLE[letters[i]].e[letters[i+1]];
+      if(i < letters.length-1){
+        k = Kerning[CHARTABLE[letters[i]].shape + CHARTABLE[letters[i+1]].shape] * (CHARTABLE[letters[i]].size*2+CHARTABLE[letters[i+1]].size)/3; // Append shape constants to lookup kerning in table
+        if(CHARTABLE[letters[i]].e.hasOwnProperty(letters[i+1]))
+          k *= CHARTABLE[letters[i]].e[letters[i+1]];
+      }
+      else
+        k = 0;
+      this.spaces.push(k);
 
-      len += s;
+      len += (s*CHARSIZE+k*SPACING)*seg;
     }
 
       if(len > 0)
-        len = this.charModifier = clamp(NUMCHARS / len, 0, 1); //Rescale letters if over total allowance
+        len = this.charModifier = clamp(this.length / len, 0, 1); //Rescale letters if over total allowance
       else 
         len = this.charModifier = 1;
 
@@ -157,24 +166,18 @@ class Line extends SceneElement {
       }
       else
         letter = new Letter(0, 0, 1, null, char, -1);      
-
-      let kern = 0;
-      if(i < letters.length-1){
-        kern = Kerning[CHARTABLE[letters[i]].shape + CHARTABLE[letters[i+1]].shape] * SPACING * this.segment * (CHARTABLE[letters[i]].size+CHARTABLE[letters[i+1]].size)/2; // Append shape constants to lookup kerning in table
-        if(CHARTABLE[letters[i]].e.hasOwnProperty(letters[i+1]))
-          kern *= (CHARTABLE[letters[i]]).e[letters[i+1]];
-      }
+      
         
-      let sz = CHARTABLE[letters[i]].size * CHARSIZE * this.segment * len;
-      this.stretch += (sz + kern);
+      let sz = this.sizes[i] * CHARSIZE * this.segment * len;
+      let kz = this.spaces[i] * SPACING * this.segment * len;
 
-      this.spaces.push(kern);
-      this.sizes.push(sz);
+      this.stretch += (sz+kz);
+
+      this.sizes[i] = sz;
+      this.spaces[i] = kz;
 
       this.letters.push(letter);
     }
-
-    
   }
 
   clear(){ 
@@ -226,6 +229,8 @@ class Line extends SceneElement {
 
         sx += (sizes[i] + spaces[i]);
         sy += (sizes[i] + spaces[i]);
+
+        
 
         letters[i].render(buffer, scale * m * CHARSIZE * this.charModifier, t);
       }
