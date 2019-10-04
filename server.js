@@ -45,6 +45,18 @@ app.get('/', function(request, response) {
 
 // Posting
 
+app.post('/screenshot', (req, res) => {
+  let blob = req.body.dat;
+  fs.writeFile(outputDir + "/screenshot.jpg", blob, 'binary', function(err){
+    if(err){
+      console.log(err);
+      res.end();
+    }
+    else
+      res.send('../output/screenshot.jpg');
+  });
+});
+
 app.post('/addFrame', (req, res) => {
   let frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
   let fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
@@ -62,7 +74,6 @@ app.post('/addFrame', (req, res) => {
 
 let userdir;
 
-
 app.post('/encode', (req, res) => {
   let oldTemp = tempDir;
 
@@ -72,9 +83,9 @@ app.post('/encode', (req, res) => {
   
   var proc = new ffmpeg()
       .input(tempDir.name + '/frame-%03d.jpg')
-      .fps(24)
+      .fps(15)
       .outputOptions([
-        '-framerate 24',
+        '-framerate 15',
         '-start_number 0',
         '-refs 5',
         '-c:v libx264',

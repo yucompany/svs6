@@ -39,14 +39,26 @@ var elements = {
 
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
-// Load all base assets here
+const onEnd = new Event("ended");
+
+var playing = false;
+var T = 0;
+var T_MAX = 0;
+
+// Load all base assets heres
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(1);  // Ensure volume is set to 1
+
+      T_MAX = bg.duration();
   });
   bg.hide(); 
   bg.hideControls();
+  bg.onended(function(){
+    console.log("video finished");
+    dispatchEvent(onEnd);
+  });
 
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
@@ -83,9 +95,16 @@ function setup(){
 }
 
 
+
 function draw(){  // Our tick function imported from p5.js
+  if(playing){
+    if(T < T_MAX)
+      T = clamp(T + (1.0 / 15.0), 0, T_MAX);
+  }
+
   let bg = assets.background;
-  let time = bg.time();
+    bg.time(T);
+  let time = T;
   let matte = assets.matte;
       matte.time(time);
 
@@ -122,14 +141,36 @@ function draw(){  // Our tick function imported from p5.js
 
 var FIRSTNAME, LASTNAME;
 
+const onReset = new Event("resetted");
+
 function reset(){
     let bg = assets.background;
-        bg.stop();
+    //    bg.stop();
+        
+        T = 0;
+        playing = false;
 
-        elements.line1.reset();
-        elements.line2.reset();
+        elements.line1.clear();
+        elements.line2.clear();
 
-    bg.play();
+    dispatchEvent(onReset);
+}
+
+const onRestart = new Event("restarted");
+
+function restart(){
+  let bg = assets.background;
+   // bg.stop();
+
+    T = 0;
+    playing = true;
+
+    elements.line1.reset();
+    elements.line2.reset();
+
+   // bg.play();
+
+    dispatchEvent(onRestart);
 }
 
 function construct(first, last){
@@ -151,6 +192,8 @@ function construct(first, last){
   }
 }
 
+const onInitialized = new Event('initialized');
+
 function initialize(){
     let char = "";
     let letter;
@@ -165,45 +208,12 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-        bg.stop(); 
-        bg.play();
+     //   bg.stop(); 
+     //   bg.play();
+
+     T = 0;
+     playing = true;
 
     capture.beginCapture(framerate);
+      dispatchEvent(onInitialized); // Fire initialized event
 }
-
-
-var sequence = 0;
-var built = 0;
-
-function update(dt) {
-    dt /= 1000;
-
-    let bg = assets.background;
-    let matte = assets.matte;
-   // let flares = assets.flares;
-        matte.time(bg.time());
-      //  flares.time(bg.time());
-    
-    let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
-            offset = lerp(.66, .97, seq);
-
-    let line;
-    for(let i = 0; i < lines.length; i++){
-      line = lines[i];
-
-      line.object.x = (offset * line.origin.x) + lerp(744, 117, seq) ;
-      line.object.y = (offset * line.origin.y) + lerp(262, 713, seq) ;
-      line.object.scale = offset*.67;
-
-      if(i == 0 && bg.time() > 3.625 && built <= 0){
-        line.object.build();
-        built++;
-      }
-      else if(i == 1 && bg.time() > 5.08 && built <= 1){
-        line.object.build();
-        built++;
-      }
-    }
-
-    drawing.render(camera);
-};
