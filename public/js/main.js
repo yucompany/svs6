@@ -44,7 +44,7 @@ const onEnd = new Event("ended");
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(0);
+      bg.time(.1);
       bg.volume(1);  // Ensure volume is set to 1
 
       bg.elt.playsInline = true; // Ensure video does not maximize
@@ -138,7 +138,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.stop();
+        bg.time(.1);
 
         elements.line1.clear();
         elements.line2.clear();
@@ -150,14 +150,21 @@ const onRestart = new Event("restarted");
 
 function restart(){
   let bg = assets.background;
-    bg.stop();
+    bg.time(.1);
 
     elements.line1.reset();
     elements.line2.reset();
 
-    bg.play();
+    let promise = bg.elt.play();
+    if (promise !== undefined) {
+      promise.then(function() {
+        console.log("video played success");
 
-    dispatchEvent(onRestart);
+        dispatchEvent(onRestart);
+      }).catch(function(error) {
+        console.log("video played fail: " + error);
+      });
+    }
 }
 
 function construct(first, last){
@@ -195,9 +202,18 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-        bg.stop(); 
-        bg.play();
 
-    capture.beginCapture(framerate);
-      dispatchEvent(onInitialized); // Fire initialized event
+    let promise = bg.elt.play();
+    if (promise !== undefined) {
+      promise.then(function() {
+        console.log("video played success");
+
+        capture.beginCapture(framerate);
+        dispatchEvent(onInitialized); // Fire initialized event
+      }).catch(function(error) {
+        console.log("video played fail: " + error);
+      });
+    }
+
+    
 }
