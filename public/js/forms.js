@@ -1218,7 +1218,7 @@ const verifyName = function(){
         alert("Error. 404. Page not found. But seriously… Our lawyers said at least one of those words isn’t allowed. Try again!");
     }
     var throwAccept = function(f, l){
-        construct(f, l);
+        construct(f, l, capture.video);
     }
     var throwRepeat = function(){
         reset();

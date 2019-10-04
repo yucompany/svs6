@@ -12,7 +12,6 @@ if (replay) {
 const downloadPhoto = document.getElementById('dlPhoto');
 if (downloadPhoto) {
     downloadPhoto.addEventListener('click', () => {
-        console.log('DOWNLOADING PHOTO');
         save(canvas, 'screen.jpg');
     });
 }
@@ -21,7 +20,6 @@ if (downloadPhoto) {
 const downloadVideo = document.getElementById('dlVideo');
 if (downloadVideo) {
     downloadVideo.addEventListener("click", () => {
-        console.log('DOWNLOADING VIDEO');
         let vid = capture.video;
     });
 }
@@ -33,10 +31,7 @@ if (facebookShare) {
         const videoFilePath = capture.getVideoFile(this.name);
 
         if (videoFilePath) {
-            // Start S3 Upload.
-            beginUploadToS3(videoFilePath);
-
-            // showFacebookShare(videoFilePath);
+            showFacebookShare(videoFilePath);
         } else {
             alert('Please click the "Video" button first to generate an .mp4 video in the output directory.');
         }

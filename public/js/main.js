@@ -145,12 +145,11 @@ function construct(first, last, callback){
     if(loaded <= 1)
       return;
 
-      initialize();
+      initialize(callback);
   }
-  if (callback) return callback();
 }
 
-function initialize(){
+function initialize(callback){
     let char = "";
     let letter;
     let container;
@@ -167,7 +166,7 @@ function initialize(){
         bg.stop(); 
         bg.play();
 
-    capture.beginCapture(framerate);
+    capture.beginCapture(framerate, callback);
 }
 
 
@@ -230,5 +229,5 @@ $(document).ready(() => {
                 construct(first, last, capture.video);
             }
         }
-    }, 500);
+    }, 1200);
 });
