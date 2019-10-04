@@ -28,7 +28,7 @@ var outputDir = __dirname + "/output";
 app.use(express.static('public'))
    .use(express.static('assets'))
    .use(express.static('lib'))
-   .use(express.static('output'));
+   .use('/output', express.static('output'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
@@ -95,7 +95,7 @@ app.post('/encode', (req, res) => {
 
         console.log('/output/' + req.body.path + '.mp4');
 
-        res.send('/output/' + req.body.path + '.mp4');
+        res.send('../output/' + req.body.path + '.mp4');
       })
       .run()
 

@@ -31,7 +31,6 @@ var elements = {
   bg : "",
   buffer: "",
   mask : "",
-  shadows : "",
   fx : "",
 
   line1 : "",
@@ -43,7 +42,7 @@ const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framer
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(bg.duration());
+      bg.time(0);
       bg.volume(1);  // Ensure volume is set to 1
   });
   bg.hide(); 
@@ -77,7 +76,6 @@ function setup(){
   let bg = elements.bg = assets.bg;
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
   let mask = elements.mask = new Mask(WIDTH2, HEIGHT2);
-  //let shadows = elements.shadows = createGraphics(WIDTH, HEIGHT);
   let fx = elements.fx = assets.flares;
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
@@ -126,12 +124,12 @@ var FIRSTNAME, LASTNAME;
 
 function reset(){
     let bg = assets.background;
-     //   bg.stop();
+        bg.stop();
 
         elements.line1.reset();
         elements.line2.reset();
 
-    //bg.play();
+    bg.play();
 }
 
 function construct(first, last){
@@ -167,10 +165,10 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-      //  bg.stop(); 
-    //    bg.play();
+        bg.stop(); 
+        bg.play();
 
-      //  capture.beginCapture(framerate);
+    capture.beginCapture(framerate);
 }
 
 
