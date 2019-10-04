@@ -59,6 +59,8 @@ function preload(){
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
+
+    matte.elt.playsInline = true;
   });
   matte.hide(); 
   matte.hideControls();
