@@ -25,6 +25,18 @@ router.post('/addFrame', (req, res) => {
     });
 });
 
+router.post('/screenshot', (req, res) => {
+    let blob = req.body.dat;
+    fs.writeFile(outputDir + "/screenshot.jpg", blob, 'binary', function(err){
+      if(err){
+        console.log(err);
+        res.end();
+      }
+      else
+        res.send('../output/screenshot.jpg');
+    });
+});
+
 router.post('/encode', (req, res) => {
     let oldTemp = tempDir;
 
@@ -34,9 +46,9 @@ router.post('/encode', (req, res) => {
 
     var proc = new ffmpeg()
         .input(tempDir.name + '/frame-%03d.jpg')
-        .fps(24)
+        .fps(15)
         .outputOptions([
-          '-framerate 24',
+          '-framerate 15',
           '-start_number 0',
           '-refs 5',
           '-c:v libx264',
@@ -57,7 +69,7 @@ router.post('/encode', (req, res) => {
 
           console.log('/output/' + req.body.path + '.mp4');
 
-          res.send('/output/' + req.body.path + '.mp4');
+          res.send('../output/' + req.body.path + '.mp4');
         })
         .run()
 
