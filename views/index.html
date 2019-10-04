@@ -33,9 +33,11 @@
     <script src="js/letters.js"></script>
     <script src="js/drawing.js"></script>
     <script src="js/capture.js"></script>
-    
+
     <script src="js/forms.js" defer></script>
     <script src="js/ui.js" defer></script>
+
+    <script src="js/fb-sdk.js"></script>
 
     <script src="js/main.js" defer></script>
   </head>
@@ -99,14 +101,18 @@
                         <button id="dlVideo" class="btn dlbtn btn-primary text-uppercase flex-fill ml-3">Video<div></div></button>
                       </div>
                   </div>
-      
-                  <div id="sharing" class="d-flex flex-column align-items-start flex-fill border-right px-4">
-                      <h2 class="text-left">Share</h2>
-                      <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
-                      <div class="d-flex flex-fill mt-3">
-                        <img id="shareTwitter" src="../images/icons/twitter.png" class="socialicon">
-                        <img id="shareFacebook" src="../images/icons/facebook.png" class="socialicon ml-3">
-                      </div>
+              </div>
+  
+              <div id="sharing" class="d-flex flex-column align-items-start flex-fill border-right px-4">
+                  <h2 class="text-left">Share</h2>
+                  <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
+                  <div class="d-flex flex-fill mt-3">
+                    <button id="shareTwitter">
+                        <img src="../images/icons/twitter.png" class="socialicon">
+                    </button>
+                    <button id="shareFacebook">
+                        <img src="../images/icons/facebook.png" class="socialicon ml-3">
+                    </button>
                   </div>
 
                   <div id="redo-container" class="d-flex flex-column align-items-start flex-fill px-4">

@@ -1,6 +1,7 @@
-"use strict";
+'use strict';
 
 // Global variables
+var FIRSTNAME, LASTNAME;
 
 const framerate = 15;
 
@@ -50,10 +51,21 @@ function preload(){
       bg.elt.playsInline = true; // Ensure video does not maximize
       bg.elt.WebKitPlaysInline = true;
   });
-  bg.hide(); 
+  bg.hide();
   bg.hideControls();
   bg.onended(function(){
-    console.log("video finished");
+    console.log('Video generated!');
+
+    // Encode video
+    console.log('Video now encoding to .mp4');
+    capture.video;
+    // Get filename
+    const fileName = capture.getFileName();
+
+    if (fileName) {
+        console.log('MS: Initiating S3 upload now that video has been generated.');
+        beginUploadToS3(fileName);
+    }
     dispatchEvent(onEnd);
   });
 
@@ -131,8 +143,6 @@ function draw(){  // Our tick function imported from p5.js
   image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 }
 
-
-var FIRSTNAME, LASTNAME;
 
 const onReset = new Event("resetted");
 
@@ -212,7 +222,6 @@ function initialize(){
 
         capture.beginCapture(framerate);
         dispatchEvent(onInitialized); // Fire initialized event
-
       }).catch(function(error) {
         console.log("video played fail: " + error);
       });
@@ -233,3 +242,52 @@ function initialize(){
     }*/
     
 }
+
+// Begins upload to S3
+function beginUploadToS3(file) {
+    console.log('Show Loading...');
+      $.ajax({
+        type: 'POST',
+        url: '/aws/s3upload',
+        data: {
+            videoFilePath: file
+        },
+
+        success: (response) => {
+             console.log({ response });
+        },
+
+        error: (err) => {
+            throw err;
+        },
+
+        complete: () => {
+            console.log('End Loading...');
+        }
+    });
+}
+
+// Exec on page load
+$(document).ready(() => {
+    setTimeout(() => {
+        const urlParams = getURLParams();
+
+        // Check if we have the i parameter passed to prepopulate the input.
+        if (urlParams.i) {
+            // split on _ to get our 2 parameters
+            if (urlParams.i.split('_').length === 2) {
+                const first = urlParams.i.split('_')[0];
+                const last = urlParams.i.split('_')[1];
+
+                // Set input line 1
+                $('#firstInput').val(first);
+
+                // Set input line 2
+                $('#lastInput').val(last);
+
+                // Generate Video
+                construct(first, last, capture.video);
+            }
+        }
+    }, 1200);
+});

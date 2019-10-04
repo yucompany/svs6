@@ -2,6 +2,7 @@
 
 var videoContainer;
 
+let fileName = null;
 const onCaptured = new Event('captured');
 
 class Capture {
@@ -32,7 +33,6 @@ class Capture {
     let capturing = this.capturing;
     if(capturing)
       return;
-    
     this.capturing = true;    
     
     let f = this.format; let d = this.duration;
@@ -93,7 +93,7 @@ class Capture {
     
     $.ajax({
       type: 'POST',
-      url: '/addFrame',
+      url: '/encoder/addFrame',
       data: {
         dat: frame,
         frame: (frames-1),
@@ -116,18 +116,19 @@ class Capture {
   }
   
   
-  encode(filename){
+  encode(filename, download){
     filename = filename || "unnamed";
     
     $.ajax({
       type: 'POST',
-      url: '/encode',
+      url: '/encoder/encode',
       data: {
         path: filename
       },
       
       success: function(data){
-        console.log("Received " + data);
+        console.log("Done generating " + data);
+        fileName = data;
 
         let link = document.createElement('a');
             link.href = data;
@@ -138,5 +139,9 @@ class Capture {
             document.body.removeChild(link);
       }
     })
+  }
+
+  getFileName(){
+    return fileName;
   }
 }
