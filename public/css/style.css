@@ -75,7 +75,7 @@ small {
   background-image: url("../images/icons/download.svg");
 }
 
-#redo .btn {
+#redo {
   background-color: #F04933 !important;
 }
 
@@ -85,17 +85,16 @@ small {
 
 #canvas-holder {
   position: relative;
+  height: calc(100% * (720/1280));
 }
 
-#reset {
-  background-image: url("../images/icons/reset\ arrow.svg");
+#replay {
+  width: 156px;
+  height: 156px;
 
-  position: absolute;
-  bottom:0;
-  right:0;
-
-  width: 64px;
-  height: 64px;
+  -webkit-transition: opacity .33s ease;
+    -o-transition: opacity .33s ease;
+    transition: opacity .33s ease;
 }
 
 .socialicon {
@@ -134,4 +133,32 @@ button {
     #canvas-holder {
       display: npne
     }
+}
+
+#submission {
+  -webkit-transition: opacity .5s ease;
+    -o-transition: opacity .5s ease;
+    transition: opacity .5s ease;
+}
+
+#exports.shown {
+  -webkit-transition: opacity .67s ease 1s;
+    -o-transition: opacity .67s ease 1s;
+    transition: opacity .67s ease 1s;
+}
+
+#exports.hidden {
+  -webkit-transition: opacity .67s ease;
+    -o-transition: opacity .67s ease;
+    transition: opacity .67s ease;
+}
+
+.hidden {
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+.shown {
+  pointer-events: all !important;
+  opacity: 1 !important;
 }

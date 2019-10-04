@@ -17,7 +17,8 @@ const DESTINATION = { x: 262, y: 713 };
 const LINEWIDTH = 240;
 
 // Core elements
-var canvas; var canvasHolder = 'canvas-holder';
+
+var canvas; var canvasHolder = document.getElementById('canvas-holder');
 
 var assets = {
   background : "",
@@ -39,18 +40,28 @@ var elements = {
 
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
+const onEnd = new Event("ended");
+
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(1);  // Ensure volume is set to 1
+
+      bg.elt.playsInline = true; // Ensure video does not maximize
   });
   bg.hide(); 
   bg.hideControls();
+  bg.onended(function(){
+    console.log("video finished");
+    dispatchEvent(onEnd);
+  });
 
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
+
+    matte.elt.playsInline = true;
   });
   matte.hide(); 
   matte.hideControls();
@@ -69,9 +80,9 @@ function setup(){
   imageMode(CENTER);
   frameRate(framerate);
 
-  canvas = createCanvas(WIDTH, HEIGHT);
+  canvas = createCanvas(WIDTH, HEIGHT); console.log(canvas);
     canvas.parent(canvasHolder);
-    canvas.class('w-100 h-auto');
+    canvas.class('w-100 h-100');
 
   let bg = elements.bg = assets.bg;
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
@@ -120,14 +131,30 @@ function draw(){  // Our tick function imported from p5.js
 }
 
 
+const onReset = new Event("resetted");
+
 function reset(){
     let bg = assets.background;
         bg.stop();
 
-        elements.line1.reset();
-        elements.line2.reset();
+        elements.line1.clear();
+        elements.line2.clear();
+
+    dispatchEvent(onReset);
+}
+
+const onRestart = new Event("restarted");
+
+function restart(){
+  let bg = assets.background;
+    bg.stop();
+
+    elements.line1.reset();
+    elements.line2.reset();
 
     bg.play();
+
+    dispatchEvent(onRestart);
 }
 
 function construct(first, last, callback){
@@ -149,7 +176,9 @@ function construct(first, last, callback){
   }
 }
 
-function initialize(callback){
+const onInitialized = new Event('initialized');
+
+function initialize(){
     let char = "";
     let letter;
     let container;
@@ -167,6 +196,7 @@ function initialize(callback){
         bg.play();
 
     capture.beginCapture(framerate, callback);
+    dispatchEvent(onInitialized);
 }
 
 

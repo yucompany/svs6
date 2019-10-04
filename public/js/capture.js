@@ -3,6 +3,7 @@
 var videoContainer;
 
 let fileName = null;
+const onCaptured = new Event('captured');
 
 class Capture {
 
@@ -38,15 +39,27 @@ class Capture {
     saveFrames('frame', f, d, fps, function(arr) {
       this.captured = arr;
       this.capturing = false;
+
+      console.log("Frames have been captured => ");
+        console.log(arr);
+
+      dispatchEvent(onCaptured); // Fire captured
     }.bind(this));
   }
 
-  get photo(){ 
+  get photo(){
     let captured = this.captured;
-    if(captured.length <= 0)
-      return null;
-    else
-      return captured[captured.length-1];
+
+    if(captured == null || captured.length <= 0) return;
+
+    let frame = captured[captured.length-1].imageData; console.log(frame);
+    var json = JSON.stringify(frame),
+            blob = new Blob([json], {type: "image/octet-stream"}),
+            url = window.URL.createObjectURL(blob);
+
+    downloadPhoto.href = url;
+    downloadPhoto.download = "screenshot.jpg";
+    downloadPhoto.click();
   }
 
   get video(){
