@@ -81,7 +81,7 @@ class Capture {
     
     $.ajax({
       type: 'POST',
-      url: '/addFrame',
+      url: '/encoder/addFrame',
       data: {
         dat: frame,
         frame: (frames-1),
@@ -109,7 +109,7 @@ class Capture {
     
     $.ajax({
       type: 'POST',
-      url: '/encode',
+      url: '/encoder/encode',
       data: {
         path: filename
       },

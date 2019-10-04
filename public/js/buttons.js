@@ -29,11 +29,14 @@ if (downloadVideo) {
 // Share to Facebook Button
 const facebookShare = document.getElementById('shareFacebook');
 if (facebookShare) {
-    facebookShare.addEventListener('click', () => {
+    facebookShare.addEventListener('click', async () => {
         const videoFilePath = capture.getVideoFile(this.name);
 
         if (videoFilePath) {
-            showFacebookShare(videoFilePath);
+            // Start S3 Upload.
+            await beginUploadToS3(videoFilePath);
+
+            // showFacebookShare(videoFilePath);
         } else {
             alert('Please click the "Download" button first to generate an .mp4 video in the output directory.');
         }
@@ -67,4 +70,18 @@ function showFacebookShare() {
 // Helper function for Twitter sharing
 function showTwitterShare() {
     window.open(`http://twitter.com/share?text=BE%20THE%20VALLEY&url=${encodeURIComponent('www.google.com')}&hashtags=#BeTheValley&via=leexperiential`, '', 'width=720,height=250');
+}
+
+// Begins upload to S3
+async function beginUploadToS3(file) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            videoFilePath: file
+        })
+      });
+      return await response.json(); // parses JSON response into native JavaScript objects
 }
