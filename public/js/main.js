@@ -45,10 +45,11 @@ const onEnd = new Event("ended");
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(0);
+      bg.time(.1);
       bg.volume(1);  // Ensure volume is set to 1
 
       bg.elt.playsInline = true; // Ensure video does not maximize
+      bg.elt.WebKitPlaysInline = true;
   });
   bg.hide();
   bg.hideControls();
@@ -73,6 +74,7 @@ function preload(){
     matte.volume(0);
 
     matte.elt.playsInline = true;
+    matte.elt.WebKitPlaysInline = true;
   });
   matte.hide(); 
   matte.hideControls();
@@ -146,7 +148,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.stop();
+        bg.time(0);
 
         elements.line1.clear();
         elements.line2.clear();
@@ -163,9 +165,17 @@ function restart(){
     elements.line1.reset();
     elements.line2.reset();
 
-    bg.play();
+    let promise = bg.elt.play();
+    if (promise !== undefined) {
+      promise.then(function() {
+        console.log("video played success");
 
-    dispatchEvent(onRestart);
+        dispatchEvent(onRestart);
+
+      }).catch(function(error) {
+        console.log("video played fail: " + error);
+      });
+    }
 }
 
 function construct(first, last){
@@ -203,49 +213,35 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-        bg.stop(); 
-        bg.play();
+        bg.stop();
 
-    capture.beginCapture(framerate);
-    dispatchEvent(onInitialized);
-}
+    let promise = bg.elt.play();
+    if (promise !== undefined) {
+      promise.then(function() {
+        console.log("video played success");
 
-
-var sequence = 0;
-var built = 0;
-
-function update(dt) {
-    dt /= 1000;
-
-    let bg = assets.background;
-    let matte = assets.matte;
-   // let flares = assets.flares;
-        matte.time(bg.time());
-      //  flares.time(bg.time());
-    
-    let seq = sequence = clamp(bg.time() / 7.4583, 0, 1);
-            offset = lerp(.66, .97, seq);
-
-    let line;
-    for(let i = 0; i < lines.length; i++){
-      line = lines[i];
-
-      line.object.x = (offset * line.origin.x) + lerp(744, 117, seq) ;
-      line.object.y = (offset * line.origin.y) + lerp(262, 713, seq) ;
-      line.object.scale = offset*.67;
-
-      if(i == 0 && bg.time() > 3.625 && built <= 0){
-        line.object.build();
-        built++;
-      }
-      else if(i == 1 && bg.time() > 5.08 && built <= 1){
-        line.object.build();
-        built++;
-      }
+        capture.beginCapture(framerate);
+        dispatchEvent(onInitialized); // Fire initialized event
+      }).catch(function(error) {
+        console.log("video played fail: " + error);
+      });
     }
 
-    drawing.render(camera);
-};
+   /* let matte = assets.matte;
+    promise = matte.elt.play();
+    if (promise !== undefined) {
+      promise.then(function() {
+        console.log("video played success");
+
+      
+
+
+      }).catch(function(error) {
+        console.log("video played fail: " + error);
+      });
+    }*/
+    
+}
 
 // Begins upload to S3
 function beginUploadToS3(file) {
