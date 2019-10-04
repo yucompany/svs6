@@ -31,7 +31,6 @@ var elements = {
   bg : "",
   buffer: "",
   mask : "",
-  shadows : "",
   fx : "",
 
   line1 : "",
@@ -77,7 +76,6 @@ function setup(){
   let bg = elements.bg = assets.bg;
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
   let mask = elements.mask = new Mask(WIDTH2, HEIGHT2);
-  //let shadows = elements.shadows = createGraphics(WIDTH, HEIGHT);
   let fx = elements.fx = assets.flares;
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
@@ -170,7 +168,7 @@ function initialize(){
         bg.stop(); 
         bg.play();
 
-        capture.beginCapture(framerate);
+    capture.beginCapture(framerate);
 }
 
 

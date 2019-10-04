@@ -20,7 +20,7 @@ const app = express();
 app.use(express.static('public'))
    .use(express.static('assets'))
    .use(express.static('lib'))
-   .use(express.static('output'));
+   .use('/output', express.static('output'));
 
 // Server options
 app.use(bodyParser.json());

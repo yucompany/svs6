@@ -20,9 +20,9 @@ if (downloadPhoto) {
 // Download Video Button
 const downloadVideo = document.getElementById('dlVideo');
 if (downloadVideo) {
-    downloadVideo.addEventListener('click', () => {
+    downloadPhoto.addEventListener("click", () => {
         console.log('DOWNLOADING VIDEO');
-        capture.video;
+        save(canvas, FIRSTNAME + "_" + LASTNAME + "_VALLEY.jpg");
     });
 }
 
@@ -38,7 +38,7 @@ if (facebookShare) {
 
             // showFacebookShare(videoFilePath);
         } else {
-            alert('Please click the "Download" button first to generate an .mp4 video in the output directory.');
+            alert('Please click the "Video" button first to generate an .mp4 video in the output directory.');
         }
     });
 }

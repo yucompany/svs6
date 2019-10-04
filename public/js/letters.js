@@ -3,56 +3,86 @@
 // SQ = Square , TTR = Top-strong Trapezoid, BTR = Bottom-strong Trapezoid
 
 const CHARTABLE = {
-  "A" : { shape: "BTR", size: 1.1 },
-  "B" : { shape: "SQ", size: 1 },
-  "C" : { shape: "SQ", size: 1 },
-  "D" : { shape: "SQ", size: 1},
-  "E" : { shape: "SQ", size: .87},
-  "F" : { shape: "TTR", size: 1},
-  "G" : { shape: "SQ", size: 1},
-  "H" : { shape: "SQ", size: 1},
-  "I" : { shape: "SQ", size: .33},
-  "J" : { shape: "BTR", size: 1},
-  "K" : { shape: "SQ", size: 1},
-  "L" : { shape: "BTR", size: .75},
-  "M" : { shape: "SQ", size: 1.67},
-  "N" : { shape: "SQ", size: 1},
-  "O" : { shape: "SQ", size: 1},
-  "P" : { shape: "TTR", size: 1},
-  "Q" : { shape: "BTR", size: 1},
-  "R" : { shape: "SQ", size: 1},
-  "S" : { shape: "SQ", size: 1},
-  "T" : { shape: "TTR", size: 1},
-  "U" : { shape: "SQ", size: 1},
-  "V" : { shape: "TTR", size: 1},
-  "W" : { shape: "TTR", size: 1.67},
-  "X" : { shape: "SQ", size: 1},
-  "Y" : { shape: "TTR", size: 1},
-  "Z" : { shape: "SQ", size: 1},
+  "A" : { shape: "BTR", size: 1, e: { F: 1.5, P: 1.5, J: 1, L: 1.1 } },
+  "B" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "C" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2}  },
+  "D" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "E" : { shape: "SQ", size: .7, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
+  "F" : { shape: "TTR", size: .8, e: { F: 1.1, P: 1.2, J: 1.2, L: 1.35 } },
+  "G" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "H" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "I" : { shape: "I", size: .3, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2, I: 1.5 } },
+  "J" : { shape: "J", size: .95, e: { F: 1.5, P: 1.5, J: .85, L: .9 } },
+  "K" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
+  "L" : { shape: "L", size: .8, e: { F: 1.5, P: 1.5, J: .85, L: .9 } },
+  "M" : { shape: "SQ", size: 1.2, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2 } },
+  "N" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "O" : { shape: "SQ", size: .85, e: { F: 1.3, P: 1.3, J: 1.2, L: 1.2 } },
+  "P" : { shape: "TTR", size: .8, e: { F: 1.1, P: 1.35, J: 1.2, L: 1.55  } },
+  "Q" : { shape: "BTR", size: .95, e: { F: 1.5, P: 1.5, J: 1, L: 1.2 } },
+  "R" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "S" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "T" : { shape: "TTR", size: .9, e: { F: 1.1, P: 1.2, J: .85, L: 1.35 } },
+  "U" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "V" : { shape: "TTR", size: 1, e: { F: 1.1, P: 1.2, J: 1.2, L: 1.5 } },
+  "W" : { shape: "TTR", size: 1.4, e: { F: 1.1, P: 1.2, J: 1.3, L: 1.5 } },
+  "X" : { shape: "SQ", size: .95, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "Y" : { shape: "TTR", size: .95, e: { F: 1.1, P: 1.2, J: .9, L: 1.5 } },
+  "Z" : { shape: "SQ", size: .8, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
 
-  "@" : { shape: "SQ", size: 1.5},
-  "#" : { shape: "SQ", size: 1},
-  "-" : { shape: "SQ", size: 1},
-  "+" : { shape: "SQ", size: 1},
-  " " : { shape: "SQ", size: .33}
+  "@" : { shape: "SQ", size: 1.35, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
+  "#" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
+  "-" : { shape: "SQ", size: .55, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
+  "+" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
+  " " : { shape: "SQ", size: .35, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } }
 }
 
-const NUMCHARS = 7.0;
-const CHARSIZE = .7 * (6.0 / NUMCHARS); 
-const SPACING = CHARSIZE * (.67);
+const NUMCHARS = 6.0;
+const CHARSIZE = .67 * (6.0 / NUMCHARS); 
+const SPACING = CHARSIZE * (.87);
 
 const Kerning = {
   "SQSQ"   : 1,
-  "SQTTR"  : .5,
-  "SQBTR"  : .5,
+  "SQTTR"  : .9,
+  "SQBTR"  : .9,
+  "SQL" : .9,
+  "SQJ" : .9,
+  "SQI" : 1.35,
 
-  "TTRSQ"  : .87,
-  "TTRBTR" : .5,
-  "TTRTTR" : .9,
+  "TTRSQ"  : .9,
+  "TTRBTR" : .6,
+  "TTRTTR" : .8,
+  "TTRL" : .7,
+  "TTRJ" : .6,
+  "TTRI" : 1.2,
 
-  "BTRSQ"  : .87,
-  "BTRTTR" : .5,
-  "BTRBTR" : .87
+  "BTRSQ"  : .9,
+  "BTRTTR" : .6,
+  "BTRBTR" : .9,
+  "BTRL" : .9,
+  "BTRJ" : .9,
+  "BTRI" : 1.2,
+
+  "LSQ" : .7,
+  "LTTR": .3,
+  "LBTR" : .7,
+  "LL" : .85,
+  "LJ" : .7,
+  "LI" : 1.1,
+
+  "JSQ" : .7,
+  "JTTR": .5,
+  "JBTR" : .5,
+  "JL" : .9,
+  "JJ" : .75,
+  "JI" : 1,
+
+  "ISQ" : 1,
+  "ITTR": .9,
+  "IBTR" : .9,
+  "IL" : .9,
+  "IJ" : .9,
+  "II" : 1
 }
 
 
