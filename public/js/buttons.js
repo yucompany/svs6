@@ -73,15 +73,25 @@ function showTwitterShare() {
 }
 
 // Begins upload to S3
-async function beginUploadToS3(file) {
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+function beginUploadToS3(file) {
+    console.log('Show Loading...');
+      $.ajax({
+        type: 'POST',
+        url: '/aws/s3upload',
+        data: {
+            videoFilePath: '/output/MAX_SORTO.mp4'
         },
-        body: JSON.stringify({
-            videoFilePath: file
-        })
-      });
-      return await response.json(); // parses JSON response into native JavaScript objects
+
+        success: (response) => {
+             console.log({ response });
+        },
+
+        error: (err) => {
+            throw err;
+        },
+
+        complete: () => {
+            console.log('End Loading...');
+        }
+    });
 }
