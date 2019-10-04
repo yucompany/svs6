@@ -11,17 +11,17 @@ const CHARTABLE = {
   "F" : { shape: "TTR", size: .8, e: { F: 1.1, P: 1.2, J: 1.2, L: 1.35 } },
   "G" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
   "H" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
-  "I" : { shape: "SQ", size: .35, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2 } },
-  "J" : { shape: "BTR", size: .95, e: { F: 1.5, P: 1.5, J: .85, L: .9 } },
+  "I" : { shape: "I", size: .3, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2, I: 1.5 } },
+  "J" : { shape: "J", size: .95, e: { F: 1.5, P: 1.5, J: .85, L: .9 } },
   "K" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } },
-  "L" : { shape: "BTR", size: .8, e: { F: 1.5, P: 1.5, J: .85, L: .9 } },
-  "M" : { shape: "SQ", size: 1.35, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2 } },
+  "L" : { shape: "L", size: .8, e: { F: 1.5, P: 1.5, J: .85, L: .9 } },
+  "M" : { shape: "SQ", size: 1.2, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2 } },
   "N" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
   "O" : { shape: "SQ", size: .85, e: { F: 1.3, P: 1.3, J: 1.2, L: 1.2 } },
-  "P" : { shape: "TTR", size: .8, e: { F: 1.1, P: 1.35, J: 1.2, L: 1.35 } },
+  "P" : { shape: "TTR", size: .8, e: { F: 1.1, P: 1.35, J: 1.2, L: 1.55  } },
   "Q" : { shape: "BTR", size: .95, e: { F: 1.5, P: 1.5, J: 1, L: 1.2 } },
   "R" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
-  "S" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
+  "S" : { shape: "SQ", size: .9, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
   "T" : { shape: "TTR", size: .9, e: { F: 1.1, P: 1.2, J: .85, L: 1.35 } },
   "U" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
   "V" : { shape: "TTR", size: 1, e: { F: 1.1, P: 1.2, J: 1.2, L: 1.5 } },
@@ -43,16 +43,46 @@ const SPACING = CHARSIZE * (.87);
 
 const Kerning = {
   "SQSQ"   : 1,
-  "SQTTR"  : .8,
+  "SQTTR"  : .9,
   "SQBTR"  : .9,
+  "SQL" : .9,
+  "SQJ" : .9,
+  "SQI" : 1.35,
 
-  "TTRSQ"  : .8,
+  "TTRSQ"  : .9,
   "TTRBTR" : .6,
   "TTRTTR" : .8,
+  "TTRL" : .7,
+  "TTRJ" : .6,
+  "TTRI" : 1.2,
 
   "BTRSQ"  : .9,
   "BTRTTR" : .6,
-  "BTRBTR" : .9
+  "BTRBTR" : .9,
+  "BTRL" : .9,
+  "BTRJ" : .9,
+  "BTRI" : 1.2,
+
+  "LSQ" : .7,
+  "LTTR": .3,
+  "LBTR" : .7,
+  "LL" : .85,
+  "LJ" : .7,
+  "LI" : 1.1,
+
+  "JSQ" : .7,
+  "JTTR": .5,
+  "JBTR" : .5,
+  "JL" : .9,
+  "JJ" : .75,
+  "JI" : 1,
+
+  "ISQ" : 1,
+  "ITTR": .9,
+  "IBTR" : .9,
+  "IL" : .9,
+  "IJ" : .9,
+  "II" : 1
 }
 
 
