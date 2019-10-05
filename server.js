@@ -23,8 +23,8 @@ app.use(express.static('public'))
    .use('/output', express.static('output'));
 
 // Server options
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
+app.use(bodyParser.json({ extended: true, limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve client
 app.get('/', (req, res) => {

@@ -53,18 +53,17 @@ function preload(){
   });
   bg.hide();
   bg.hideControls();
-  bg.onended(function(){
+  bg.onended(async function(){
     console.log('Video generated!');
 
     // Encode video
     console.log('Video now encoding to .mp4');
-    capture.video;
+    const fileName = await capture.video();
+    console.log({fileName});
     // Get filename
-    const fileName = capture.getFileName();
-
     if (fileName) {
         console.log('MS: Initiating S3 upload now that video has been generated.');
-        beginUploadToS3(fileName);
+        await beginUploadToS3(fileName);
     }
     dispatchEvent(onEnd);
   });
@@ -244,27 +243,27 @@ function initialize(){
 }
 
 // Begins upload to S3
-function beginUploadToS3(file) {
-    console.log('Show Loading...');
-      $.ajax({
-        type: 'POST',
-        url: '/aws/s3upload',
-        data: {
-            videoFilePath: file
-        },
+async function beginUploadToS3(file) {
+    try {
+        console.log('Show Loading...');
+        const result = await fetch('aws/s3upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                videoFilePath: file
+            })
+        });
 
-        success: (response) => {
-             console.log({ response });
-        },
+        const response = await result.json();
+        console.log('End Loading...');
 
-        error: (err) => {
-            throw err;
-        },
+        console.log(response);
 
-        complete: () => {
-            console.log('End Loading...');
-        }
-    });
+        return result;
+    } catch (err) {
+        console.log(err);
+        console.log('Error uploading::\n', err);
+    }
 }
 
 // Exec on page load

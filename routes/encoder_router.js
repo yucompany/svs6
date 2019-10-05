@@ -21,7 +21,7 @@ router.post('/addFrame', (req, res) => {
         if (err) {
             console.log('there was an error writing file: ' + err);
         }
-        res.end();
+        res.status(200).send();
     });
 });
 
@@ -30,10 +30,10 @@ router.post('/screenshot', (req, res) => {
     fs.writeFile(outputDir + "/screenshot.jpg", blob, 'binary', function(err){
       if(err){
         console.log(err);
-        res.end();
+        res.status(500).end();
       }
       else
-        res.send('/output/screenshot.jpg');
+        res.status(200).send('/output/screenshot.jpg');
     });
 });
 
@@ -69,7 +69,7 @@ router.post('/encode', (req, res) => {
 
           console.log('/output/' + req.body.path + '.mp4');
 
-          res.send('/output/' + req.body.path + '.mp4');
+          res.status(200).send('/output/' + req.body.path + '.mp4');
         })
         .run()
 
