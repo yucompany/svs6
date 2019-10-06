@@ -42,6 +42,14 @@ var elements = {
 
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
+
+var CAPTURED;
+var captures = new CCapture( {
+  format: 'jpg',
+	framerate: framerate
+} );
+
+
 const onEnd = new Event("ended");
 
 p5.disableFriendlyErrors = true;
@@ -63,6 +71,13 @@ function preload(){
     let canvasPixels = get();
     let output = elements.output;
         output.image(canvasPixels, 0, 0);
+
+    if(capturing){
+      captures.stop();
+      capturing = false;
+
+      capture.video();
+    }
 
     dispatchEvent(onEnd);
   });
@@ -105,10 +120,38 @@ function setup(){
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
 }
 
+let ready = false;
+let capturing = false;
 
-async function draw(){  // Our tick function imported from p5.js
+function draw(){
+  if(!ready){
+    render();
+    ready = true;
+ 
+  }
+}
+
+let gTime = 0;
+let playing = false;
+
+let t0 = Date.now();
+let t1 = 0;
+let dt = 0;
+
+async function render(){
+  requestAnimationFrame(render);
+
+  t1 = Date.now();
+  dt = (t1 - t0)/1000;
+  t0 = t1;
+
   let bg = assets.background;
-  let time = bg.time();
+
+  if(playing && gTime < bg.duration())
+    gTime = clamp(gTime + dt, 0, bg.duration());
+  
+    let time = gTime;
+      bg.time(time);
   let matte = assets.matte;
       matte.time(time);
 
@@ -116,31 +159,35 @@ async function draw(){  // Our tick function imported from p5.js
   let offset = lerp(.66, .97, seq);
 
   blendMode(BLEND);
-  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+  await  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
   let buffer = elements.buffer;
   buffer.clear();
       let line1 = elements.line1;
           line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line1.scale = offset;
-          line1.render(buffer, 1, time);
+    await      line1.render(buffer, 1, time);
       let line2 = elements.line2;
           line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line2.scale = offset;
-          line2.render(buffer, 1, time);
+    await     line2.render(buffer, 1, time);
   
   let mask = elements.mask;
-    mask.mask(matte, buffer);
+  await mask.mask(matte, buffer);
     
-   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  await image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
  /* * * * * * * * */
 
   blendMode(SCREEN);
   let fx = elements.fx;
-   image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  await image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+  if(capturing)
+    await captures.capture( canvas.elt );
 }
+
 
 
 const onReset = new Event("resetted");
@@ -148,6 +195,9 @@ const onReset = new Event("resetted");
 function reset(){
     let bg = assets.background;
         bg.stop();
+
+        gTime = 0;
+        playing = false;
 
         elements.line1.clear();
         elements.line2.clear();
@@ -163,6 +213,8 @@ function restart(){
 
   bg.stop();
   matte.stop();
+
+  gTime = 0;
     
 
     elements.line1.reset();
@@ -170,6 +222,8 @@ function restart(){
 
     bg.play();
     matte.play();
+
+    playing = true;
 
     dispatchEvent(onRestart);
 }
@@ -215,9 +269,14 @@ function initialize(){
         matte.stop();
         matte.play();
 
+ 
+
+    gTime = 0;
+    playing = true;
+
     capture.beginCapture(framerate);
-    dispatchEvent(onInitialized); // Fire initialized event
     
+    dispatchEvent(onInitialized); // Fire initialized event
 }
 
 // Begins upload to S3

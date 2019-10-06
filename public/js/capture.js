@@ -18,7 +18,7 @@ class Capture {
     else
         this.format = 'jpg';
 
-    this.capturing = false;
+    //this.capturing = false;
     this.encoding = false;
 
     this.frames = 0;
@@ -28,7 +28,15 @@ class Capture {
     }
 
     beginCapture(fps){
-        let capturing = this.capturing;
+        if(capturing)
+            captures.stop();
+
+        console.log('did it');
+
+        captures.start();
+        capturing = true;
+
+        /*let capturing = this.capturing;
         if(capturing)
             return;
         this.capturing = true;
@@ -42,7 +50,7 @@ class Capture {
             console.log(arr);
 
             dispatchEvent(onCaptured); // Fire captured
-        }.bind(this));
+        }.bind(this));*/
     }
 
     get photo(){
@@ -52,6 +60,15 @@ class Capture {
     }
 
     async video() {
+        captures.save(async function(blob){
+            const path = await this.sendTAR(blob);
+            const result = await this.encode(FIRSTNAME + "_" + LASTNAME);
+
+            console.log("Successfully encoded video from unzip tar!");
+
+        }.bind(this));
+        
+        /*
         let captured = this.captured;
 
         this.name = FIRSTNAME + "_" + LASTNAME;
@@ -60,10 +77,30 @@ class Capture {
         for (let i = 0; i < captured.length; i++) {
             await this.sendFrame(captured[i].imageData, i);
         }
-
+        */
+        /*
         await this.encode(this.name);
 
-        return `/output/${this.name}.mp4`;
+        return `/output/${this.name}.mp4`;*/
+    }
+
+    async sendTAR(tar){
+        let formdata = new FormData();
+        formdata.append('tarz', tar);
+
+        console.log(tar);
+
+        try {
+            const result = await fetch('/encoder/sendTAR', {
+                method: 'POST',
+                body: formdata
+            });
+
+            return result;
+        } catch (err) {
+            console.log(err);
+            console.log("error uploading: ", err);
+        }
     }
 
     async sendFrame(frame, i) {
