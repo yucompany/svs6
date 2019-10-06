@@ -30,7 +30,6 @@ $(document).ready(() => {
                 // Encode video
                 console.log('No stored version of this video found - server now encoding to .mp4');
                 const videoFile = await capture.video();
-                console.log(videoFile);
 
                 // Get filename
                 if (videoFile) {
@@ -38,9 +37,8 @@ $(document).ready(() => {
                     await beginUploadToS3(videoFile);
 
                     // At this point we may want to delete the video from static storage in express.
-                    console.log('deleting video from static storage.');
+                    console.log('WIP - deleting video from static storage.');
 
-                    console.log('downloading now, this might be from s3 in a bit.');
                     // Begin download.
                     triggerDownload(videoFile, false);
                 }
@@ -121,7 +119,7 @@ async function beginUploadToS3(file) {
     }
 }
 
-// Checks if we already have a generated video stored in S3
+// Checks if we already have a generated video stored in S3. Returns boolean.
 async function checkIfVideoExists(s3Key) {
     try {
         console.log('Note to dev: Show Loading in UI...');
@@ -138,8 +136,6 @@ async function checkIfVideoExists(s3Key) {
 
         console.log('Note to dev: End Loading in UI...');
 
-        console.log(response);
-
         return response;
     } catch (err) {
         console.log(err);
@@ -153,20 +149,17 @@ function generateKeyFromInput() {
 }
 
 // Starts a download.
-// NOTE!!! - This might be dependent on the output being available here and not in S3.
 function triggerDownload(videoFile, cached) {
-    console.log('downloading', videoFile);
-    if (cached) {
-        const link = document.createElement('a');
-        link.href = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + videoFile;
-        link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
+    const link = document.createElement('a');
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    if (cached) {
+        link.href = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + videoFile;
     } else {
-        const link = document.createElement('a');
         link.href = videoFile;
+    }
+
+    if (link.href) {
+        // File name for downloaded file.
         link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
 
         document.body.appendChild(link);
