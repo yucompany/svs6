@@ -251,8 +251,8 @@ $(document).ready(() => {
                 $('#lastInput').val(last);
 
                 // Generate Video
-                construct(first, last, capture.video);
-            }
+                verifyName();
+            };
         }
-    }, 1200);
+    }, 300);
 });

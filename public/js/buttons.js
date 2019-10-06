@@ -153,6 +153,7 @@ function triggerDownload(videoFile, cached) {
     const link = document.createElement('a');
 
     if (cached) {
+        // We'll want to replace this with the client's S3 bucket address.
         link.href = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + videoFile;
     } else {
         link.href = videoFile;
