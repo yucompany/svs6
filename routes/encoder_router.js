@@ -1,6 +1,7 @@
 'use strict';
 
-const router            = require('express').Router();
+const express = require('express');
+const router            = express.Router();
 const ffmpegInstaller   = require('@ffmpeg-installer/ffmpeg');
 const ffmpeg            = require('fluent-ffmpeg');
 const sprintf           = require('sprintf');
@@ -25,34 +26,24 @@ router.post('/addFrame', (req, res) => {
     });
 });
 
-router.post('/screenshot', (req, res) => {
-    let blob = req.body.dat;
-    fs.writeFile(outputDir + "/screenshot.jpg", blob, 'binary', function(err){
-      if(err){
-        console.log(err);
-        res.status(500).end();
-      }
-      else
-        res.status(200).send('/output/screenshot.jpg');
-    });
-});
-
 router.post('/encode', (req, res) => {
     let oldTemp = tempDir;
+
+    console.log(baseDir);
 
     console.log(outputDir + '/' + req.body.path + '.mp4');
 
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()
-        .input(tempDir.name + '/frame-%03d.jpg')
-        .fps(15)
+        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
+        .input(baseDir + '/assets/audio/theme.mp3')
         .outputOptions([
           '-framerate 15',
           '-start_number 0',
           '-refs 5',
           '-c:v libx264',
-          '-crf 18',
+          '-crf 23',
           '-b:v 1024',
           '-b:a 128k'
         ])

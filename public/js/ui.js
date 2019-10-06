@@ -17,8 +17,16 @@ const downloadVideo = document.getElementById("dlVideo");
       let photo = capture.photo;
     })
 
-    downloadVideo.addEventListener("click", () => { 
-      let vid = capture.video;
+    downloadVideo.addEventListener("click", async function(){ 
+        // Encode video
+      console.log('Video now encoding to .mp4');
+      const fileName = await capture.video();
+      console.log({fileName});
+      // Get filename
+      if (fileName) {
+          console.log('MS: Initiating S3 upload now that video has been generated.');
+          await beginUploadToS3(fileName);
+      }
   });
 
   const title = document.getElementById("titlecard");

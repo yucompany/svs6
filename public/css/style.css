@@ -71,12 +71,9 @@ small {
   border: 0;
 }
 
-.dlbtn button div {
-  background-image: url("../images/icons/download.svg");
-}
-
-#redo {
-  background-color: #F04933 !important;
+.dlbtn {
+  width: 156px;
+  height: auto; 
 }
 
 .ctoa {
@@ -102,8 +99,13 @@ small {
   height: 32px;
 }
 
+#hbo-logo {
+  width:64px;
+  height: auto;
+}
+
 .footer {
-  height: 96px;
+  height: auto;
   background-color: #4B4E4D;
 }
 

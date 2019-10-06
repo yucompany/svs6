@@ -35,18 +35,22 @@ var elements = {
   fx : "",
 
   line1 : "",
-  line2 : ""
+  line2 : "",
+
+  output: ""
 }
 
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
 const onEnd = new Event("ended");
 
+p5.disableFriendlyErrors = true;
+
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(.1);
-      bg.volume(1);  // Ensure volume is set to 1
+      bg.time(0);
+      bg.volume(0);  // Ensure volume is set to 1
 
       bg.elt.playsInline = true; // Ensure video does not maximize
       bg.elt.WebKitPlaysInline = true;
@@ -56,15 +60,10 @@ function preload(){
   bg.onended(async function(){
     console.log('Video generated!');
 
-    // Encode video
-    console.log('Video now encoding to .mp4');
-    const fileName = await capture.video();
-    console.log({fileName});
-    // Get filename
-    if (fileName) {
-        console.log('MS: Initiating S3 upload now that video has been generated.');
-        await beginUploadToS3(fileName);
-    }
+    let canvasPixels = get();
+    let output = elements.output;
+        output.image(canvasPixels, 0, 0);
+
     dispatchEvent(onEnd);
   });
 
@@ -100,13 +99,14 @@ function setup(){
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
   let mask = elements.mask = new Mask(WIDTH2, HEIGHT2);
   let fx = elements.fx = assets.flares;
+  let output = elements.output = createGraphics(WIDTH, HEIGHT);
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
 }
 
 
-function draw(){  // Our tick function imported from p5.js
+async function draw(){  // Our tick function imported from p5.js
   let bg = assets.background;
   let time = bg.time();
   let matte = assets.matte;
@@ -133,13 +133,13 @@ function draw(){  // Our tick function imported from p5.js
   let mask = elements.mask;
     mask.mask(matte, buffer);
     
-  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
  /* * * * * * * * */
 
   blendMode(SCREEN);
   let fx = elements.fx;
-  image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+   image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 }
 
 
@@ -147,7 +147,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.time(0);
+        bg.stop();
 
         elements.line1.clear();
         elements.line2.clear();
@@ -159,31 +159,28 @@ const onRestart = new Event("restarted");
 
 function restart(){
   let bg = assets.background;
-    bg.stop();
+  let matte = assets.matte;
+
+  bg.stop();
+  matte.stop();
+    
 
     elements.line1.reset();
     elements.line2.reset();
 
-    let promise = bg.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
+    bg.play();
+    matte.play();
 
-        dispatchEvent(onRestart);
-
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
-    }
+    dispatchEvent(onRestart);
 }
 
-function construct(first, last){
+async function construct(first, last){
   FIRSTNAME = first;
   LASTNAME = last;
   
   let loaded = 0;
-    loadName(first, loadedLine);
-    loadName(last, loadedLine);
+   await loadName(first, loadedLine);
+   await loadName(last, loadedLine);
 
   function loadedLine(){
     console.log("Loaded line " + loaded)
@@ -213,32 +210,13 @@ function initialize(){
 
     let bg = assets.background;
         bg.stop();
+        bg.play();
+        let matte = assets.matte;
+        matte.stop();
+        matte.play();
 
-    let promise = bg.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
-
-        capture.beginCapture(framerate);
-        dispatchEvent(onInitialized); // Fire initialized event
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
-    }
-
-   /* let matte = assets.matte;
-    promise = matte.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
-
-      
-
-
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
-    }*/
+    capture.beginCapture(framerate);
+    dispatchEvent(onInitialized); // Fire initialized event
     
 }
 

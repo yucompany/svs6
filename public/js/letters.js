@@ -123,22 +123,24 @@ function loadLetter(letter, callback){
     }
   }
   
-  function loadName(name, callback){
+  async function loadName(name, callback){
     if(name.length <= 0)
       callback();
     else{
       let loaded = 0; let len = name.length;
   
       function onLoadLetter(){
-        ++loaded;
+        ++loaded; console.log(loaded);
         if(loaded >= len)
           callback();
       }
   
       for(let i = 0; i < name.length; i++){
         let char = name[i];
-        if(char != " ")  loadLetter(char, onLoadLetter);
-        else  onLoadLetter();
+        if(char != " ")
+           await loadLetter(char, onLoadLetter);
+        else
+          onLoadLetter();
       }
     }
   }

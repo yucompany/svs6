@@ -28,36 +28,27 @@ class Capture {
     }
 
     beginCapture(fps){
-    let capturing = this.capturing;
-    if(capturing)
-        return;
-    this.capturing = true;
+        let capturing = this.capturing;
+        if(capturing)
+            return;
+        this.capturing = true;
 
-    let f = this.format; let d = this.duration;
-    saveFrames('frame', f, d, fps, function(arr) {
-        this.captured = arr;
-        this.capturing = false;
+        let f = this.format; let d = this.duration;
+        saveFrames('frame', f, d, fps, function(arr) {
+            this.captured = arr;
+            this.capturing = false;
 
-        console.log("Frames have been captured => ");
-        console.log(arr);
+            console.log("Frames have been captured => ");
+            console.log(arr);
 
-        dispatchEvent(onCaptured); // Fire captured
-    }.bind(this));
+            dispatchEvent(onCaptured); // Fire captured
+        }.bind(this));
     }
 
     get photo(){
-    let captured = this.captured;
-
-    if(captured == null || captured.length <= 0) return;
-
-    let frame = captured[captured.length-1].imageData; console.log(frame);
-    var json = JSON.stringify(frame),
-            blob = new Blob([json], {type: "image/octet-stream"}),
-            url = window.URL.createObjectURL(blob);
-
-    downloadPhoto.href = url;
-    downloadPhoto.download = "screenshot.jpg";
-    downloadPhoto.click();
+        let output = elements.output;
+        if(output)
+            save(output, FIRSTNAME + "_" + LASTNAME + ".jpg");  // Grab output buffer
     }
 
     async video() {

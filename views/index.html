@@ -46,7 +46,7 @@
     <div class="d-flex flex-column justify-content-center align-items-center">
 
       <div id="header" class="mt-5 mb-2 w-50">
-        <img src="../images/misc/logo.png" class="img-fluid">
+        <img src="../images/misc/silicon-valley-logo.png" class="img-fluid">
       </div>
       
       <div id="bodytext" class="container py-3 w-75">
@@ -55,7 +55,7 @@
       </div>
 
       <div id="canvas-holder" class="d-flex justify-content-center pt-1 pb-5 w-75">
-        <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute" src="../images/misc/title card.jpg">
+        <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute hidden" src="../images/misc/title card.jpg">
         <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute"><img id="replay" class="hidden" src="../images/icons/reset arrow.svg"></div>
 
         <!-- p5 canvas goes here -->
@@ -97,35 +97,37 @@
                   <div id="downloading" class="flex-fill border-right px-4">
                       <h2 class="text-left mb-1">Download your creation</h2>
                       <div class="d-flex mt-2 w-100 pt-2">
-                        <button id="dlPhoto" class="btn dlbtn btn-primary text-uppercase flex-fill">Image<div></div></button>
-                        <button id="dlVideo" class="btn dlbtn btn-primary text-uppercase flex-fill ml-3">Video<div></div></button>
+                        <img id="dlPhoto" src="../images/icons/button-image-download.png" class="dlbtn">
+                        <img id="dlVideo" src="../images/icons/button-video-download.png" class="dlbtn ml-3">
                       </div>
                   </div>
-              </div>
-  
-              <div id="sharing" class="d-flex flex-column align-items-start flex-fill border-right px-4">
-                  <h2 class="text-left">Share</h2>
-                  <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
-                  <div class="d-flex flex-fill mt-3">
-                    <button id="shareTwitter">
-                        <img src="../images/icons/twitter.png" class="socialicon">
-                    </button>
-                    <button id="shareFacebook">
-                        <img src="../images/icons/facebook.png" class="socialicon ml-3">
-                    </button>
-                  </div>
 
-                  <div id="redo-container" class="d-flex flex-column align-items-start flex-fill px-4">
-                      <button id="redo" class="btn btn-primary mt-2 w-100 text-uppercase pt-2">Redo</button>
-                  </div>
-          </div>
+                  <div id="sharing" class="d-flex flex-column align-items-start flex-fill border-right px-4">
+                    <h2 class="text-left">Share</h2>
+                    <input id="shareurl" name="shareURL" type="text" class="form-control" autocomplete="off">
+                    <div class="d-flex flex-fill mt-3">
+                      <button id="shareTwitter">
+                          <img src="../images/icons/twitter.png" class="socialicon">
+                      </button>
+                      <button id="shareFacebook">
+                          <img src="../images/icons/facebook.png" class="socialicon ml-3">
+                      </button>
+                    </div>
+                </div>
+
+                <div id="redo-container" class="d-flex flex-column align-items-start flex-fill px-4">
+                  <img id="redo" src="../images/icons/button-redo.png" class="dlbtn ml-3">
+                </div>
+
+              </div>
       </div>
 
       <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-5">
-          <div id="footercopy" class="container text-center mw-50">
+          <img id="hbo-logo" src="../images/misc/hbo-logo.png" class="img-fluid mt-3">
+          <div id="footercopy" class="container text-center mt-3 mw-50">
             <small>© 2019 Home Box Office, Inc. All Rights Reserved.<br>This website may contain mature content.</small>
           </div>
-          <div id="footerlinks" class="container d-flex justify-content-center text-center w-25 pt-3 font-weight-bold">
+          <div id="footerlinks" class="container d-flex justify-content-center text-center w-25 my-3 font-weight-bold">
               <a class="px-2" href="https://www.hbo.com/privacy-policy" target="_blank">PRIVACY</a>
               <a class="px-2" href="https://www.hbo.com/terms-of-use" target="_blank">TERMS</a>
           </div>
