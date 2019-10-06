@@ -55,16 +55,6 @@ function preload(){
   bg.hideControls();
   bg.onended(async function(){
     console.log('Video generated!');
-
-    // Encode video
-    console.log('Video now encoding to .mp4');
-    const fileName = await capture.video();
-    console.log({fileName});
-    // Get filename
-    if (fileName) {
-        console.log('MS: Initiating S3 upload now that video has been generated.');
-        await beginUploadToS3(fileName);
-    }
     dispatchEvent(onEnd);
   });
 
@@ -240,30 +230,6 @@ function initialize(){
       });
     }*/
     
-}
-
-// Begins upload to S3
-async function beginUploadToS3(file) {
-    try {
-        console.log('Show Loading...');
-        const result = await fetch('aws/s3upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                videoFilePath: file
-            })
-        });
-
-        const response = await result.json();
-        console.log('End Loading...');
-
-        console.log(response);
-
-        return result;
-    } catch (err) {
-        console.log(err);
-        console.log('Error uploading::\n', err);
-    }
 }
 
 // Exec on page load

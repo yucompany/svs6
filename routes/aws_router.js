@@ -37,4 +37,32 @@ router.post('/s3upload', (req, res) => {
     }
 });
 
+router.post('/s3cacheKey', (req, res) => {
+    //Check if this key is already stored in S3.
+    const s3Key = req.body.s3Key;
+    console.log('tec-demo' + s3Key,);
+
+    return new Promise((resolve, reject) => {
+        const params = {
+            Bucket: 'social-sharing-install',
+            Key: 'tec-demo' + s3Key
+        };
+
+        s3.getObject(params, (err, data) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send(err)
+                reject();
+            } else {
+                if (data.Body) {
+                    res.status(200).send(true);
+                } else {
+                    res.status(200).send(false);
+                }
+                resolve();
+            }
+        });
+    });
+});
+
 module.exports = router;

@@ -110,14 +110,6 @@ class Capture {
 
             console.log("Done generating " + response);
 
-            let link = document.createElement('a');
-                link.href = response;
-                link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
-
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
             return response;
         } catch (err) {
             console.log('Encoding error::\n', err);
