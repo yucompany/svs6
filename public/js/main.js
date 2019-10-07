@@ -202,8 +202,6 @@ function draw(){
   if(capturing){
     let frame = await capture.captureFrame();
     capture.addFrame(frame);
-
-    console.log( frame);
   }
   
   requestAnimationFrame(render);

@@ -58,7 +58,9 @@ class Capture {
 
     captureFrame(){
         return new Promise(function(res, rej){
-            canvas.elt.toBlob(res, 'image/png', 1);
+            //canvas.elt.toBlob(res, 'image/jpeg', 1);
+
+            res(canvas.elt.toDataURL("image/jpeg"));
         });
     }
 
@@ -129,6 +131,35 @@ class Capture {
     }
 
     async sendFrame(frame, i) {
+        try {
+           /* var reader = new FileReader();
+            var base64data = await new Promise(function(res, rej) {
+                reader.readAsDataURL(frame);
+                reader.onloadend = function(){
+                    res(reader.result);
+                }
+            });*/
+
+            let format = this.format;
+
+            const result = await fetch('/encoder/addFrame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dat: frame,
+                    frame: (i + 1),
+                    format: format
+                })
+            });
+
+            return result;
+        } catch (err) {
+            console.log(err);
+            console.log("error uploading: ", err);
+        }
+    }
+
+    /*async sendFrame(frame, i) {
         
         let formdata = new FormData();
         let id = "frame-" + pad(i, 7) + ".png";
@@ -157,9 +188,11 @@ class Capture {
             console.log(err);
             console.log("error uploading: ", err);
         }
-    }
+    }*/
 
     async encode(filename) {
+        console.log("encded")
+
         try {
             const result = await fetch('/encoder/encode', {
                 method: 'POST',

@@ -16,20 +16,22 @@ const tmp               = require('tmp');
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 // POSTs
-router.post('/addFrame', upload.single('frame'), (req, res) => {
-    //const frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
-    //const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
-    let fr = req.file;
-    const dir = tempDir.name + "/" + fr.originalname;
+router.post('/addFrame', (req, res) => {
+    const frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
+    const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
+    //let fr = req.file;
+    const dir = tempDir.name + "/" + fName;
 
-    console.log(req.file);
-    console.log('received frame: ' + fr.originalname);
+   // console.log(req.file);
+  //  console.log('received frame: ' + fr.originalname);
 
-    fs.writeFile(dir, fr, 'base64', (err) => {
+  console.log("received " + fName);
+
+    fs.writeFile(dir, frame, 'base64', (err) => {
       if (err) {  
           console.log('there was an error writing file: ' + err);
       }
-      res.status(200).send(dir);
+      res.status(200).send();
   });
 
     
@@ -76,7 +78,7 @@ router.post('/encode', (req, res) => {
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()
-        .input(tempDir.name + '/frame-%07d.jpg').inputFPS(15)
+        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
         .input(baseDir + '/assets/audio/theme.mp3')
         .outputOptions([
           '-framerate 15',
