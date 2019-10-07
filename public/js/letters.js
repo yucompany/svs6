@@ -86,41 +86,45 @@ const Kerning = {
 }
 
 
-function loadLetter(letter, callback){
-    let letters = assets.letters;
-    if(letters.hasOwnProperty(letter)){
-      callback(letters[letter])
-    }
-    else {
-      let path = "/images/letters/";
-      if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/"
-  
-      let lt = letter;
-      if(letter == "@") lt = "AT";
-      else if(letter == "#") lt = "HASH";
-      else if(letter == "+") lt = "PLUS";
-      else if(letter == "-") lt = "SUB";
-  
-      let letterPath = path + lt + "12f";
-  
-      let loaded = 0;
-      let letterImages = [];
-        for(let i = 0; i < 12; i++) letterImages.push(null);
-      
-      for(let i = 0; i < 12; i++) loadImage(letterPath + "/" + i + ".png", function(image){
-        pushImage(i, image);
-      });
-      
-      function pushImage(i, image){
-        ++loaded;
-        letterImages[i] = image;
-  
-        if(loaded >= 11){
-          letters[letter] = letterImages;
-          callback(letterImages);
+function loadLetter(letter){
+    return new Promise(function(res, rej){
+      let letters = assets.letters;
+      if(letters.hasOwnProperty(letter)){
+        res(letters[letter])
+      }
+      else {
+        let path = "/images/letters/";
+        if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/"
+    
+        let lt = letter;
+        if(letter == "@") lt = "AT";
+        else if(letter == "#") lt = "HASH";
+        else if(letter == "+") lt = "PLUS";
+        else if(letter == "-") lt = "SUB";
+    
+        let letterPath = path + lt + "12f";
+    
+        let loaded = 0;
+        let letterImages = [];
+          for(let i = 0; i < 12; i++) letterImages.push(null);
+        
+        for(let i = 0; i < 12; i++) loadImage(letterPath + "/" + i + ".png", function(image){
+          pushImage(i, image);
+        });
+        
+        function pushImage(i, image){
+          ++loaded;
+          letterImages[i] = image;
+    
+          if(loaded >= 11){
+            letters[letter] = letterImages;
+            res(letterImages);
+          }
         }
       }
-    }
+
+    });
+    
   }
   
   async function loadName(name, callback){
@@ -129,18 +133,12 @@ function loadLetter(letter, callback){
     else{
       let loaded = 0; let len = name.length;
   
-      function onLoadLetter(){
-        ++loaded; console.log(loaded);
-        if(loaded >= len)
-          callback();
-      }
-  
-      for(let i = 0; i < name.length; i++){
+      for(let i = 0; i < len; i++){
         let char = name[i];
         if(char != " ")
-           await loadLetter(char, onLoadLetter);
-        else
-          onLoadLetter();
+           await loadLetter(char);
       }
+
+      callback();
     }
   }

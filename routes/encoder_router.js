@@ -7,7 +7,7 @@ const ffmpeg            = require('fluent-ffmpeg');
 const sprintf           = require('sprintf');
 const fs                = require('fs');
 const multer            = require('multer');
-  const upload = multer();
+  const upload = multer({dest:outputDir});
   const tarball = require('tarball-extract');
 
 const tarfs             = require('tar-fs');
@@ -31,15 +31,16 @@ router.post('/addFrame', (req, res) => {
     });
 });
 
-router.post('/sendTAR', upload.single('tarz'), (req, res) => {
-  const frame = req.file;
-  console.log(frame);
 
-  tarball.extractTarball(baseDir + "/" + req.file.destination + "/" + req.file.filename, baseDir + '/frames', function(err){
+router.post('/sendTAR', upload.single('tarz'), (req, res) => {    
+    console.log("temporary path located at:\n" + tempDir.name);
+
+  let zip = req.file;
+
+  tarball.extractTarball(outputDir + "/" + zip.filename, tempDir.name, function(err){
     if(err) console.log(err)
+    res.status(200).send(zip.destination + "/" +zip.filename);
   })
-
-  res.status(200).send(req.file.destination + "/" + req.file.filename);
   /*const frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
   const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
   const dir = tempDir.name + "/" + fName;
@@ -64,7 +65,7 @@ router.post('/encode', (req, res) => {
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()
-        .input(baseDir + "/frames" + '/%07d.jpg').inputFPS(15)
+        .input(oldTemp.name + '/%07d.jpg').inputFPS(15)
         .input(baseDir + '/assets/audio/theme.mp3')
         .outputOptions([
           '-framerate 15',
@@ -92,7 +93,7 @@ router.post('/encode', (req, res) => {
         })
         .run()
 
-    tempDir = tmp.dirSync({unsafeCleanup: true});
+    global.tempDir = tmp.dirSync({unsafeCleanup: true});
 });
 
 module.exports = router;

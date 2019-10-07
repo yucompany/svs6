@@ -77,6 +77,7 @@ function preload(){
       capturing = false;
 
       capture.video();
+      console.log("video captured");
     }
 
     dispatchEvent(onEnd);
@@ -98,6 +99,10 @@ function preload(){
 var lineA = { origin: {x: 540, y:-290}, object: "" }
 var lineB = { origin: {x: 400, y:-220}, object: "" }
 var lines = [ lineA, lineB ];
+
+let t0 = Date.now();
+let t1 = 0;
+let dt = 0;
 
 function setup(){
   pixelDensity(1);
@@ -123,35 +128,27 @@ function setup(){
 let ready = false;
 let capturing = false;
 
-function draw(){
-  if(!ready){
-    render();
-    ready = true;
- 
-  }
-}
-
 let gTime = 0;
 let playing = false;
 
-let t0 = Date.now();
-let t1 = 0;
-let dt = 0;
+let f = 0.0;
+let tf = 150.0;
 
-async function render(){
-  requestAnimationFrame(render);
 
+async function draw(){
   t1 = Date.now();
   dt = (t1 - t0)/1000;
   t0 = t1;
 
   let bg = assets.background;
 
-  if(playing && gTime < bg.duration())
-    gTime = clamp(gTime + dt, 0, bg.duration());
-  
-    let time = gTime;
-      bg.time(time);
+  if(playing && gTime < bg.duration()){
+    f += 1.0;
+    gTime = clamp(bg.duration() * f / tf, 0, bg.duration());
+  }
+
+  let time = gTime;
+    bg.time(time);
   let matte = assets.matte;
       matte.time(time);
 
@@ -159,33 +156,33 @@ async function render(){
   let offset = lerp(.66, .97, seq);
 
   blendMode(BLEND);
-  await  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
   let buffer = elements.buffer;
   buffer.clear();
       let line1 = elements.line1;
           line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line1.scale = offset;
-    await      line1.render(buffer, 1, time);
+      line1.render(buffer, 1, time);
       let line2 = elements.line2;
           line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line2.scale = offset;
-    await     line2.render(buffer, 1, time);
-  
+     line2.render(buffer, 1, time);
+
   let mask = elements.mask;
   await mask.mask(matte, buffer);
     
-  await image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
  /* * * * * * * * */
 
   blendMode(SCREEN);
   let fx = elements.fx;
-  await image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+ //  image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
   if(capturing)
-    await captures.capture( canvas.elt );
+     captures.capture( canvas.elt );
 }
 
 
@@ -194,9 +191,11 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.stop();
+        bg.pause();
+    let matte = assets.matte;
+        matte.pause();
 
-        gTime = 0;
+        gTime = 0; f = 0.0;
         playing = false;
 
         elements.line1.clear();
@@ -211,30 +210,30 @@ function restart(){
   let bg = assets.background;
   let matte = assets.matte;
 
-  bg.stop();
-  matte.stop();
+  //bg.stop();
+ //matte.stop();
 
   gTime = 0;
     
-
+  f = 0.0;
     elements.line1.reset();
     elements.line2.reset();
 
-    bg.play();
-    matte.play();
+   // bg.play();
+    //matte.play();
 
     playing = true;
 
     dispatchEvent(onRestart);
 }
 
-async function construct(first, last){
+function construct(first, last){
   FIRSTNAME = first;
   LASTNAME = last;
   
   let loaded = 0;
-   await loadName(first, loadedLine);
-   await loadName(last, loadedLine);
+  loadName(first, loadedLine);
+  loadName(last, loadedLine);
 
   function loadedLine(){
     console.log("Loaded line " + loaded)
@@ -249,7 +248,7 @@ async function construct(first, last){
 
 const onInitialized = new Event('initialized');
 
-function initialize(){
+async function initialize(){
     let char = "";
     let letter;
     let container;
@@ -263,20 +262,43 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-        bg.stop();
-        bg.play();
-        let matte = assets.matte;
-        matte.stop();
-        matte.play();
+     //   bg.stop();
 
- 
+     let played = false;
 
-    gTime = 0;
-    playing = true;
+    console.log("tried to load bg");
+    try {
+      await bg.elt.play();
+      console.log("played bg");
+      played = true;
+    }
+    catch(err) {
+      console.log("failed play bg")
+    }
 
-    capture.beginCapture(framerate);
-    
-    dispatchEvent(onInitialized); // Fire initialized event
+    if(played){
+      let matte = assets.matte;
+
+      console.log("tried to load matte");
+      try {
+        await matte.elt.play();
+        console.log("played matte");
+        played = true;
+      }
+      catch(err) {
+        console.log("failed to play matte");
+        played = false;
+      }
+    }
+  
+      if(played){
+        gTime = 0; f = 0.0;
+        playing = true;
+
+       // capture.beginCapture(framerate);
+        
+        dispatchEvent(onInitialized); // Fire initialized event
+      }
 }
 
 // Begins upload to S3
