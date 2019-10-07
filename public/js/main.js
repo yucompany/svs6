@@ -43,15 +43,14 @@ var elements = {
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
 
-var CAPTURED;
+/*var CAPTURED;
 var captures = new CCapture( {
   format: 'jpg',
-	framerate: framerate
-} );
+	framerate: 15
+} );*/
 
 
 const onEnd = new Event("ended");
-const onCapture  = new Event("captured");
 
 p5.disableFriendlyErrors = true;
 
@@ -60,9 +59,9 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(0);  // Ensure volume is set to 1
-      bg.hide();
-    bg.hideControls();
   });
+  bg.hide();
+  bg.hideControls();
   
   bg.onended(async function(){
     console.log('Video generated!');
@@ -71,12 +70,12 @@ function preload(){
     let output = elements.output;
         output.image(canvasPixels, 0, 0);
 
-    if(capturing){
+  /*  if(capturing){
       captures.stop();
       capturing = false;
 
       dispatchEvent(onCapture);
-    }
+    }*/
 
     dispatchEvent(onEnd);
   });
@@ -84,9 +83,9 @@ function preload(){
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
-    matte.hide(); 
-    matte.hideControls();
   });
+  matte.hide(); 
+  matte.hideControls();
 
 
   let flares = assets.flares = loadImage("../images/misc/optics.png");
@@ -133,24 +132,10 @@ let tf = 150.0;
 let drawReady = false;
 
  function draw(){
-
-    t1 = Date.now();
-    dt = (t1 - t0)/1000;
-    t0 = t1;
-
   
   let bg = assets.background;
 
-  if(playing){
-    f += 1.0;
-    gTime = clamp(gTime + dt, 0, bg.duration());
-  }
-  else
-    gTime = 0;
-
-
-  let time = gTime;
-    bg.time(time);
+  let time = bg.time();
   let matte = assets.matte;
     matte.time(time);
 
@@ -183,8 +168,8 @@ let drawReady = false;
   let fx = elements.fx;
    image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-  if(capturing)
-     captures.capture( canvas.elt );
+//  if(capturing)
+  //   captures.capture( canvas.elt );
 }
 
 
@@ -193,7 +178,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        //bg.stop();
+        bg.time(0);
     let matte = assets.matte;
        // matte.stop();
 
@@ -212,7 +197,7 @@ function restart(){
   let bg = assets.background;
   let matte = assets.matte;
 
-  //bg.stop();
+  bg.stop();
   //matte.stop();
 
   gTime = 0.0;
@@ -222,7 +207,7 @@ function restart(){
     elements.line2.reset();
 
     bg.play();
-    matte.play();
+   //matte.play();
 
     playing = true;
 
@@ -268,7 +253,7 @@ function initialize(){
        // bg.stop();
 
      bg.play();
-     matte.play();
+     //matte.play();
 
     gTime = 0; f = 0.0;
     playing = true;
