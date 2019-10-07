@@ -141,6 +141,7 @@ function reset(){
 
         elements.line1.clear();
         elements.line2.clear();
+        $('$shareurl').val('');
 
     dispatchEvent(onReset);
 }
@@ -234,25 +235,74 @@ function initialize(){
 
 // Exec on page load
 $(document).ready(() => {
-    setTimeout(() => {
+    setTimeout(async () => {
         const urlParams = getURLParams();
+
+        let line1;
+        let line2;
+        let deepLinkId;
+
+        // Check if we have the x parameter passed to prepopulate the input.
+        if (urlParams.x) {
+            console.log('Check if id x', urlParams.x, 'for deeplink exists');
+            const response = await checkDeepLinkId(urlParams.x);
+
+            if (response.line1 && response.line2) {
+                line1 = response.line1;
+                line2 = response.line2;
+                deepLinkId = response.deeplink_id;
+
+                populatePage();
+            }
+        }
 
         // Check if we have the i parameter passed to prepopulate the input.
         if (urlParams.i) {
             // split on _ to get our 2 parameters
             if (urlParams.i.split('_').length === 2) {
-                const first = urlParams.i.split('_')[0];
-                const last = urlParams.i.split('_')[1];
+                line1 = urlParams.i.split('_')[0];
+                line2 = urlParams.i.split('_')[1];
 
-                // Set input line 1
-                $('#firstInput').val(first);
-
-                // Set input line 2
-                $('#lastInput').val(last);
-
-                // Generate Video
-                verifyName();
+                populatePage();
             };
         }
-    }, 300);
+
+        function populatePage() {
+            // Set input line 1
+            $('#firstInput').val(line1);
+
+            // Set input line 2
+            $('#lastInput').val(line2);
+
+            // Set share URL
+            if (deepLinkId) $('#shareurl').val(window.location.href + '?x=' + deepLinkId);
+
+            // Play/Generate Video
+            verifyName();
+        }
+    }, 1200);
 });
+
+// Checks if we already have a generated video stored in S3. Returns boolean.
+async function checkDeepLinkId(id) {
+    try {
+        console.log('Note to dev: Show Loading in UI...');
+
+        const result = await fetch('aws/processId', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                deepLinkId: id
+            })
+        });
+
+        const response = await result.json();
+
+        console.log('Note to dev: End Loading in UI...');
+
+        return response;
+    } catch (err) {
+        console.log(err);
+        console.log('Error uploading::\n', err);
+    }
+}

@@ -31,16 +31,18 @@ $(document).ready(() => {
                 console.log('No stored version of this video found - server now encoding to .mp4');
                 const videoFile = await capture.video();
 
-                // Get filename
+                // Begin download before we begin the upload to S3 server side..
+                triggerDownload(videoFile, false);
+
                 if (videoFile) {
                     console.log('Initiating S3 upload.');
-                    await beginUploadToS3(videoFile);
+                    const deepLinkId = await beginUploadToS3(videoFile);
+
+                    // Show deepLink on client.
+                    $('#shareurl').val(window.location.href + '?x=' + deepLinkId);
 
                     // At this point we may want to delete the video from static storage in express.
-                    console.log('WIP - deleting video from static storage.');
-
-                    // Begin download.
-                    triggerDownload(videoFile, false);
+                    console.log('WIP - deleting video from static storage. this should probably happen on the server');
                 }
             } else {
                 console.log('Trigger Download from S3 instead.');
@@ -106,13 +108,11 @@ async function beginUploadToS3(file) {
             })
         });
 
-        const response = await result.json();
+        const response = await result.text();
 
         console.log('Note to dev: End Loading in UI...');
 
-        console.log(response);
-
-        return result;
+        return response;
     } catch (err) {
         console.log(err);
         console.log('Error uploading::\n', err);
