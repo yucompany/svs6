@@ -71,10 +71,8 @@ class Capture {
         capturing  = false;
 
         this.photo()
-
         .then(function(url){
             console.log(url);
-            downloadPhoto.parentElement.href = url;
         });
 
         this.video();

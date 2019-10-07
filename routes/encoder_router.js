@@ -56,7 +56,7 @@ router.post('/screenshot', (req, res) => {
       if (err) {  
           console.log('there was an error writing file: ' + err);
       }
-      res.status(200).send(dir);
+      res.status(200).send('/output/screenshot.jpg');
     });
 });
 
