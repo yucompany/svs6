@@ -1211,6 +1211,9 @@ const nameform = document.forms["nameform"];
     const lastname = nameform["lastname"];
 
 const verifyName = function(){
+    var throwEmpty = function(){
+        alert("Line 1 and Line 2 cannot be empty!");
+     }
     var throwError = function(){
        alert("Invalid name input, only alphabet and +, -, @, # are supported!");
     }
@@ -1269,6 +1272,11 @@ const verifyName = function(){
             throwError();
             return;
         }
+    }
+
+    if ($('#firstInput').val().trim() === '' || $('#lastInput').val().trim() === '') {
+        throwEmpty();
+        return;
     }
 
     // Passes character table test, profanity filter

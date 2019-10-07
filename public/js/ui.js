@@ -32,6 +32,7 @@ $(document).ready(() => {
         downloadVideo.addEventListener('click', async () => {
             // Before encoding anything, let's see if this video is already stored in S3.
             const s3Key = generateKeyFromInput();
+            console.log('s3Key', s3Key);
             const cacheVideo = await checkIfVideoExists(s3Key);
 
             if (!cacheVideo) {
@@ -132,7 +133,7 @@ async function checkIfVideoExists(s3Key) {
             })
         });
 
-        const response = await result.json();
+        const response = await result.text();
 
         console.log('Note to dev: End Loading in UI...');
 
@@ -161,7 +162,7 @@ function triggerDownload(videoFile, cached) {
 
     if (link.href) {
         // File name for downloaded file.
-        link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
+        link.download = FIRSTNAME + "_" + LASTNAME + ".mp4";
 
         document.body.appendChild(link);
         link.click();
