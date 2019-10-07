@@ -56,23 +56,57 @@ class Capture {
         this.captured.push(frame);
     }
 
-    captureFrame(call){
-            canvas.elt.toBlob(call, 'image/jpeg', .85);
+    captureFrame(){
+        return new Promise(function(res, rej){
+            setTimeout(function(){
+                canvas.elt.toBlob(res, 'image/jpeg', .85);
+            }, 100);
+        })
+            
             //res(canvas.elt.toDataURL("image/jpeg"));
     }
 
-    async stopCapture(){
+    stopCapture(){
         console.log(this.captured);
         capturing  = false;
 
-        await this.video();
-        console.log("finished video");
+        this.photo()
+
+        .then(function(url){
+            console.log(url);
+            downloadPhoto.parentElement.href = url;
+        });
+
+        this.video();
+        
     }
 
-    get photo(){
-        let output = elements.output;
+    photo(){
+        /*let output = elements.output;
         if(output)
             save(output, FIRSTNAME + "_" + LASTNAME + ".jpg");  // Grab output buffer
+            */
+
+        
+
+        return new Promise(function(res, rej) {
+            let captured = this.captured;
+            var reader = new FileReader();
+
+            reader.onload = function(){
+                var dataUrl = reader.result;
+                res(dataUrl);
+            }
+            reader.readAsDataURL(captured[captured.length-1]);
+        }.bind(this)).then(function(r){
+            return fetch('/encoder/screenshot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dat: r
+                })
+            });
+        })
     }
 
     getLastFrame() {
@@ -83,7 +117,7 @@ class Capture {
         return frame;
     }
 
-    async video() {
+    video() {
       /*  captures.save(async function(blob){
             const path = await this.sendTAR(blob);
             const result = await this.encode(FIRSTNAME + "_" + LASTNAME);
@@ -94,18 +128,27 @@ class Capture {
         
         
         let captured = this.captured;
+        let promises = [];
+
+        for (let i = 0; i < captured.length; i++)
+            promises.push(this.sendFrame(captured[i], i));
 
         this.name = FIRSTNAME + "_" + LASTNAME;
 
         console.log('Sending frames... ' + captured.length);
-        for (let i = 0; i < captured.length; i++) {
+        /*for (let i = 0; i < captured.length; i++) {
             await this.sendFrame(captured[i], i);
-        }
-        
-        
-        await this.encode(this.name);
+        }*/
 
-        return `/output/${this.name}.mp4`;
+        Promise.all(promises)
+        
+        .then(function(a){
+            this.encode(this.name);
+        }.bind(this))
+
+        .then(function(a){
+            return `/output/${this.name}.mp4`;
+        }.bind(this))
     }
 
     async sendTAR(tar){
@@ -188,23 +231,25 @@ class Capture {
         }
     }*/
 
-    async encode(filename) {
+    encode(filename) {
         console.log("encded")
 
         try {
-            const result = await fetch('/encoder/encode', {
+            const result = fetch('/encoder/encode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     path: filename
                 })
-            });
+            })
 
-            const response = await result.text();
+            .then(function(r){
+                const response = r.text();
+                console.log("Done generating " + response);
 
-            console.log("Done generating " + response);
+                return response;
+            })
 
-            return response;
         } catch (err) {
             console.log('Encoding error::\n', err);
         }

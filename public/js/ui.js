@@ -20,11 +20,6 @@ $(document).ready(() => {
 
     // Download Photo Button
     const downloadPhoto = document.getElementById('dlPhoto');
-    if (downloadPhoto) {
-        downloadPhoto.addEventListener('click', () => {
-            save(canvas, 'screen.jpg');
-        });
-    }
 
     // Download Video Button
     const downloadVideo = document.getElementById('dlVideo');
@@ -150,7 +145,7 @@ function generateKeyFromInput() {
 
 // Starts a download.
 function triggerDownload(videoFile, cached) {
-    const link = document.createElement('a');
+    const link = downloadVideo.parentElement;
 
     if (cached) {
         // We'll want to replace this with the client's S3 bucket address.
@@ -163,9 +158,9 @@ function triggerDownload(videoFile, cached) {
         // File name for downloaded file.
         link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
 
-        document.body.appendChild(link);
+        //document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        //document.body.removeChild(link);
     }
 }
 

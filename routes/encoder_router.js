@@ -46,6 +46,20 @@ router.post('/addFrame', (req, res) => {
     });*/
 });
 
+router.post('/screenshot', (req, res) => {
+  const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
+  const dir = outputDir + "/screenshot.jpg";
+
+  console.log("received");
+
+    fs.writeFile(dir, frame, 'base64', (err) => {
+      if (err) {  
+          console.log('there was an error writing file: ' + err);
+      }
+      res.status(200).send(dir);
+    });
+});
+
 
 router.post('/sendTAR', upload.single('tarz'), (req, res) => {    
     console.log("temporary path located at:\n" + tempDir.name);

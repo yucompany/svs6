@@ -175,31 +175,25 @@ function draw(){
   mask.mask(matte, buffer)
     
   .then(function(m){
-      
+      image(m, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+      //console.log("masked");
 
       //blendMode(SCREEN);
       //let fx = elements.fx;
       //image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-      return new Promise(function(r, j){
-        image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
-
-        if(capturing)
-          capture.captureFrame(r);
-        else
-         r();
-      })
+      if(capturing)
+        return capture.captureFrame();
   })
   .then(function(fr){
-    return new Promise(function(r, j){
-      if(fr)
-        capture.addFrame(fr);
-
-
-      requestAnimationFrame(render);
-      r();
-    });
+    if(fr){ 
+      capture.addFrame(fr);
+      //console.log(fr);
+    }
+    requestAnimationFrame(render);
   })
+
+  
     
 
  /* * * * * * * * */
