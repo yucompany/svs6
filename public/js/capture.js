@@ -56,12 +56,9 @@ class Capture {
         this.captured.push(frame);
     }
 
-    captureFrame(){
-        return new Promise(function(res, rej){
-            //canvas.elt.toBlob(res, 'image/jpeg', 1);
-
-            res(canvas.elt.toDataURL("image/jpeg"));
-        });
+    captureFrame(call){
+            canvas.elt.toBlob(call, 'image/jpeg', .85);
+            //res(canvas.elt.toDataURL("image/jpeg"));
     }
 
     async stopCapture(){
@@ -130,33 +127,34 @@ class Capture {
         }
     }
 
-    async sendFrame(frame, i) {
-        try {
-           /* var reader = new FileReader();
-            var base64data = await new Promise(function(res, rej) {
-                reader.readAsDataURL(frame);
-                reader.onloadend = function(){
-                    res(reader.result);
-                }
-            });*/
+    sendFrame(frame, i) {
+        let format = this.format;
 
-            let format = this.format;
+        return new Promise(function(res, rej) {
+            var reader = new FileReader();
 
-            const result = await fetch('/encoder/addFrame', {
+            reader.onload = function(){
+                var dataUrl = reader.result;
+                res(dataUrl);
+            }
+            reader.readAsDataURL(frame);
+        }).then(function(r){
+            return fetch('/encoder/addFrame', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    dat: frame,
+                    dat: r,
                     frame: (i + 1),
                     format: format
                 })
             });
-
-            return result;
-        } catch (err) {
-            console.log(err);
-            console.log("error uploading: ", err);
-        }
+        })
+        .then(function(x){
+            console.log(x);
+            return new Promise(function(a, b){
+                a(x);
+            })
+        })
     }
 
     /*async sendFrame(frame, i) {

@@ -264,7 +264,7 @@ class Mask extends SceneElement {
   
       dest.updatePixels();
 
-      res();
+      res(dest);
     });
   }
   

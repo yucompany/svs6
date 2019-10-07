@@ -138,8 +138,9 @@ function draw(){
 }
 
 
- async function render(){
+ function render(){
   let bg = assets.background;
+  let matte = assets.matte;
 
    if(playing){
      f += 1.0;
@@ -149,17 +150,8 @@ function draw(){
     gTime = 0;
 
   let time = gTime;
-  
-  
-  await new Promise(function(res, rej){
-    bg.time(time);
-    res();
-  })  
-  let matte = assets.matte;
-  await new Promise(function(res, rej){
-    matte.time(time);
-    res();
-  })  
+  bg.time(time)
+  matte.time(time);
 
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
@@ -177,18 +169,42 @@ function draw(){
           line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line2.scale = offset;
-     line2.render(buffer, 1, time);
+      line2.render(buffer, 1, time);
 
   let mask = elements.mask;
-  await mask.mask(matte, buffer);
+  mask.mask(matte, buffer)
     
-  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  .then(function(m){
+      
+
+      //blendMode(SCREEN);
+      //let fx = elements.fx;
+      //image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+      return new Promise(function(r, j){
+        image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+        if(capturing)
+          capture.captureFrame(r);
+        else
+         r();
+      })
+  })
+  .then(function(fr){
+    return new Promise(function(r, j){
+      if(fr)
+        capture.addFrame(fr);
+
+
+      requestAnimationFrame(render);
+      r();
+    });
+  })
+    
 
  /* * * * * * * * */
 
-  blendMode(SCREEN);
-  let fx = elements.fx;
-  // image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  
 
   /*if(capturing){
      //captures.capture( canvas.elt );
@@ -199,12 +215,6 @@ function draw(){
         });
       });
   }*/
-  if(capturing){
-    let frame = await capture.captureFrame();
-    capture.addFrame(frame);
-  }
-  
-  requestAnimationFrame(render);
 }
 
 
