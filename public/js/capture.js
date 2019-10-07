@@ -36,12 +36,11 @@ class Capture {
         captures.start();
         capturing = true;*/
 
-        let capturing = this.capturing;
-        if(capturing)
-            return;
-        this.capturing = true;
+       
+        capturing = true;
+        this.captured = [];
 
-        let f = this.format; let d = this.duration;
+        /*let f = this.format; let d = this.duration;
         saveFrames('frame', f, d, fps, function(arr) {
             this.captured = arr;
             this.capturing = false;
@@ -50,7 +49,25 @@ class Capture {
             console.log(arr);
 
             dispatchEvent(onCaptured); // Fire captured
-        }.bind(this));
+        }.bind(this));*/
+    }
+
+    addFrame(frame){
+        this.captured.push(frame);
+    }
+
+    captureFrame(){
+        return new Promise(function(res, rej){
+            canvas.elt.toBlob(res, 'image/png', 1);
+        });
+    }
+
+    async stopCapture(){
+        console.log(this.captured);
+        capturing  = false;
+
+        await this.video();
+        console.log("finished video");
     }
 
     get photo(){
@@ -81,9 +98,9 @@ class Capture {
 
         this.name = FIRSTNAME + "_" + LASTNAME;
 
-        console.log('Sending frames...');
+        console.log('Sending frames... ' + captured.length);
         for (let i = 0; i < captured.length; i++) {
-            await this.sendFrame(captured[i].imageData, i);
+            await this.sendFrame(captured[i], i);
         }
         
         
@@ -112,20 +129,30 @@ class Capture {
     }
 
     async sendFrame(frame, i) {
+        
+        let formdata = new FormData();
+        let id = "frame-" + pad(i, 7) + ".png";
+
+        console.log("sent " + id);
+
+        var reader = new FileReader();
+        reader.readAsDataURL(frame); 
+        reader.onloadend = function() {
+            var base64data = reader.result;                
+            console.log(base64data);
+        }
+
+        formdata.append('frame', frame, id);
+
         try {
             let format = this.format;
 
             const result = await fetch('/encoder/addFrame', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    dat: frame,
-                    frame: (i + 1),
-                    format: format
-                })
+                body: formdata
             });
 
-            return result;
+            return "pinged " + result;
         } catch (err) {
             console.log(err);
             console.log("error uploading: ", err);

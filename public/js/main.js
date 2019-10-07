@@ -70,12 +70,12 @@ function preload(){
     let output = elements.output;
         output.image(canvasPixels, 0, 0);
 
-  /*  if(capturing){
-      captures.stop();
+   if(capturing){
+      capture.stopCapture();
       capturing = false;
 
-      dispatchEvent(onCapture);
-    }*/
+      dispatchEvent(onCaptured);
+    }
 
     dispatchEvent(onEnd);
   });
@@ -129,15 +129,37 @@ let playing = false;
 let f = 0.0;
 let tf = 150.0;
 
-let drawReady = false;
 
- function draw(){
-  
+function draw(){
+  if(!ready){
+    render();
+    ready = true;
+  }
+}
+
+
+ async function render(){
   let bg = assets.background;
 
-  let time = bg.time();
+   if(playing){
+     f += 1.0;
+     gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+   }
+   else
+    gTime = 0;
+
+  let time = gTime;
+  
+  
+  await new Promise(function(res, rej){
+    bg.time(time);
+    res();
+  })  
   let matte = assets.matte;
+  await new Promise(function(res, rej){
     matte.time(time);
+    res();
+  })  
 
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
@@ -158,7 +180,7 @@ let drawReady = false;
      line2.render(buffer, 1, time);
 
   let mask = elements.mask;
-   mask.mask(matte, buffer);
+  await mask.mask(matte, buffer);
     
   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
@@ -166,10 +188,25 @@ let drawReady = false;
 
   blendMode(SCREEN);
   let fx = elements.fx;
-   image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  // image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-//  if(capturing)
-  //   captures.capture( canvas.elt );
+  /*if(capturing){
+     //captures.capture( canvas.elt );
+     await new Promise(function(res, rej) {
+       canvas.elt.toBlob(function(blob){
+          console.log(blob);  
+        res(blob);
+        });
+      });
+  }*/
+  if(capturing){
+    let frame = await capture.captureFrame();
+    capture.addFrame(frame);
+
+    console.log( frame);
+  }
+  
+  requestAnimationFrame(render);
 }
 
 
@@ -178,7 +215,7 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.time(0);
+      //  bg.time(0);
     let matte = assets.matte;
        // matte.stop();
 
@@ -198,7 +235,7 @@ function restart(){
   let bg = assets.background;
   let matte = assets.matte;
 
-  bg.stop();
+ // bg.stop();
   //matte.stop();
 
   gTime = 0.0;
@@ -207,7 +244,7 @@ function restart(){
     elements.line1.reset();
     elements.line2.reset();
 
-    bg.play();
+   // bg.play();
    //matte.play();
 
     playing = true;
@@ -253,7 +290,7 @@ function initialize(){
     let matte = assets.matte;
        // bg.stop();
 
-     bg.play();
+     //bg.play();
      //matte.play();
 
     gTime = 0; f = 0.0;
