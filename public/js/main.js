@@ -43,15 +43,14 @@ var elements = {
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
 
-var CAPTURED;
+/*var CAPTURED;
 var captures = new CCapture( {
   format: 'jpg',
-	framerate: framerate
-} );
+	framerate: 15
+} );*/
 
 
 const onEnd = new Event("ended");
-const onCapture  = new Event("captured");
 
 p5.disableFriendlyErrors = true;
 
@@ -60,12 +59,10 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(0);  // Ensure volume is set to 1
-
-      bg.elt.playsInline = true; // Ensure video does not maximize
-      bg.elt.WebKitPlaysInline = true;
   });
   bg.hide();
   bg.hideControls();
+  
   bg.onended(async function(){
     console.log('Video generated!');
 
@@ -73,12 +70,12 @@ function preload(){
     let output = elements.output;
         output.image(canvasPixels, 0, 0);
 
-    if(capturing){
+  /*  if(capturing){
       captures.stop();
       capturing = false;
 
       dispatchEvent(onCapture);
-    }
+    }*/
 
     dispatchEvent(onEnd);
   });
@@ -86,12 +83,10 @@ function preload(){
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
-
-    matte.elt.playsInline = true;
-    matte.elt.WebKitPlaysInline = true;
   });
   matte.hide(); 
   matte.hideControls();
+
 
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
@@ -109,7 +104,7 @@ function setup(){
   background(0);
   stroke(255);
   imageMode(CENTER);
-  frameRate(framerate);
+  frameRate(120);
 
   canvas = createCanvas(WIDTH, HEIGHT); console.log(canvas);
     canvas.parent(canvasHolder);
@@ -136,22 +131,11 @@ let tf = 150.0;
 
 let drawReady = false;
 
-async function draw(){
-
-    t1 = Date.now();
-    dt = (t1 - t0)/1000;
-    t0 = t1;
-
+ function draw(){
   
   let bg = assets.background;
 
-  if(playing && gTime < bg.duration()){
-    f += 1.0;
-    gTime = clamp(gTime + dt, 0, bg.duration());
-  }
-
-  let time = gTime;
-    bg.time(time);
+  let time = bg.time();
   let matte = assets.matte;
     matte.time(time);
 
@@ -174,7 +158,7 @@ async function draw(){
      line2.render(buffer, 1, time);
 
   let mask = elements.mask;
-  await mask.mask(matte, buffer);
+   mask.mask(matte, buffer);
     
   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
@@ -184,8 +168,8 @@ async function draw(){
   let fx = elements.fx;
    image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-  if(capturing)
-     captures.capture( canvas.elt );
+//  if(capturing)
+  //   captures.capture( canvas.elt );
 }
 
 
@@ -194,9 +178,9 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.stop();
+        bg.time(0);
     let matte = assets.matte;
-        //matte.pause();
+       // matte.stop();
 
         gTime = 0; f = 0.0;
         playing = false;
@@ -215,16 +199,16 @@ function restart(){
   let matte = assets.matte;
 
   bg.stop();
- //matte.stop();
+  //matte.stop();
 
-  gTime = 0;
+  gTime = 0.0;
     
   f = 0.0;
     elements.line1.reset();
     elements.line2.reset();
 
     bg.play();
-    //matte.play();
+   //matte.play();
 
     playing = true;
 
@@ -267,7 +251,7 @@ function initialize(){
 
     let bg = assets.background;
     let matte = assets.matte;
-        bg.stop();
+       // bg.stop();
 
      bg.play();
      //matte.play();

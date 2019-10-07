@@ -65,7 +65,7 @@ router.post('/encode', (req, res) => {
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()
-        .input(oldTemp.name + '/%07d.jpg').inputFPS(15)
+        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
         .input(baseDir + '/assets/audio/theme.mp3')
         .outputOptions([
           '-framerate 15',

@@ -2,6 +2,8 @@
 
 var videoContainer;
 
+const onCaptured  = new Event("captured");
+
 class Capture {
     constructor(name, duration, format){
     this.name = name;
@@ -26,15 +28,15 @@ class Capture {
     }
 
     beginCapture(fps){
-        if(capturing)
+       /* if(capturing)
             captures.stop();
 
         console.log('did it');
 
         captures.start();
-        capturing = true;
+        capturing = true;*/
 
-        /*let capturing = this.capturing;
+        let capturing = this.capturing;
         if(capturing)
             return;
         this.capturing = true;
@@ -48,7 +50,7 @@ class Capture {
             console.log(arr);
 
             dispatchEvent(onCaptured); // Fire captured
-        }.bind(this));*/
+        }.bind(this));
     }
 
     get photo(){
@@ -66,15 +68,15 @@ class Capture {
     }
 
     async video() {
-        captures.save(async function(blob){
+      /*  captures.save(async function(blob){
             const path = await this.sendTAR(blob);
             const result = await this.encode(FIRSTNAME + "_" + LASTNAME);
 
             console.log("Successfully encoded video from unzip tar!");
 
-        }.bind(this));
+        }.bind(this));*/
         
-        /*
+        
         let captured = this.captured;
 
         this.name = FIRSTNAME + "_" + LASTNAME;
@@ -83,11 +85,11 @@ class Capture {
         for (let i = 0; i < captured.length; i++) {
             await this.sendFrame(captured[i].imageData, i);
         }
-        */
-        /*
+        
+        
         await this.encode(this.name);
 
-        return `/output/${this.name}.mp4`;*/
+        return `/output/${this.name}.mp4`;
     }
 
     async sendTAR(tar){
