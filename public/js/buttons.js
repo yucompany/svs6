@@ -39,7 +39,7 @@ $(document).ready(() => {
                     const deepLinkId = await beginUploadToS3(videoFile);
 
                     // Show deepLink on client.
-                    $('#shareurl').val(window.location.href + '?x=' + deepLinkId);
+                    $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
 
                     // At this point we may want to delete the video from static storage in express.
                     console.log('WIP - deleting video from static storage. this should probably happen on the server');

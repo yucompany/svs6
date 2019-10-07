@@ -252,6 +252,8 @@ $(document).ready(() => {
                 line2 = response.line2;
                 deepLinkId = response.deeplink_id;
 
+                console.log('deeplink', deepLinkId);
+
                 populatePage();
             }
         }
@@ -275,7 +277,7 @@ $(document).ready(() => {
             $('#lastInput').val(line2);
 
             // Set share URL
-            if (deepLinkId) $('#shareurl').val(window.location.href + '?x=' + deepLinkId);
+            if (deepLinkId) $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
 
             // Play/Generate Video
             verifyName();
