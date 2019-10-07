@@ -252,7 +252,7 @@ class Mask extends SceneElement {
   }
 
   mask(source, dest, shadows){
-    return new Promise(function(res, rej){
+ //   return new Promise(function(res, rej){
       source.loadPixels();
       dest.loadPixels();
   
@@ -264,8 +264,8 @@ class Mask extends SceneElement {
   
       dest.updatePixels();
 
-      res();
-    });
+ //     res();
+  //  });
   }
   
 }
