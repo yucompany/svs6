@@ -7,10 +7,29 @@ const docClient   = new AWS.DynamoDB.DocumentClient({region: 'us-west-2'});
 const fs          = require('fs');
 
 router.post('/s3upload', (req, res) => {
-    const videoFile = outputDir.split('/output')[0] + req.body.videoFilePath;
-
     try {
-        fs.readFile(videoFile, (err, data) => {
+        const imageFileBuffer = outputDir.split('/output')[0] + req.body.imageFilePath;
+        const videoFilePath = outputDir.split('/output')[0] + req.body.videoFilePath;
+
+        // Upload Image
+
+        const params = {
+            Bucket: 'social-sharing-install',
+            Key: 'tec-demo' + req.body.imageFilePath,
+            Body: imageFileBuffer
+        };
+
+        console.log(`Uploading ${req.body.imageFilePath} to S3 bucket...`);
+        s3.upload(params, async (err, data) => {
+            if (err) {
+                console.log('Error uploading to S3::\n', err);
+            } else {
+                console.log('Upload complete!');
+            }
+        });
+
+        // Upload Video
+        fs.readFile(videoFilePath, (err, data) => {
             if (err) { throw err; }
 
             const base64data = new Buffer.from(data, 'binary');
@@ -29,16 +48,26 @@ router.post('/s3upload', (req, res) => {
                     console.log('Upload complete!');
 
                     console.log('Generating deep link');
-                    const deepLink = await generateDeepLink(req.body.videoFilePath);
+                    const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.imageFilePath);
 
                     console.log('Deleting video from temporary storage.');
-                    fs.unlinkSync(videoFile);
+                    fs.unlinkSync(videoFilePath);
 
                     res.status(200).send(deepLink);
                 }
             });
-
         });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err)
+    }
+});
+
+router.post('/s3uploadImage', (req, res) => {
+    const imageFile = outputDir.split('/output')[0] + req.body.imageFilePath;
+
+    try {
+
     } catch (err) {
         console.log(err);
         res.status(500).send(err)
@@ -47,6 +76,27 @@ router.post('/s3upload', (req, res) => {
 
 router.post('/s3cacheKey', (req, res) => {
     return new Promise((resolve, reject) => {
+
+        // const params = {
+        //     TableName : 'tec-demo',
+        //     KeyConditionExpression: '#deeplink_id = :deeplink_id',
+        //     ExpressionAttributeNames: {
+        //         '#deeplink_id': 'deeplink_id'
+        //     },
+        //     ExpressionAttributeValues: {
+        //         ':deeplink_id': deepLinkId
+        //     },
+        //     ScanIndexForward: false
+        // };
+
+        // docClient.query(params, (err, data) => {
+        //     if (err) {
+        //         res.status(500).send(err);
+        //     } else {
+        //         res.status(200).send(data.Items[0]);
+        //     }
+        // });
+
         //Check if this key is already stored in S3.
         const s3Key = req.body.s3Key;
         console.log('tec-demo' + s3Key);
@@ -104,7 +154,7 @@ router.post('/processId', (req, res) => {
     });
 });
 
-function generateDeepLink(videoFile) {
+function generateDeepLink(videoFile, imageFile) {
     return new Promise((resolve, reject) => {
         const uniqueId = Math.random().toString(24).slice(2);
 
@@ -118,7 +168,8 @@ function generateDeepLink(videoFile) {
                 line1: line1,
                 line2: line2,
                 timestamp: new Date().getTime(),
-                output_file: videoFile
+                output_video: videoFile,
+                output_image: imageFile
             }
         };
 

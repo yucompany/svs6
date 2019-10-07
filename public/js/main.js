@@ -84,7 +84,7 @@ function preload(){
     matte.time(0);
     matte.volume(0);
   });
-  matte.hide(); 
+  matte.hide();
   matte.hideControls();
 
 
@@ -278,7 +278,7 @@ $(document).ready(() => {
             console.log('Check if id x', urlParams.x, 'for deeplink exists');
             const response = await checkDeepLinkId(urlParams.x);
 
-            if (response.line1 && response.line2) {
+            if (response && response.line1 && response.line2) {
                 line1 = response.line1;
                 line2 = response.line2;
                 deepLinkId = response.deeplink_id;

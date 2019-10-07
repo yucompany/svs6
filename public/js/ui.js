@@ -22,7 +22,7 @@ $(document).ready(() => {
     const downloadPhoto = document.getElementById('dlPhoto');
     if (downloadPhoto) {
         downloadPhoto.addEventListener('click', () => {
-            save(canvas, 'screen.jpg');
+            capture.downloadPhoto();
         });
     }
 
@@ -83,7 +83,8 @@ function showFacebookShare() {
             object: {
                 'og:url': 'https://developers.facebook.com/docs/',
                 'og:title': 'BE THE VALLEY DEEP LINK TITLE',
-                'og:description': `#BeTheValley`
+                'og:description': `#BeTheValley`,
+                'og:image': ''
             }
         })
     }, (response) => {
@@ -97,7 +98,7 @@ function showTwitterShare() {
 }
 
 // Begins upload to S3
-async function beginUploadToS3(file) {
+async function beginUploadToS3(videoFile) {
     try {
         console.log('Note to dev: Show Loading in UI...');
 
@@ -105,7 +106,8 @@ async function beginUploadToS3(file) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                videoFilePath: file
+                videoFilePath: videoFile,
+                imageFilePath: capture.photo()
             })
         });
 
@@ -133,7 +135,7 @@ async function checkIfVideoExists(s3Key) {
             })
         });
 
-        const response = await result.text();
+        const response = await result.json();
 
         console.log('Note to dev: End Loading in UI...');
 

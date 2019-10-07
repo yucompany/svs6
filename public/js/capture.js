@@ -53,13 +53,13 @@ class Capture {
         }.bind(this));
     }
 
-    get photo(){
+    downloadPhoto(){
         let output = elements.output;
         if(output)
             save(output, FIRSTNAME + "_" + LASTNAME + ".jpg");  // Grab output buffer
     }
 
-    getLastFrame() {
+    photo() {
         const captured = this.captured;
         if (captured == null || captured.length <= 0) return;
 
