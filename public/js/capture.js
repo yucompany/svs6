@@ -2,8 +2,6 @@
 
 var videoContainer;
 
-const onCaptured = new Event('captured');
-
 class Capture {
     constructor(name, duration, format){
     this.name = name;
