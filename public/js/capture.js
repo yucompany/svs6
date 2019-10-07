@@ -60,6 +60,14 @@ class Capture {
     downloadPhoto.click();
     }
 
+    getLastFrame() {
+        const captured = this.captured;
+        if (captured == null || captured.length <= 0) return;
+
+        const frame = captured[captured.length-1].imageData;
+        return frame;
+    }
+
     async video() {
         let captured = this.captured;
 

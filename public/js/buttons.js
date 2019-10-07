@@ -52,13 +52,7 @@ $(document).ready(() => {
     const facebookShare = document.getElementById('shareFacebook');
     if (facebookShare) {
         facebookShare.addEventListener('click', async () => {
-            const videoFilePath = capture.getVideoFile(this.name);
-
-            if (videoFilePath) {
-                showFacebookShare(videoFilePath);
-            } else {
-                alert('Please click the "Video" button first to generate an .mp4 video in the output directory.');
-            }
+            showFacebookShare();
         });
     }
 
@@ -78,13 +72,14 @@ function showFacebookShare() {
         action_type: 'og.shares',
         action_properties: JSON.stringify({
             object: {
-                'og:url': window.location.href,
+                'og:url': 'https://developers.facebook.com/docs/',
                 'og:title': 'BE THE VALLEY DEEP LINK TITLE',
                 'og:description': `#BeTheValley`
-                // 'og:image': this.userData.output_still_1 || this.userData.output_file
             }
         })
-    }, () => {});
+    }, (response) => {
+        console.log(response);
+    });
 }
 
 // Helper function for Twitter sharing
