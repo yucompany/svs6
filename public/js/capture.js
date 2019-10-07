@@ -59,6 +59,14 @@ class Capture {
             save(output, FIRSTNAME + "_" + LASTNAME + ".jpg");  // Grab output buffer
     }
 
+    getLastFrame() {
+        const captured = this.captured;
+        if (captured == null || captured.length <= 0) return;
+
+        const frame = captured[captured.length-1].imageData;
+        return frame;
+    }
+
     async video() {
       /*  captures.save(async function(blob){
             const path = await this.sendTAR(blob);
@@ -137,14 +145,6 @@ class Capture {
             const response = await result.text();
 
             console.log("Done generating " + response);
-
-            let link = document.createElement('a');
-                link.href = response;
-                link.download = FIRSTNAME + "_" + LASTNAME + "_VALLEY.mp4";
-
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
 
             return response;
         } catch (err) {
