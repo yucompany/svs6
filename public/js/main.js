@@ -141,7 +141,7 @@ function reset(){
 
         elements.line1.clear();
         elements.line2.clear();
-        $('$shareurl').val('');
+        $('#shareurl').val('');
 
     dispatchEvent(onReset);
 }

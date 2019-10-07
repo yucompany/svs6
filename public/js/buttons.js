@@ -40,9 +40,6 @@ $(document).ready(() => {
 
                     // Show deepLink on client.
                     $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
-
-                    // At this point we may want to delete the video from static storage in express.
-                    console.log('WIP - deleting video from static storage. this should probably happen on the server');
                 }
             } else {
                 console.log('Trigger Download from S3 instead.');
