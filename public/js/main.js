@@ -35,18 +35,30 @@ var elements = {
   fx : "",
 
   line1 : "",
-  line2 : ""
+  line2 : "",
+
+  output: ""
 }
 
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
+
+var CAPTURED;
+var captures = new CCapture( {
+  format: 'jpg',
+	framerate: framerate
+} );
+
+
 const onEnd = new Event("ended");
+
+p5.disableFriendlyErrors = true;
 
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(.1);
-      bg.volume(1);  // Ensure volume is set to 1
+      bg.time(0);
+      bg.volume(0);  // Ensure volume is set to 1
 
       bg.elt.playsInline = true; // Ensure video does not maximize
       bg.elt.WebKitPlaysInline = true;
@@ -55,6 +67,19 @@ function preload(){
   bg.hideControls();
   bg.onended(async function(){
     console.log('Video generated!');
+
+    let canvasPixels = get();
+    let output = elements.output;
+        output.image(canvasPixels, 0, 0);
+
+    if(capturing){
+      captures.stop();
+      capturing = false;
+
+      capture.video();
+      console.log("video captured");
+    }
+
     dispatchEvent(onEnd);
   });
 
@@ -75,6 +100,10 @@ var lineA = { origin: {x: 540, y:-290}, object: "" }
 var lineB = { origin: {x: 400, y:-220}, object: "" }
 var lines = [ lineA, lineB ];
 
+let t0 = Date.now();
+let t1 = 0;
+let dt = 0;
+
 function setup(){
   pixelDensity(1);
   background(0);
@@ -90,15 +119,36 @@ function setup(){
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
   let mask = elements.mask = new Mask(WIDTH2, HEIGHT2);
   let fx = elements.fx = assets.flares;
+  let output = elements.output = createGraphics(WIDTH, HEIGHT);
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
 }
 
+let ready = false;
+let capturing = false;
 
-function draw(){  // Our tick function imported from p5.js
+let gTime = 0;
+let playing = false;
+
+let f = 0.0;
+let tf = 150.0;
+
+
+async function draw(){
+  t1 = Date.now();
+  dt = (t1 - t0)/1000;
+  t0 = t1;
+
   let bg = assets.background;
-  let time = bg.time();
+
+  if(playing && gTime < bg.duration()){
+    f += 1.0;
+    gTime = clamp(bg.duration() * f / tf, 0, bg.duration());
+  }
+
+  let time = gTime;
+    bg.time(time);
   let matte = assets.matte;
       matte.time(time);
 
@@ -113,15 +163,15 @@ function draw(){  // Our tick function imported from p5.js
           line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line1.scale = offset;
-          line1.render(buffer, 1, time);
+      line1.render(buffer, 1, time);
       let line2 = elements.line2;
           line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line2.scale = offset;
-          line2.render(buffer, 1, time);
-  
+     line2.render(buffer, 1, time);
+
   let mask = elements.mask;
-    mask.mask(matte, buffer);
+  await mask.mask(matte, buffer);
     
   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
@@ -129,15 +179,24 @@ function draw(){  // Our tick function imported from p5.js
 
   blendMode(SCREEN);
   let fx = elements.fx;
-  image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+ //  image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+  if(capturing)
+     captures.capture( canvas.elt );
 }
+
 
 
 const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-        bg.time(0);
+        bg.pause();
+    let matte = assets.matte;
+        matte.pause();
+
+        gTime = 0; f = 0.0;
+        playing = false;
 
         elements.line1.clear();
         elements.line2.clear();
@@ -150,22 +209,23 @@ const onRestart = new Event("restarted");
 
 function restart(){
   let bg = assets.background;
-    bg.stop();
+  let matte = assets.matte;
 
+  //bg.stop();
+ //matte.stop();
+
+  gTime = 0;
+    
+  f = 0.0;
     elements.line1.reset();
     elements.line2.reset();
 
-    let promise = bg.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
+   // bg.play();
+    //matte.play();
 
-        dispatchEvent(onRestart);
+    playing = true;
 
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
-    }
+    dispatchEvent(onRestart);
 }
 
 function construct(first, last){
@@ -173,8 +233,8 @@ function construct(first, last){
   LASTNAME = last;
   
   let loaded = 0;
-    loadName(first, loadedLine);
-    loadName(last, loadedLine);
+  loadName(first, loadedLine);
+  loadName(last, loadedLine);
 
   function loadedLine(){
     console.log("Loaded line " + loaded)
@@ -189,7 +249,7 @@ function construct(first, last){
 
 const onInitialized = new Event('initialized');
 
-function initialize(){
+async function initialize(){
     let char = "";
     let letter;
     let container;
@@ -203,34 +263,43 @@ function initialize(){
     container.populate(LASTNAME);
 
     let bg = assets.background;
-        bg.stop();
+     //   bg.stop();
 
-    let promise = bg.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
+     let played = false;
 
-        capture.beginCapture(framerate);
-        dispatchEvent(onInitialized); // Fire initialized event
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
+    console.log("tried to load bg");
+    try {
+      await bg.elt.play();
+      console.log("played bg");
+      played = true;
+    }
+    catch(err) {
+      console.log("failed play bg")
     }
 
-   /* let matte = assets.matte;
-    promise = matte.elt.play();
-    if (promise !== undefined) {
-      promise.then(function() {
-        console.log("video played success");
+    if(played){
+      let matte = assets.matte;
 
-      
+      console.log("tried to load matte");
+      try {
+        await matte.elt.play();
+        console.log("played matte");
+        played = true;
+      }
+      catch(err) {
+        console.log("failed to play matte");
+        played = false;
+      }
+    }
+  
+      if(played){
+        gTime = 0; f = 0.0;
+        playing = true;
 
-
-      }).catch(function(error) {
-        console.log("video played fail: " + error);
-      });
-    }*/
-    
+       // capture.beginCapture(framerate);
+        
+        dispatchEvent(onInitialized); // Fire initialized event
+      }
 }
 
 // Exec on page load

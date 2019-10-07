@@ -18,7 +18,7 @@ class Capture {
     else
         this.format = 'jpg';
 
-    this.capturing = false;
+    //this.capturing = false;
     this.encoding = false;
 
     this.frames = 0;
@@ -28,36 +28,35 @@ class Capture {
     }
 
     beginCapture(fps){
-    let capturing = this.capturing;
-    if(capturing)
-        return;
-    this.capturing = true;
+        if(capturing)
+            captures.stop();
 
-    let f = this.format; let d = this.duration;
-    saveFrames('frame', f, d, fps, function(arr) {
-        this.captured = arr;
-        this.capturing = false;
+        console.log('did it');
 
-        console.log("Frames have been captured => ");
-        console.log(arr);
+        captures.start();
+        capturing = true;
 
-        dispatchEvent(onCaptured); // Fire captured
-    }.bind(this));
+        /*let capturing = this.capturing;
+        if(capturing)
+            return;
+        this.capturing = true;
+
+        let f = this.format; let d = this.duration;
+        saveFrames('frame', f, d, fps, function(arr) {
+            this.captured = arr;
+            this.capturing = false;
+
+            console.log("Frames have been captured => ");
+            console.log(arr);
+
+            dispatchEvent(onCaptured); // Fire captured
+        }.bind(this));*/
     }
 
     get photo(){
-    let captured = this.captured;
-
-    if(captured == null || captured.length <= 0) return;
-
-    let frame = captured[captured.length-1].imageData; console.log(frame);
-    var json = JSON.stringify(frame),
-            blob = new Blob([json], {type: "image/octet-stream"}),
-            url = window.URL.createObjectURL(blob);
-
-    downloadPhoto.href = url;
-    downloadPhoto.download = "screenshot.jpg";
-    downloadPhoto.click();
+        let output = elements.output;
+        if(output)
+            save(output, FIRSTNAME + "_" + LASTNAME + ".jpg");  // Grab output buffer
     }
 
     getLastFrame() {
@@ -69,6 +68,15 @@ class Capture {
     }
 
     async video() {
+        captures.save(async function(blob){
+            const path = await this.sendTAR(blob);
+            const result = await this.encode(FIRSTNAME + "_" + LASTNAME);
+
+            console.log("Successfully encoded video from unzip tar!");
+
+        }.bind(this));
+        
+        /*
         let captured = this.captured;
 
         this.name = FIRSTNAME + "_" + LASTNAME;
@@ -77,10 +85,30 @@ class Capture {
         for (let i = 0; i < captured.length; i++) {
             await this.sendFrame(captured[i].imageData, i);
         }
-
+        */
+        /*
         await this.encode(this.name);
 
-        return `/output/${this.name}.mp4`;
+        return `/output/${this.name}.mp4`;*/
+    }
+
+    async sendTAR(tar){
+        let formdata = new FormData();
+        formdata.append('tarz', tar);
+
+        console.log(tar);
+
+        try {
+            const result = await fetch('/encoder/sendTAR', {
+                method: 'POST',
+                body: formdata
+            });
+
+            return result;
+        } catch (err) {
+            console.log(err);
+            console.log("error uploading: ", err);
+        }
     }
 
     async sendFrame(frame, i) {
