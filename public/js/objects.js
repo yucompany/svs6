@@ -252,15 +252,20 @@ class Mask extends SceneElement {
   }
 
   mask(source, dest, shadows){
-    source.loadPixels();
-    dest.loadPixels();
+    return new Promise(function(res, rej){
+      source.loadPixels();
+      dest.loadPixels();
+  
+      let s = source.pixels;
+      let d = dest.pixels;
+  
+      for(let i = 0; i < s.length; i += 4)
+        if(s[i] > 100) d[i+3] = 0;
+  
+      dest.updatePixels();
 
-    let s = source.pixels;
-    let d = dest.pixels;
-
-    for(let i = 0; i < s.length; i += 4)
-      if(s[i] > 100) d[i+3] = 0;
-
-    dest.updatePixels();
+      res(dest);
+    });
   }
+  
 }

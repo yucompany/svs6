@@ -130,15 +130,17 @@ function loadLetter(letter, callback){
       let loaded = 0; let len = name.length;
   
       function onLoadLetter(){
-        ++loaded;
+        ++loaded; console.log(loaded);
         if(loaded >= len)
           callback();
       }
   
       for(let i = 0; i < name.length; i++){
         let char = name[i];
-        if(char != " ")  loadLetter(char, onLoadLetter);
-        else  onLoadLetter();
+        if(char != " ")
+           loadLetter(char, onLoadLetter);
+        else
+          onLoadLetter();
       }
     }
   }

@@ -1,9 +1,10 @@
 'use strict';
 
-const router = require('express').Router();
-const AWS    = require('aws-sdk');
-const s3     = new AWS.S3();
-const fs     = require('fs');
+const router      = require('express').Router();
+const AWS         = require('aws-sdk');
+const s3          = new AWS.S3();
+const docClient   = new AWS.DynamoDB.DocumentClient({region: 'us-west-2'});
+const fs          = require('fs');
 
 router.post('/s3upload', (req, res) => {
     const videoFile = outputDir.split('/output')[0] + req.body.videoFilePath;
@@ -21,12 +22,19 @@ router.post('/s3upload', (req, res) => {
             };
 
             console.log(`Uploading ${req.body.videoFilePath} to S3 bucket...`);
-            s3.upload(params, function(err, data) {
+            s3.upload(params, async (err, data) => {
                 if (err) {
                     console.log('Error uploading to S3::\n', err);
                 } else {
                     console.log('Upload complete!');
-                    res.status(200).send(data);
+
+                    console.log('Generating deep link');
+                    const deepLink = await generateDeepLink(req.body.videoFilePath);
+
+                    console.log('Deleting video from temporary storage.');
+                    fs.unlinkSync(videoFile);
+
+                    res.status(200).send(deepLink);
                 }
             });
 
@@ -36,5 +44,93 @@ router.post('/s3upload', (req, res) => {
         res.status(500).send(err)
     }
 });
+
+router.post('/s3cacheKey', (req, res) => {
+    return new Promise((resolve, reject) => {
+        //Check if this key is already stored in S3.
+        const s3Key = req.body.s3Key;
+        console.log('tec-demo' + s3Key);
+
+        const params = {
+            Bucket: 'social-sharing-install',
+            Key: 'tec-demo' + s3Key
+        };
+
+        s3.getObject(params, (err, data) => {
+            if (err) {
+                if (err.message === 'The specified key does not exist.') {
+                    res.status(200).send(false);
+                    resolve();
+                } else {
+                    res.status(400).send(err);
+                    reject(err);
+                }
+            } else {
+                if (data.Body) {
+                    res.status(200).send(true);
+                } else {
+                    res.status(200).send(false);
+                }
+                resolve();
+            }
+        });
+    });
+});
+
+router.post('/processId', (req, res) => {
+    //Check if this key is already stored in S3.
+    const deepLinkId = req.body.deepLinkId;
+
+    return new Promise((resolve, reject) => {
+        const params = {
+            TableName : 'tec-demo',
+            KeyConditionExpression: '#deeplink_id = :deeplink_id',
+            ExpressionAttributeNames: {
+                '#deeplink_id': 'deeplink_id'
+            },
+            ExpressionAttributeValues: {
+                ':deeplink_id': deepLinkId
+            },
+            ScanIndexForward: false
+        };
+
+        docClient.query(params, (err, data) => {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                res.status(200).send(data.Items[0]);
+            }
+        });
+    });
+});
+
+function generateDeepLink(videoFile) {
+    return new Promise((resolve, reject) => {
+        const uniqueId = Math.random().toString(24).slice(2);
+
+        const line1 = videoFile.split('output/')[1].split('_')[0];
+        const line2 = videoFile.split('output/')[1].split('_')[1].split('.mp4')[0];
+
+        const paramsObj = {
+            TableName : 'tec-demo',
+            Item: {
+                deeplink_id: uniqueId,
+                line1: line1,
+                line2: line2,
+                timestamp: new Date().getTime(),
+                output_file: videoFile
+            }
+        };
+
+        docClient.put(paramsObj, (err, data) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else {
+                resolve(uniqueId);
+            }
+        });
+    });
+}
 
 module.exports = router;
