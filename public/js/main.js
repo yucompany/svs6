@@ -61,6 +61,7 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.time(0);
       bg.volume(0);  // Ensure volume is set to 1
+      bg.elt.autoplay = true;
   });
   bg.hide();
   bg.hideControls();
@@ -85,6 +86,7 @@ function preload(){
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.time(0);
     matte.volume(0);
+    matte.elt.autoplay = true;
   });
   matte.hide();
   matte.hideControls();
