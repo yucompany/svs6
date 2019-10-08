@@ -22,7 +22,7 @@ $(document).ready(() => {
     const downloadPhoto = document.getElementById('dlPhoto');
     if (downloadPhoto) {
         downloadPhoto.addEventListener('click', () => {
-            capture.downloadPhoto();
+            capture.photo();
         });
     }
 

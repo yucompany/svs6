@@ -70,12 +70,12 @@ function preload(){
     let output = elements.output;
         output.image(canvasPixels, 0, 0);
 
-  /*  if(capturing){
-      captures.stop();
+   if(capturing){
+      capture.stopCapture();
       capturing = false;
 
-      dispatchEvent(onCapture);
-    }*/
+      dispatchEvent(onCaptured);
+    }
 
     dispatchEvent(onEnd);
   });
@@ -129,15 +129,33 @@ let playing = false;
 let f = 0.0;
 let tf = 150.0;
 
-let drawReady = false;
 
- function draw(){
-  
+function draw(){
+  if(!ready){
+    render();
+    ready = true;
+  }
+}
+
+
+ function render(){
+  function breakPromise(err){
+    Promise.reject(err);
+  }
+
   let bg = assets.background;
-
-  let time = bg.time();
   let matte = assets.matte;
-    matte.time(time);
+
+   if(playing){
+     f += 1.0;
+     gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+   }
+   else
+    gTime = 0;
+
+  let time = gTime;
+  bg.time(time)
+  matte.time(time);
 
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
@@ -155,21 +173,46 @@ let drawReady = false;
           line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
           line2.scale = offset;
-     line2.render(buffer, 1, time);
+      line2.render(buffer, 1, time);
 
   let mask = elements.mask;
-   mask.mask(matte, buffer);
+  mask.mask(matte, buffer)
     
-  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  .then(function(m){
+      image(m, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+      //console.log("masked");
+
+      //blendMode(SCREEN);
+      //let fx = elements.fx;
+      //image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+      if(capturing)
+        return capture.captureFrame();
+  }, breakPromise)
+  .then(function(fr){
+    if(fr){ 
+      capture.addFrame(fr);
+      //console.log(fr);
+    }
+    requestAnimationFrame(render);
+  }, breakPromise)
+
+  
+    
 
  /* * * * * * * * */
 
-  blendMode(SCREEN);
-  let fx = elements.fx;
-   image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+  
 
-//  if(capturing)
-  //   captures.capture( canvas.elt );
+  /*if(capturing){
+     //captures.capture( canvas.elt );
+     await new Promise(function(res, rej) {
+       canvas.elt.toBlob(function(blob){
+          console.log(blob);  
+        res(blob);
+        });
+      });
+  }*/
 }
 
 
@@ -180,7 +223,7 @@ function reset(){
     let bg = assets.background;
         bg.time(0);
     let matte = assets.matte;
-       // matte.stop();
+        matte.time(0);
 
         gTime = 0; f = 0.0;
         playing = false;
@@ -198,8 +241,11 @@ function restart(){
   let bg = assets.background;
   let matte = assets.matte;
 
-  bg.stop();
+ // bg.stop();
   //matte.stop();
+  bg.time(0);
+  matte.time(0);
+
 
   gTime = 0.0;
     
@@ -207,7 +253,7 @@ function restart(){
     elements.line1.reset();
     elements.line2.reset();
 
-    bg.play();
+   // bg.play();
    //matte.play();
 
     playing = true;
@@ -253,7 +299,7 @@ function initialize(){
     let matte = assets.matte;
        // bg.stop();
 
-     bg.play();
+     //bg.play();
      //matte.play();
 
     gTime = 0; f = 0.0;

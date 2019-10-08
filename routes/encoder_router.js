@@ -17,17 +17,46 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 // POSTs
 router.post('/addFrame', (req, res) => {
-    const frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
+    const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
     const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
+    //let fr = req.file;
     const dir = tempDir.name + "/" + fName;
 
-    console.log('received frame: ' + fName);
+    //console.log(frame);
+
+   // console.log(req.file);
+  //  console.log('received frame: ' + fr.originalname);
+
+  console.log("received " + fName);
 
     fs.writeFile(dir, frame, 'base64', (err) => {
-        if (err) {
+      if (err) {  
+          console.log('there was an error writing file: ' + err);
+      }
+      res.status(200).send();
+  });
+
+    
+/*
+    fs.writeFile(dir, frame, 'base64', (err) => {
+        if (err) {  
             console.log('there was an error writing file: ' + err);
         }
         res.status(200).send();
+    });*/
+});
+
+router.post('/screenshot', (req, res) => {
+  const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
+  const dir = outputDir + "/screenshot.jpg";
+
+  console.log("received");
+
+    fs.writeFile(dir, frame, 'base64', (err) => {
+      if (err) {  
+          console.log('there was an error writing file: ' + err);
+      }
+      res.status(200).send('/output/screenshot.jpg');
     });
 });
 
