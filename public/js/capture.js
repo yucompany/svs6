@@ -64,6 +64,7 @@ class Capture {
         if (captured == null || captured.length <= 0) return;
 
         const frame = captured[captured.length-1].imageData;
+
         return frame;
     }
 

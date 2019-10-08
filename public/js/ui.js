@@ -107,7 +107,7 @@ async function beginUploadToS3(videoFile) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 videoFilePath: videoFile,
-                imageFilePath: capture.photo()
+                imageFile: capture.photo()
             })
         });
 

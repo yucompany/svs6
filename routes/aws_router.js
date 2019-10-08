@@ -8,53 +8,65 @@ const fs          = require('fs');
 
 router.post('/s3upload', (req, res) => {
     try {
-        const imageFileBuffer = outputDir.split('/output')[0] + req.body.imageFilePath;
         const videoFilePath = outputDir.split('/output')[0] + req.body.videoFilePath;
+        const imageFile = outputDir.split('/output')[0] + req.body.imageFile.replace(/^data:image\/(png|jpg);base64,/, "");;
+        const imageFilePath = videoFilePath.replace('.mp4', '.jpg');
 
-        // Upload Image
+        // First Write Image
+        fs.writeFile(imageFilePath, imageFile, 'base64', (err) => {
+            if (err) throw err;
+            console.log(imageFilePath, 'stored');
 
-        const params = {
-            Bucket: 'social-sharing-install',
-            Key: 'tec-demo' + req.body.imageFilePath,
-            Body: imageFileBuffer
-        };
+            // Now Upload Image
+            fs.readFile(imageFilePath, (err, data) => {
+                if (err) { throw err; }
 
-        console.log(`Uploading ${req.body.imageFilePath} to S3 bucket...`);
-        s3.upload(params, async (err, data) => {
-            if (err) {
-                console.log('Error uploading to S3::\n', err);
-            } else {
-                console.log('Upload complete!');
-            }
-        });
+                const base64data = new Buffer.from(data, 'base64');
 
-        // Upload Video
-        fs.readFile(videoFilePath, (err, data) => {
-            if (err) { throw err; }
+                const params = {
+                    Bucket: 'social-sharing-install',
+                    Key: 'tec-demo' + req.body.videoFilePath.replace('.mp4', '.jpg'),
+                    Body: base64data
+                };
 
-            const base64data = new Buffer.from(data, 'binary');
+                console.log(`Uploading ${imageFilePath} to S3 bucket...`);
+                s3.upload(params, async (err, data) => {
+                    if (err) {
+                        console.log('Error uploading to S3::\n', err);
+                    } else {
+                        console.log('Upload complete!');
 
-            const params = {
-                Bucket: 'social-sharing-install',
-                Key: 'tec-demo' + req.body.videoFilePath,
-                Body: base64data
-            };
+                        // Now Upload Video
+                        fs.readFile(videoFilePath, (err, data) => {
+                            if (err) { throw err; }
 
-            console.log(`Uploading ${req.body.videoFilePath} to S3 bucket...`);
-            s3.upload(params, async (err, data) => {
-                if (err) {
-                    console.log('Error uploading to S3::\n', err);
-                } else {
-                    console.log('Upload complete!');
+                            const base64data = new Buffer.from(data, 'binary');
 
-                    console.log('Generating deep link');
-                    const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.imageFilePath);
+                            const params = {
+                                Bucket: 'social-sharing-install',
+                                Key: 'tec-demo' + req.body.videoFilePath,
+                                Body: base64data
+                            };
 
-                    console.log('Deleting video from temporary storage.');
-                    fs.unlinkSync(videoFilePath);
+                            console.log(`Uploading ${req.body.videoFilePath} to S3 bucket...`);
+                            s3.upload(params, async (err, data) => {
+                                if (err) {
+                                    console.log('Error uploading to S3::\n', err);
+                                } else {
+                                    console.log('Upload complete!');
 
-                    res.status(200).send(deepLink);
-                }
+                                    console.log('Generating deep link');
+                                    const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
+
+                                    console.log('Deleting video from temporary storage.');
+                                    fs.unlinkSync(videoFilePath);
+
+                                    res.status(200).send(deepLink);
+                                }
+                            });
+                        });
+                    }
+                });
             });
         });
     } catch (err) {
