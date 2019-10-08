@@ -62,6 +62,7 @@ function preload(){
       bg.time(0);
       bg.volume(0);  // Ensure volume is set to 1
       bg.elt.autoplay = true;
+      bg.play();
   });
   bg.hide();
   bg.hideControls();
@@ -87,6 +88,7 @@ function preload(){
     matte.time(0);
     matte.volume(0);
     matte.elt.autoplay = true;
+    matte.play();
   });
   matte.hide();
   matte.hideControls();
