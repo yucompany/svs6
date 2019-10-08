@@ -4,6 +4,7 @@
 var FIRSTNAME, LASTNAME;
 
 const framerate = 15;
+const duration = 10;
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -37,7 +38,8 @@ var elements = {
   line1 : "",
   line2 : "",
 
-  output: ""
+  output: "",
+  masker: ""
 }
 
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
@@ -112,7 +114,7 @@ function setup(){
 
   let bg = elements.bg = assets.bg;
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
-  let mask = elements.mask = new Mask(WIDTH2, HEIGHT2);
+  let mask = elements.mask = new Mask(0, 0, assets.matte, elements.buffer);
   let fx = elements.fx = assets.flares;
   let output = elements.output = createGraphics(WIDTH, HEIGHT);
 
@@ -127,7 +129,7 @@ let gTime = 0;
 let playing = false;
 
 let f = 0.0;
-let tf = 150.0;
+let tf = 1.0 * (duration*framerate);
 
 
 function draw(){
@@ -167,7 +169,7 @@ function draw(){
       let line1 = elements.line1;
           line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
-          line1.scale = offset;
+let sc =  line1.scale = offset;
       line1.render(buffer, 1, time);
       let line2 = elements.line2;
           line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
@@ -175,11 +177,18 @@ function draw(){
           line2.scale = offset;
       line2.render(buffer, 1, time);
 
-  let mask = elements.mask;
-  mask.mask(matte, buffer)
-    
-  .then(function(m){
-      image(m, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+    let dx = abs(line1.x - line2.x);
+    let dy = abs(line1.y - line2.y);
+
+    let h = dy*sc*6;
+    let w = dx*sc*5;
+
+    let mask = elements.mask;
+  mask.mask(Math.floor(line1.x - w/2), Math.floor(line1.y - h/2), Math.floor(line1.x + w/2), Math.floor(line1.y + h/2), Date.now())
+
+  .then(function(dt){
+    console.log(dt);
+      image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
       //console.log("masked");
 
       //blendMode(SCREEN);
@@ -187,7 +196,7 @@ function draw(){
       //image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
       if(capturing)
-        return capture.captureFrame();
+        return capture.captureFrame(dt);
   }, breakPromise)
   .then(function(fr){
     if(fr){ 

@@ -247,25 +247,37 @@ class Line extends SceneElement {
 }
 
 class Mask extends SceneElement {
-  constructor(x, y){
+  constructor(x, y, src, dest){
     super(x, y);
+  
+    this.source = src;
+    this.dest = dest;
   }
 
-  mask(source, dest, shadows){
+  mask(x1, y1, x2, y2, t){
     return new Promise(function(res, rej){
+      let source = this.source;
+      let dest = this.dest;
+
       source.loadPixels();
       dest.loadPixels();
-  
+
       let s = source.pixels;
       let d = dest.pixels;
-  
-      for(let i = 0; i < s.length; i += 4)
-        if(s[i] > 100) d[i+3] = 0;
-  
-      dest.updatePixels();
 
-      res(dest);
-    });
+      for(let i = x1; i < x2; i++){
+        for(let j = y1; j < y2; j++){
+          let ind = (j * WIDTH + i) * 4;
+
+          if(s[ind] > 100)
+            d[ind + 3] = 0;
+        }
+      }
+
+      dest.updatePixels();
+      res((Date.now() - t));
+    }.bind(this))
+    
   }
   
 }

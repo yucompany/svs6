@@ -56,11 +56,12 @@ class Capture {
         this.captured.push(frame);
     }
 
-    captureFrame(){
+    captureFrame(dt){
         return new Promise(function(res, rej){
             setTimeout(function(){
                 canvas.elt.toBlob(res, 'image/jpeg', .85);
-            }, 100);
+            }, dt);
+                
         })
 
             //res(canvas.elt.toDataURL("image/jpeg"));
