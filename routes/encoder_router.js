@@ -19,49 +19,32 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 router.post('/addFrame', (req, res) => {
     const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
     const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
-    //let fr = req.file;
     const dir = tempDir.name + "/" + fName;
 
-    //console.log(frame);
-
-   // console.log(req.file);
-  //  console.log('received frame: ' + fr.originalname);
-
-  console.log("received " + fName);
+    console.log("received " + fName);
 
     fs.writeFile(dir, frame, 'base64', (err) => {
-      if (err) {  
+      if (err) {
           console.log('there was an error writing file: ' + err);
       }
       res.status(200).send();
   });
-
-    
-/*
-    fs.writeFile(dir, frame, 'base64', (err) => {
-        if (err) {  
-            console.log('there was an error writing file: ' + err);
-        }
-        res.status(200).send();
-    });*/
 });
 
 router.post('/screenshot', (req, res) => {
   const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
-  const dir = outputDir + "/screenshot.jpg";
-
-  console.log("received");
+  const dir = outputDir + '/' + req.body.fileName;
 
     fs.writeFile(dir, frame, 'base64', (err) => {
-      if (err) {  
+      if (err) {
           console.log('there was an error writing file: ' + err);
       }
-      res.status(200).send('/output/screenshot.jpg');
+      res.status(200).send(`/output/${req.body.fileName}`);
     });
 });
 
 
-router.post('/sendTAR', upload.single('tarz'), (req, res) => {    
+router.post('/sendTAR', upload.single('tarz'), (req, res) => {
     console.log("temporary path located at:\n" + tempDir.name);
 
   let zip = req.file;

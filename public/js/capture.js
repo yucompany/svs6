@@ -36,7 +36,7 @@ class Capture {
         captures.start();
         capturing = true;*/
 
-       
+
         capturing = true;
         this.captured = [];
 
@@ -62,7 +62,7 @@ class Capture {
                 canvas.elt.toBlob(res, 'image/jpeg', .85);
             }, 100);
         })
-            
+
             //res(canvas.elt.toDataURL("image/jpeg"));
     }
 
@@ -76,157 +76,160 @@ class Capture {
         });
 
         this.video();
-        
+
     }
 
     photo() {
-        return new Promise(function(res, rej) {
-            let captured = this.captured;
-            var reader = new FileReader();
+        return new Promise((resolve, reject) => {
+            const captured = this.captured;
+            const reader = new FileReader();
 
-            reader.onload = function(){
-                var dataUrl = reader.result;
-                res(dataUrl);
-            }
+            reader.onload = () => {
+                const dataUrl = reader.result;
+                resolve(dataUrl);
+            };
+
+            reader.onerror = (err) => {
+                console.log('Issue reading file');
+                reject(err);
+            };
+
             reader.readAsDataURL(captured[captured.length-1]);
-        }.bind(this)).then(function(r){
-            return fetch('/encoder/screenshot', {
+        })
+        .then((buffer) => {
+            const fetchRequest = fetch('/encoder/screenshot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    dat: r
+                    dat: buffer,
+                    fileName: FIRSTNAME + '_' + LASTNAME + '.jpg'
                 })
             });
-        })
-    }
 
+            fetchRequest
+            .then((response) => {
+                response.text()
+                .then((result) => {
+                    triggerPhotoDownload(result);
+                    return result;
+                })
+                .catch((err) => {
+                    console.log('Error parsing response');
+                    throw err;
+                });
+            })
+            .catch((err) => {
+                console.log('Error communicating with server.');
+                throw err;
+            });
+        })
+        .catch((err) => {
+            console.log('Error reading frame for Photo download.');
+            throw err;
+        });
+    }
 
     video() {
-        let captured = this.captured;
-        let promises = [];
+        return new Promise((resolve, reject) => {
+            let captured = this.captured;
+            let promises = [];
 
-        for (let i = 0; i < captured.length; i++)
-            promises.push(this.sendFrame(captured[i], i));
+            for (let i = 0; i < captured.length; i++) {
+                promises.push(this.sendFrame(captured[i], i));
+            }
 
-        this.name = FIRSTNAME + "_" + LASTNAME;
+            this.name = FIRSTNAME + '_' + LASTNAME;
 
-        console.log('Sending frames... ' + captured.length);
-        /*for (let i = 0; i < captured.length; i++) {
-            await this.sendFrame(captured[i], i);
-        }*/
+            console.log('Sending frames... ' + captured.length);
 
-        Promise.all(promises)
-
-        .then(function(a){
-            this.encode(this.name);
-        }.bind(this))
-
-        .then(function(a){
-            return `/output/${this.name}.mp4`;
-        }.bind(this))
-    }
-
-    async sendTAR(tar){
-        let formdata = new FormData();
-        formdata.append('tarz', tar);
-
-        console.log(tar);
-
-        try {
-            const result = await fetch('/encoder/sendTAR', {
-                method: 'POST',
-                body: formdata
+            Promise.all(promises)
+            .then(() => {
+                this.encode(this.name);
+                resolve(`/output/${this.name}.mp4`);
+            })
+            .catch((err) => {
+                reject(err);
             });
-
-            return result;
-        } catch (err) {
-            console.log(err);
-            console.log("error uploading: ", err);
-        }
+        });
     }
 
     sendFrame(frame, i) {
-        let format = this.format;
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
-        return new Promise(function(res, rej) {
-            var reader = new FileReader();
+            reader.onload = () => {
+                const dataUrl = reader.result;
+                resolve(dataUrl);
+            };
 
-            reader.onload = function(){
-                var dataUrl = reader.result;
-                res(dataUrl);
-            }
+            reader.onerror = (err) => {
+                console.log('Issue reading file');
+                reject(err);
+            };
+
             reader.readAsDataURL(frame);
-        }).then(function(r){
-            return fetch('/encoder/addFrame', {
+        })
+        .then((buffer) => {
+            let format = this.format;
+            const fetchRequest = fetch('/encoder/addFrame', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    dat: r,
+                    dat: buffer,
                     frame: (i + 1),
                     format: format
                 })
             });
-        })
-        .then(function(x){
-            console.log(x);
-            return new Promise(function(a, b){
-                a(x);
+
+            fetchRequest
+            .then((response) => {
+                response.text()
+                .then((result) => {
+                    return result;
+                })
+                .catch((err) => {
+                    console.log('Error parsing response');
+                    throw err;
+                });
             })
+            .catch((err) => {
+                console.log('Error communicating with server.');
+                throw err;
+            });
         })
+        .catch((err) => {
+            console.log('Error reading frame for Photo download.');
+            throw err;
+        });
     }
 
-    /*async sendFrame(frame, i) {
-        
-        let formdata = new FormData();
-        let id = "frame-" + pad(i, 7) + ".png";
-
-        console.log("sent " + id);
-
-        var reader = new FileReader();
-        reader.readAsDataURL(frame); 
-        reader.onloadend = function() {
-            var base64data = reader.result;                
-            console.log(base64data);
-        }
-
-        formdata.append('frame', frame, id);
-
-        try {
-            let format = this.format;
-
-            const result = await fetch('/encoder/addFrame', {
-                method: 'POST',
-                body: formdata
-            });
-
-            return "pinged " + result;
-        } catch (err) {
-            console.log(err);
-            console.log("error uploading: ", err);
-        }
-    }*/
-
     encode(filename) {
-        console.log("encded")
-
-        try {
-            const result = fetch('/encoder/encode', {
+        return new Promise((resolve, reject) => {
+            console.log('Begin encode');
+            const fetchResponse = fetch('/encoder/encode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     path: filename
                 })
+            });
+
+            fetchResponse
+            .then((response) => {
+                response.text()
+                .then((result) => {
+                    console.log('Done encoding ' + result);
+                    resolve(result);
+                })
+                .catch((err) => {
+                    console.log('Error parsing response');
+                    reject(err);
+                });
             })
-
-            .then(function(r){
-                const response = r.text();
-                console.log("Done generating " + response);
-
-                return response;
-            })
-
-        } catch (err) {
-            console.log('Encoding error::\n', err);
-        }
+            .catch((err) => {
+                console.log('Error communicating with server.');
+                reject(err);
+            });
+        });
     }
 }

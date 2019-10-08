@@ -29,38 +29,15 @@ $(document).ready(() => {
     // Download Video Button
     const downloadVideo = document.getElementById('dlVideo');
     if (downloadVideo) {
-        downloadVideo.addEventListener('click', async () => {
-            // Before encoding anything, let's see if this video is already stored in S3.
-            const s3Key = generateKeyFromInput();
-            console.log('s3Key', s3Key);
-            const cacheVideo = await checkIfVideoExists(s3Key);
-
-            if (!cacheVideo) {
-                // Encode video
-                console.log('No stored version of this video found - server now encoding to .mp4');
-                const videoFile = await capture.video();
-
-                // Begin download before we begin the upload to S3 server side..
-                triggerDownload(videoFile, false);
-
-                if (videoFile) {
-                    console.log('Initiating S3 upload.');
-                    const deepLinkId = await beginUploadToS3(videoFile);
-
-                    // Show deepLink on client.
-                    $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
-                }
-            } else {
-                console.log('Trigger Download from S3 instead.');
-                triggerDownload(s3Key, true)
-            }
+        downloadVideo.addEventListener('click', () => {
+            prepareVideoDownload();
         });
     }
 
     // Share to Facebook Button
     const facebookShare = document.getElementById('shareFacebook');
     if (facebookShare) {
-        facebookShare.addEventListener('click', async () => {
+        facebookShare.addEventListener('click', () => {
             showFacebookShare();
         });
     }
@@ -97,37 +74,87 @@ function showTwitterShare() {
     window.open(`http://twitter.com/share?text=BE%20THE%20VALLEY&url=${encodeURIComponent('www.google.com')}&hashtags=#BeTheValley&via=leexperiential`, '', 'width=720,height=250');
 }
 
+// Goes throw the motions of uploading a video to S3/Server then returning it to user.
+function prepareVideoDownload() {
+    // Before encoding anything, let's see if this video is already stored in S3.
+    const s3Key = generateKeyFromInput();
+
+    checkIfVideoExists(s3Key)
+    .then((cacheVideo) => {
+        if (!cacheVideo) {
+            // Encode video
+            console.log('No stored version of this video found - server now encoding to .mp4');
+
+            capture.video()
+            .then((videoFile) => {
+                // Begin download before we begin the upload to S3 server side..
+                triggerVideoDownload(videoFile, false);
+
+                if (videoFile) {
+                    console.log('Initiating S3 upload.');
+
+                    beginUploadToS3(videoFile)
+                    .then((deepLinkId) => {
+                        // Show deepLink on client.
+                        $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
+                    })
+                    .catch((err) => {
+                        throw err;
+                    });
+                }
+            })
+            .catch((err) => {
+                throw err;
+            });
+        } else {
+            console.log('Trigger Download from S3 instead.');
+            triggerVideoDownload(s3Key, true)
+        }
+    })
+    .catch((err) => {
+        throw err;
+    });
+}
+
 // Begins upload to S3
-async function beginUploadToS3(videoFile) {
-    try {
+function beginUploadToS3(videoFile) {
+    return new Promise((resolve, reject) => {
         console.log('Note to dev: Show Loading in UI...');
 
-        const result = await fetch('aws/s3upload', {
+        const fetchResponse = fetch('aws/s3upload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 videoFilePath: videoFile,
-                imageFile: capture.photo()
+                imageFilePath: videoFile.replace('.mp4', '.jpg')
             })
         });
 
-        const response = await result.text();
-
-        console.log('Note to dev: End Loading in UI...');
-
-        return response;
-    } catch (err) {
-        console.log(err);
-        console.log('Error uploading::\n', err);
-    }
+        fetchResponse
+        .then((response) => {
+            response.text()
+            .then((result) => {
+                console.log('Note to dev: End Loading in UI...');
+                resolve(result);
+            })
+            .catch((err) => {
+                console.log('Error parsing response');
+                reject(err);
+            });
+        })
+        .catch((err) => {
+            console.log('Error communicating with server.');
+            reject(err);
+        });
+    });
 }
 
 // Checks if we already have a generated video stored in S3. Returns boolean.
-async function checkIfVideoExists(s3Key) {
-    try {
+function checkIfVideoExists(s3Key) {
+    return new Promise((resolve, reject) => {
         console.log('Note to dev: Show Loading in UI...');
 
-        const result = await fetch('aws/s3cacheKey', {
+        const fetchResponse = fetch('aws/s3cacheKey', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -135,15 +162,23 @@ async function checkIfVideoExists(s3Key) {
             })
         });
 
-        const response = await result.json();
-
-        console.log('Note to dev: End Loading in UI...');
-
-        return response;
-    } catch (err) {
-        console.log(err);
-        console.log('Error uploading::\n', err);
-    }
+        fetchResponse
+        .then((response) => {
+            response.json()
+            .then((result) => {
+                console.log('Note to dev: End Loading in UI...');
+                resolve(result);
+            })
+            .catch((err) => {
+                console.log('Error parsing response');
+                reject(err);
+            });
+        })
+        .catch((err) => {
+            console.log('Error communicating with server.');
+            reject(err);
+        });
+    });
 }
 
 // Creates a key based on the input values - used to check if we already have something stored in S3.
@@ -151,8 +186,8 @@ function generateKeyFromInput() {
     return `/output/${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}.mp4`;
 }
 
-// Starts a download.
-function triggerDownload(videoFile, cached) {
+// Starts a video download.
+function triggerVideoDownload(videoFile, cached) {
     const link = document.createElement('a');
 
     if (cached) {
@@ -170,6 +205,21 @@ function triggerDownload(videoFile, cached) {
         link.click();
         document.body.removeChild(link);
     }
+}
+
+// Starts a photo download.
+function triggerPhotoDownload(imageFile) {
+    const link = document.createElement('a');
+
+    // We'll want to replace this with the client's S3 bucket address.
+    link.href = imageFile;
+
+    // File name for downloaded file.
+    link.download = FIRSTNAME + '_' + LASTNAME + '.jpg';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Rick dev
