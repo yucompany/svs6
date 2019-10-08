@@ -139,6 +139,10 @@ function draw(){
 
 
  function render(){
+  function breakPromise(err){
+    Promise.reject(err);
+  }
+
   let bg = assets.background;
   let matte = assets.matte;
 
@@ -184,14 +188,14 @@ function draw(){
 
       if(capturing)
         return capture.captureFrame();
-  })
+  }, breakPromise)
   .then(function(fr){
     if(fr){ 
       capture.addFrame(fr);
       //console.log(fr);
     }
     requestAnimationFrame(render);
-  })
+  }, breakPromise)
 
   
     
@@ -217,9 +221,9 @@ const onReset = new Event("resetted");
 
 function reset(){
     let bg = assets.background;
-      //  bg.time(0);
+        bg.time(0);
     let matte = assets.matte;
-       // matte.stop();
+        matte.time(0);
 
         gTime = 0; f = 0.0;
         playing = false;
@@ -239,6 +243,9 @@ function restart(){
 
  // bg.stop();
   //matte.stop();
+  bg.time(0);
+  matte.time(0);
+
 
   gTime = 0.0;
     
