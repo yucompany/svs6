@@ -24,7 +24,6 @@
     <script src="p5.min.js"></script>
     <script src="p5.dom.min.js"></script>
     <script src="p5.sound.min.js"></script>
-    <script src="CCapture.all.min.js"></script>
     <script src="js/helpers.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -39,7 +38,6 @@
     <script src="js/ui.js" defer></script>
 
     <script src="js/fb-sdk.js"></script>
-    
 
     <script src="js/main.js" defer></script>
   </head>
@@ -48,7 +46,7 @@
     <div class="d-flex flex-column justify-content-center align-items-center">
 
       <div id="header" class="mt-5 mb-2 w-50">
-        <img src="../images/misc/silicon-valley-logo.png" class="img-fluid">
+        <img src="../images/misc/logo.png" class="img-fluid">
       </div>
       
       <div id="bodytext" class="container py-3 w-75">
@@ -57,7 +55,7 @@
       </div>
 
       <div id="canvas-holder" class="d-flex justify-content-center pt-1 pb-5 w-75">
-        <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute hidden" src="../images/misc/title card.jpg">
+        <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute" src="../images/misc/title card.jpg">
         <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute"><img id="replay" class="hidden" src="../images/icons/reset arrow.svg"></div>
 
         <!-- p5 canvas goes here -->
@@ -115,21 +113,21 @@
                           <img src="../images/icons/facebook.png" class="socialicon ml-3">
                       </button>
                     </div>
-                </div>
-
-                <div id="redo-container" class="d-flex flex-column align-items-start flex-fill px-4">
-                  <img id="redo" src="../images/icons/button-redo.png" class="dlbtn ml-3">
-                </div>
-
+  
+                    <div id="redo-container" class="d-flex flex-column align-items-start flex-fill px-4">
+                        <button id="redo" class="btn btn-primary mt-2 w-100 text-uppercase pt-2">Redo</button>
+                    </div>
               </div>
+  
+              
+          </div>
       </div>
 
       <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-5">
-          <img id="hbo-logo" src="../images/misc/hbo-logo.png" class="img-fluid mt-3">
-          <div id="footercopy" class="container text-center mt-3 mw-50">
+          <div id="footercopy" class="container text-center mw-50">
             <small>© 2019 Home Box Office, Inc. All Rights Reserved.<br>This website may contain mature content.</small>
           </div>
-          <div id="footerlinks" class="container d-flex justify-content-center text-center w-25 my-3 font-weight-bold">
+          <div id="footerlinks" class="container d-flex justify-content-center text-center w-25 pt-3 font-weight-bold">
               <a class="px-2" href="https://www.hbo.com/privacy-policy" target="_blank">PRIVACY</a>
               <a class="px-2" href="https://www.hbo.com/terms-of-use" target="_blank">TERMS</a>
           </div>
