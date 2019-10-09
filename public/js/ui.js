@@ -196,7 +196,7 @@ function triggerVideoDownload(videoFile, cached) {
 
     if (link.href) {
         // File name for downloaded file.
-        link.download = FIRSTNAME + "_" + LASTNAME + ".mp4";
+        link.download = FIRSTNAME + "_" + LASTNAME +  "_VALLEY.mp4";
 
         document.body.appendChild(link);
         link.click();
@@ -212,7 +212,7 @@ function triggerPhotoDownload(imageFile) {
     link.href = imageFile;
 
     // File name for downloaded file.
-    link.download = FIRSTNAME + '_' + LASTNAME + '.jpg';
+    link.download = FIRSTNAME + '_' + LASTNAME + '_VALLEY.jpg';
 
     document.body.appendChild(link);
     link.click();
