@@ -59,10 +59,7 @@ p5.disableFriendlyErrors = true;
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
-      bg.time(0);
       bg.volume(0);  // Ensure volume is set to 1
-      bg.elt.autoplay = true;
-      bg.play();
   });
   bg.hide();
   bg.hideControls();
@@ -85,10 +82,7 @@ function preload(){
   });
 
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
-    matte.time(0);
     matte.volume(0);
-    matte.elt.autoplay = true;
-    matte.play();
   });
   matte.hide();
   matte.hideControls();
@@ -110,13 +104,15 @@ function setup(){
   background(0);
   stroke(255);
   imageMode(CENTER);
-  frameRate(120);
+  frameRate(15);
 
   canvas = createCanvas(WIDTH, HEIGHT); console.log(canvas);
     canvas.parent(canvasHolder);
     canvas.class('w-100 h-100');
 
-  let bg = elements.bg = assets.bg;
+  let bg = elements.bg = assets.background; 
+  let matte = assets.matte;
+  
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
   let mask = elements.mask = new Mask(0, 0, assets.matte, elements.buffer);
   let fx = elements.fx = assets.flares;
@@ -124,6 +120,14 @@ function setup(){
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
+
+  bg.attribute('playsinline', '');
+  bg.attribute('autoplay', '');
+  bg.attribute('muted', '');
+
+  matte.attribute('playsinline', '');
+  matte.attribute('autoplay', '');
+  matte.attribute('muted', '');
 }
 
 let ready = false;
@@ -133,35 +137,40 @@ let gTime = 0;
 let playing = false;
 
 let f = 0.0;
-let tf = 1.0 * (duration*framerate);
+let tf = 150.0;
 
 
 function draw(){
   if(!ready){
+    assets.background.play();
+    assets.matte.play();
+
     render();
     ready = true;
   }
 }
 
+let VIDEOREADY = false;
 
  function render(){
   function breakPromise(err){
     Promise.reject(err);
   }
 
-  let bg = assets.background;
-  let matte = assets.matte;
-
-   if(playing){
-     f += 1.0;
-     gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
-   }
-   else
-    gTime = 0;
-
   let time = gTime;
-  bg.time(time)
-  matte.time(time);
+
+  let bg = assets.background; let bgbf = bg.elt.buffered;
+  let matte = assets.matte; let mbf = matte.elt.buffered;
+
+  VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= time) && (mbf.length > 0 && mbf.end(0) >= time);
+
+  if(VIDEOREADY)
+    console.log(bgbf.end(0));
+
+  if(playing && VIDEOREADY){
+    bg.time(time)
+    matte.time(time);
+  }   
 
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
@@ -191,41 +200,29 @@ let sc =  line1.scale = offset;
   mask.mask(Math.floor(line1.x - w/2), Math.floor(line1.y - h/2), Math.floor(line1.x + w/2), Math.floor(line1.y + h/2), Date.now())
 
   .then(function(dt){
-    console.log(dt);
       image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
       //console.log("masked");
 
-      //blendMode(SCREEN);
-      //let fx = elements.fx;
-      //image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+      blendMode(SCREEN);
+      let fx = elements.fx;
+      image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
       if(capturing)
         return capture.captureFrame(dt);
   }, breakPromise)
   .then(function(fr){
-    if(fr){ 
+    if(fr)
       capture.addFrame(fr);
-      //console.log(fr);
-    }
+
+      if(playing){
+        f += 1.0;
+        gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+      }
+      else
+        gTime = 0;
+
     requestAnimationFrame(render);
-  }, breakPromise)
-
-  
-    
-
- /* * * * * * * * */
-
-  
-
-  /*if(capturing){
-     //captures.capture( canvas.elt );
-     await new Promise(function(res, rej) {
-       canvas.elt.toBlob(function(blob){
-          console.log(blob);  
-        res(blob);
-        });
-      });
-  }*/
+  }, breakPromise);
 }
 
 
@@ -254,8 +251,6 @@ function restart(){
   let bg = assets.background;
   let matte = assets.matte;
 
- // bg.stop();
-  //matte.stop();
   bg.time(0);
   matte.time(0);
 
@@ -265,9 +260,6 @@ function restart(){
   f = 0.0;
     elements.line1.reset();
     elements.line2.reset();
-
-   // bg.play();
-   //matte.play();
 
     playing = true;
 
@@ -310,10 +302,10 @@ function initialize(){
 
     let bg = assets.background;
     let matte = assets.matte;
-       // bg.stop();
+        
+      //bg.time(0);
+      //matte.time(0);
 
-     //bg.play();
-     //matte.play();
 
     gTime = 0; f = 0.0;
     playing = true;
