@@ -1,16 +1,11 @@
 'use strict';
 
-const express = require('express');
+const express           = require('express');
 const router            = express.Router();
 const ffmpegInstaller   = require('@ffmpeg-installer/ffmpeg');
 const ffmpeg            = require('fluent-ffmpeg');
 const sprintf           = require('sprintf');
 const fs                = require('fs');
-const multer            = require('multer');
-  const upload = multer({dest:outputDir});
-  const tarball = require('tarball-extract');
-
-const tarfs             = require('tar-fs');
 const tmp               = require('tmp');
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
@@ -41,30 +36,6 @@ router.post('/screenshot', (req, res) => {
       }
       res.status(200).send(`/output/${req.body.fileName}`);
     });
-});
-
-
-router.post('/sendTAR', upload.single('tarz'), (req, res) => {
-    console.log("temporary path located at:\n" + tempDir.name);
-
-  let zip = req.file;
-
-  tarball.extractTarball(outputDir + "/" + zip.filename, tempDir.name, function(err){
-    if(err) console.log(err)
-    res.status(200).send(zip.destination + "/" +zip.filename);
-  })
-  /*const frame = req.body.dat.replace(/^data:image\/(png|jpg);base64,/, "");
-  const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
-  const dir = tempDir.name + "/" + fName;
-
-  console.log('received frame: ' + fName);
-
-  fs.writeFile(dir, frame, 'base64', (err) => {
-      if (err) {
-          console.log('there was an error writing file: ' + err);
-      }
-      res.status(200).send();
-  });*/
 });
 
 router.post('/encode', (req, res) => {

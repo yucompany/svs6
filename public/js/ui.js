@@ -1,5 +1,7 @@
 'use strict';
 
+let DEEP_LINK_ID = null;
+
 // Exec on page load - Adding button action assignments.
 $(document).ready(() => {
     // Re-do button
@@ -54,16 +56,10 @@ $(document).ready(() => {
 // Helper function for Facebook sharing
 function showFacebookShare() {
     window.FB.ui({
-        method: 'share_open_graph',
-        action_type: 'og.shares',
-        action_properties: JSON.stringify({
-            object: {
-                'og:url': 'https://developers.facebook.com/docs/',
-                'og:title': 'BE THE VALLEY DEEP LINK TITLE',
-                'og:description': `#BeTheValley`,
-                'og:image': ''
-            }
-        })
+        method: 'share',
+        href: window.location.origin,
+        quote: `test - ${window.location.origin}/?x=${DEEP_LINK_ID}`,
+        hashtag: 'BeTheValley'
     }, (response) => {
         console.log(response);
     });
@@ -95,6 +91,7 @@ function prepareVideoDownload() {
 
                     beginUploadToS3(videoFile)
                     .then((deepLinkId) => {
+                        DEEP_LINK_ID = deepLinkId;
                         // Show deepLink on client.
                         $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
                     })

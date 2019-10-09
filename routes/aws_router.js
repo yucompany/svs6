@@ -52,6 +52,9 @@ router.post('/s3upload', (req, res) => {
                                 console.log('Generating deep link');
                                 const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
 
+                                console.log('Deleting image from temporary storage.');
+                                fs.unlinkSync(imageFilePath);
+
                                 console.log('Deleting video from temporary storage.');
                                 fs.unlinkSync(videoFilePath);
 
@@ -62,17 +65,6 @@ router.post('/s3upload', (req, res) => {
                 }
             });
         });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err)
-    }
-});
-
-router.post('/s3uploadImage', (req, res) => {
-    const imageFile = outputDir.split('/output')[0] + req.body.imageFilePath;
-
-    try {
-
     } catch (err) {
         console.log(err);
         res.status(500).send(err)
