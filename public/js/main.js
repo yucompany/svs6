@@ -217,9 +217,13 @@ let sc =  line1.scale = offset;
       if(playing){
         f += 1.0;
         gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+
+        updateProgressBar(clamp(f/tf, 0, 1));
       }
-      else
+      else{
         gTime = 0;
+        updateProgressBar(0);
+      }
 
     requestAnimationFrame(render);
   }, breakPromise);

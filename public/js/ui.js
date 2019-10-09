@@ -49,7 +49,22 @@ $(document).ready(() => {
             showTwitterShare();
         });
     }
+
+    
 });
+
+const progressBar = document.getElementById("progress-bar");
+const progress = document.getElementById("progress");
+
+function updateProgressBar(percent){
+    if(progressBar == undefined || progress == undefined)
+        return;
+
+    let prg = Math.floor(percent*100);
+
+    progress.style.width = prg+"%";
+    progress.innerHTML = prg + "%";
+}
 
 // Helper function for Facebook sharing
 function showFacebookShare() {
