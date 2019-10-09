@@ -57,9 +57,8 @@ $(document).ready(() => {
 function showFacebookShare() {
     window.FB.ui({
         method: 'share',
-        href: window.location.origin,
-        quote: `test - ${window.location.origin}/?x=${DEEP_LINK_ID}`,
-        hashtag: 'BeTheValley'
+        href: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
+        quote: 'LOOK AT THIS CREATION!'
     }, (response) => {
         console.log(response);
     });
@@ -67,7 +66,18 @@ function showFacebookShare() {
 
 // Helper function for Twitter sharing
 function showTwitterShare() {
-    window.open(`http://twitter.com/share?text=BE%20THE%20VALLEY&url=${encodeURIComponent('www.google.com')}&hashtags=#BeTheValley&via=leexperiential`, '', 'width=720,height=250');
+    // Opens a pop-up with twitter sharing dialog
+    let shareURL = 'http://twitter.com/share?'; //url base
+    //params
+    const params = {
+     url: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
+     text: 'BE THE VALLEY - CHECK THIS LINK OUT ->',
+     via: 'leexperiential',
+     hashtags: "BeTheValley,Creation"
+    }
+    for (let prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop]);
+
+    window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0'); 
 }
 
 // Goes throw the motions of uploading a video to S3/Server then returning it to user.

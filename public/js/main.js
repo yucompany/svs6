@@ -187,7 +187,6 @@ let sc =  line1.scale = offset;
   mask.mask(Math.floor(line1.x - w/2), Math.floor(line1.y - h/2), Math.floor(line1.x + w/2), Math.floor(line1.y + h/2), Date.now())
 
   .then(function(dt){
-    console.log(dt);
       image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
       //console.log("masked");
 

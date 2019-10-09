@@ -31,7 +31,7 @@ router.post('/s3upload', (req, res) => {
                     console.log('Upload complete!');
 
                     // Now Upload Video
-                    fs.readFile(videoFilePath, (err, data) => {
+                    fs.readFile(videoFilePath, async (err, data) => {
                         if (err) { throw err; }
 
                         const base64data = new Buffer.from(data, 'binary');
@@ -43,14 +43,16 @@ router.post('/s3upload', (req, res) => {
                         };
 
                         console.log(`Uploading ${req.body.videoFilePath} to S3 bucket...`);
-                        s3.upload(params, async (err, data) => {
+                        console.log('Generating deep link');
+
+                        const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
+                        res.status(200).send(deepLink);
+
+                        s3.upload(params, (err, data) => {
                             if (err) {
                                 console.log('Error uploading to S3::\n', err);
                             } else {
                                 console.log('Upload complete!');
-
-                                console.log('Generating deep link');
-                                const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
 
                                 console.log('Deleting image from temporary storage.');
                                 fs.unlinkSync(imageFilePath);
@@ -58,7 +60,6 @@ router.post('/s3upload', (req, res) => {
                                 console.log('Deleting video from temporary storage.');
                                 fs.unlinkSync(videoFilePath);
 
-                                res.status(200).send(deepLink);
                             }
                         });
                     });
@@ -173,7 +174,7 @@ function generateDeepLink(videoFile, imageFile) {
         docClient.put(paramsObj, (err, data) => {
             if (err) {
                 console.log(err);
-                reject(err);
+                reject('');
             } else {
                 resolve(uniqueId);
             }
