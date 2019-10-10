@@ -346,8 +346,8 @@ $(document).ready(() => {
             // Set share URL
             if (deepLinkId) $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
 
-            // Play/Generate Video
-            verifyName();
+            // Play/Generate Video with DEEP LINK
+            submitForm();
         }
     }, 1200);
 });

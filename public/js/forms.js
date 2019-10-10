@@ -1,6 +1,5 @@
 "use strict";
 
-
 var PROHIBITED = [
     "_96WasntEnough", 
     "_H1tIer", 
@@ -1210,6 +1209,28 @@ const nameform = document.forms["nameform"];
     const firstname = nameform["firstname"];
     const lastname = nameform["lastname"];
 
+
+
+const submitForm = function(){
+
+    const s3key = generateKeyFromInput();
+
+     checkIfKeyExists(s3key)
+    .then((cacheVideo) => {
+        if(cacheVideo){  // If video exists on server, display immediately
+            dispatchEvent(onStart);
+
+            prepareExports()
+            .then(() => {
+                console.log("Successfully prepared exports after repeated input! :-)");
+                dispatchEvent(onEnd);
+            })
+        }
+        else
+            verifyName();
+    });
+}
+
 const verifyName = function(){
     var throwEmpty = function(){
         alert("Line 1 and Line 2 cannot be empty!");
@@ -1221,12 +1242,11 @@ const verifyName = function(){
         alert("Error. 404. Page not found. But seriously… Our lawyers said at least one of those words isn’t allowed. Try again!");
     }
     var throwAccept = function(f, l){
-        construct(f, l, capture.video);
+        construct(f, l);
     }
     var throwRepeat = function(){
         reset();
     }
-
 
     let first = firstname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
     let last = lastname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
@@ -1285,7 +1305,7 @@ const verifyName = function(){
 
 $('#nameform').submit(function(e){
     e.preventDefault();
-    verifyName();
+    submitForm();
 
     return false;
 });

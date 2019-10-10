@@ -1,5 +1,10 @@
 'use strict';
 
+
+const S3URL = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo';
+
+
+
 // Exec on page load - Adding button action assignments.
 $(document).ready(() => {
     // Re-do button
@@ -30,7 +35,7 @@ $(document).ready(() => {
     const downloadVideo = document.getElementById('dlVideo');
     if (downloadVideo) {
         downloadVideo.addEventListener('click', () => {
-            triggerVideoDownload(VIDEOURL, false);
+            triggerVideoDownload(VIDEOURL);
         });
     }
 
@@ -110,12 +115,12 @@ function showTwitterShare() {
     window.open(`http://twitter.com/share?text=BE%20THE%20VALLEY&url=${encodeURIComponent('www.google.com')}&hashtags=#BeTheValley&via=leexperiential`, '', 'width=720,height=250');
 }
 
-function fetchVideo(){
+/*function fetchVideo(){
     console.log("Attempting to fetch video...");
     // Before encoding anything, let's see if this video is already stored in S3.
     const s3Key = generateKeyFromInput();
 
-    return checkIfVideoExists(s3Key)
+    return checkIfKeyExists(s3Key)
     .then((cacheVideo) => {
         return new Promise(function(res, rej){
             if(!cacheVideo){
@@ -136,15 +141,101 @@ function fetchVideo(){
 
         })
     })
+}*/
+
+function prepareExports(){
+    const s3Key = generateKeyFromInput();
+
+    return checkIfKeyExists(s3Key)
+    .then((cached) => {
+
+        return new Promise(function(resolve, reject){
+
+            if(!cached){  // NO => existing data on S3
+
+                capture.photo()
+                .then((imageFile) => {
+
+                    capture.video()
+                    .then((videoFile) => {
+                        
+                        beginUploadToS3(videoFile)
+                        .then((deeplink) => {
+                            resolve(deeplink); // Found cached media, return URL
+                        })
+                        .catch((err) => {
+                            console.log("Error uploading media to S3!")
+                            reject(err);
+                        })
+
+                    })
+                    .catch((err) => {
+                        console.log("Error creating video..." + err);
+                        reject(err);
+                    })
+    
+                })
+                .catch((err) => {
+                    console.log("Error creating photo..." + err);
+                    reject(err);
+                })
+    
+            }
+            else { // YES => existing data on S3
+
+                let videoFile = s3Key + ".mp4";
+                
+                const fetchResponse = fetch('aws/deepLink', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        videoFilePath: videoFile,
+                        imageFilePath: videoFile.replace('.mp4', '.jpg')
+                    })
+                });
+        
+                fetchResponse
+                .then((response) => {
+                    response.text()
+                    .then((link) => {
+                        console.log("Successfully fetched deeplink = " + link);
+                        resolve(link);
+                    })
+                    .catch((err) => {
+                        console.log("Unable to fetch deeplink..." + err);
+                        reject(err);
+                    })
+                })
+                .catch((err) => {
+                    console.log("Unable to fetch deeplink..." + err);
+                    reject(err);
+                })
+            }
+
+        })
+        
+    })
+    .then((deeplink) => {
+        if(deeplink){
+            console.log("Successfully bound exports!");
+
+            PHOTOURL = S3URL + s3Key + ".jpg";
+            VIDEOURL = S3URL + s3Key + ".mp4";
+
+            $('#shareurl').val(window.location.origin + '?x=' + deeplink);
+        }
+    })
+
+
 }
 
-
+/*
 // Goes throw the motions of uploading a video to S3/Server then returning it to user.
 function prepareVideoDownload() {
     // Before encoding anything, let's see if this video is already stored in S3.
     const s3Key = generateKeyFromInput();
 
-    checkIfVideoExists(s3Key)
+    checkIfKeyExists(s3Key)
     .then((cacheVideo) => {
         if (!cacheVideo) {
             // Encode video
@@ -179,7 +270,7 @@ function prepareVideoDownload() {
     .catch((err) => {
         throw err;
     });
-}
+}*/
 
 // Begins upload to S3
 function beginUploadToS3(videoFile) {
@@ -212,15 +303,17 @@ function beginUploadToS3(videoFile) {
             reject(err);
         });
     })
-
     .then((deepLinkId) => {
-        // Show deepLink on client.
-        $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
+        return new Promise(function(res, rej){
+            res(deepLinkId);
+        })
     });
 }
 
 // Checks if we already have a generated video stored in S3. Returns boolean.
-function checkIfVideoExists(s3Key) {
+function checkIfKeyExists(s3Key) {
+    s3Key += ".mp4";  // Append mp4 ext to key for video lookup
+
     return new Promise((resolve, reject) => {
         console.log('Note to dev: Show Loading in UI...');
 
@@ -253,25 +346,25 @@ function checkIfVideoExists(s3Key) {
 
 // Creates a key based on the input values - used to check if we already have something stored in S3.
 function generateKeyFromInput() {
-    return `/output/${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}.mp4`;
+    return `/output/${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}`;
 }
 
-// Starts a video download.
-function triggerVideoDownload(videoFile, cached) {
-    const link = document.createElement('a');
 
-/*    if (cached) {
-        // We'll want to replace this with the client's S3 bucket address.
-        link.href = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + videoFile;
-    } else {
-        link.href = videoFile;
-    }*/
+/* * * * *
+
+    Downloads
+
+* * * * * */
+
+// Starts a video download.
+function triggerVideoDownload(videoFile) {
+    const link = document.createElement('a');
 
     link.href = videoFile;
 
     if (link.href) {
         // File name for downloaded file.
-        link.download = FIRSTNAME + "_" + LASTNAME +  "_VALLEY.mp4";
+        link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.mp4`;
 
         document.body.appendChild(link);
         link.click();
@@ -287,14 +380,24 @@ function triggerPhotoDownload(imageFile) {
     link.href = imageFile;
 
     // File name for downloaded file.
-    link.download = FIRSTNAME + '_' + LASTNAME + '_VALLEY.jpg';
+    link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.jpg`
+    console.log(link);
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
-// Rick dev
+
+
+
+/* * * * *
+
+    UI
+
+* * * * * */
+
+
 const title = document.getElementById("titlecard");
 const submit = document.getElementById("submission");
 const exporting = document.getElementById("exports");

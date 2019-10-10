@@ -47,19 +47,9 @@ class Capture {
 
     stopCapture(){
         capturing  = false;
-
-        this.photo()
-        .then((photoURL) => {
-            console.log("Successfully created photo..." + photoURL);
-
-            PHOTOURL = photoURL;
-        })
-
-        fetchVideo()
-        .then((videoURL) => {
-            console.log("Succesfully fetched video..." + videoURL);
-            
-            VIDEOURL = videoURL;
+        prepareExports()
+        .then(() => {
+            console.log("Successfully prepared exports after capture! :-)");
             dispatchEvent(onEnd);
         });
     }
