@@ -80,7 +80,7 @@ videoPreview.onloadeddata = () => {
 }
 
 function showVideoPreview(){
-    videoPreview.src = ".." + VIDEOURL
+    videoPreview.src = VIDEOURL
     videoPreview.load();
 
     updateUIVisibility(videoPreview, true);
