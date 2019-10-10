@@ -53,12 +53,11 @@ class Capture {
             console.log("Successfully created photo..." + photoURL);
 
             PHOTOURL = photoURL;
-        });
-
+        })
 
         fetchVideo()
         .then((videoURL) => {
-            console.log("Succesfully created video..." + videoURL);
+            console.log("Succesfully fetched video..." + videoURL);
             
             VIDEOURL = videoURL;
             dispatchEvent(onEnd);

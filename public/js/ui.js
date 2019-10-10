@@ -112,18 +112,8 @@ function showTwitterShare() {
 
 function fetchVideo(){
     console.log("Attempting to fetch video...");
-
-    capture.video()
-    .then((videoFile) => {
-        if(videoFile){
-            res(videoFile);
-            //beginUploadToS3(videoFile);
-        }
-    })
-
-
     // Before encoding anything, let's see if this video is already stored in S3.
-   /* const s3Key = generateKeyFromInput();
+    const s3Key = generateKeyFromInput();
 
     return checkIfVideoExists(s3Key)
     .then((cacheVideo) => {
@@ -145,7 +135,7 @@ function fetchVideo(){
             }
 
         })
-    })*/
+    })
 }
 
 
