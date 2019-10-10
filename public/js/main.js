@@ -20,6 +20,7 @@ const LINEWIDTH = 240;
 // Core elements
 
 var canvas; var canvasHolder = document.getElementById('canvas-holder');
+const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
 var assets = {
   background : "",
@@ -42,16 +43,9 @@ var elements = {
   masker: ""
 }
 
-const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
+// Global events
 
-
-/*var CAPTURED;
-var captures = new CCapture( {
-  format: 'jpg',
-	framerate: 15
-} );*/
-
-
+const onStart = new Event("started");
 const onEnd = new Event("ended");
 
 p5.disableFriendlyErrors = true;
@@ -64,21 +58,9 @@ function preload(){
   bg.hide();
   bg.hideControls();
   
-  bg.onended(async function(){
-    console.log('Video generated!');
-
-    let canvasPixels = get();
-    let output = elements.output;
-        output.image(canvasPixels, 0, 0);
-
-   if(capturing){
+  bg.onended(function(){
+   if(capturing)
       capture.stopCapture();
-      capturing = false;
-
-      dispatchEvent(onCaptured);
-    }
-
-    dispatchEvent(onEnd);
   });
 
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
@@ -106,7 +88,7 @@ function setup(){
   imageMode(CENTER);
   frameRate(15);
 
-  canvas = createCanvas(WIDTH, HEIGHT); console.log(canvas);
+  canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
     canvas.class('w-100 h-100');
 
@@ -164,21 +146,28 @@ let VIDEOREADY = false;
 
   VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= time) && (mbf.length > 0 && mbf.end(0) >= time);
 
-  if(VIDEOREADY)
-    console.log(bgbf.end(0));
+  if(VIDEOREADY){
+    if(playing){
+      bg.time(time)
+      matte.time(time);
+    }  
+    else{
+      bg.time(0);
+      matte.time(0);
+    }
+  }
 
-  if(playing && VIDEOREADY){
-    bg.time(time)
-    matte.time(time);
-  }   
+   
 
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
-
+  
   blendMode(BLEND);
   image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+
   let buffer = elements.buffer;
   buffer.clear();
+
       let line1 = elements.line1;
           line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
           line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
@@ -201,7 +190,6 @@ let sc =  line1.scale = offset;
 
   .then(function(dt){
       image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
-      //console.log("masked");
 
       blendMode(SCREEN);
       let fx = elements.fx;
@@ -260,8 +248,8 @@ function restart(){
 
 
   gTime = 0.0;
-    
   f = 0.0;
+
     elements.line1.reset();
     elements.line2.reset();
 
@@ -279,8 +267,6 @@ function construct(first, last){
   loadName(last, loadedLine);
 
   function loadedLine(){
-    console.log("Loaded line " + loaded)
-
     ++loaded;
     if(loaded <= 1)
       return;
@@ -288,8 +274,6 @@ function construct(first, last){
       initialize();
   }
 }
-
-const onInitialized = new Event('initialized');
 
 function initialize(){
     let char = "";
@@ -315,8 +299,7 @@ function initialize(){
     playing = true;
 
     capture.beginCapture(framerate);
-
-    dispatchEvent(onInitialized); // Fire initialized event
+    dispatchEvent(onStart); // Fire initialized event
 }
 
 // Exec on page load

@@ -232,3 +232,7 @@ button {
 #progress {
   opacity: 0.85 !important;
 }
+
+#video-preview {
+  z-index: 9999 !important;
+}

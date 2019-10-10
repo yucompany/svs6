@@ -161,8 +161,6 @@ class Line extends SceneElement {
       else 
         len = this.charModifier = 1;
 
-      console.log("Letter correction: " + len);
-
     for(let i = 0; i < letters.length; i++){
       char = letters[i];
 

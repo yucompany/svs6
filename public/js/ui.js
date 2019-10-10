@@ -50,8 +50,16 @@ $(document).ready(() => {
         });
     }
 
-    
+    if(videoPreview){
+        videoPreview.addEventListener('click', () => {
+            videoPreview.pause();
+            videoPreview.currentTime = '0';
+            videoPreview.play();
+        });
+    }
 });
+
+const videoPreview = document.getElementById("video-preview");
 
 const progressBar = document.getElementById("progress-bar");
 const progress = document.getElementById("progress");
@@ -65,6 +73,22 @@ function updateProgressBar(percent){
     progress.style.width = prg+"%";
     progress.innerHTML = prg + "%";
 }
+
+
+function showVideoPreview(){
+
+    capture.video()
+    .then((url) => {
+        console.log("Received " + url);
+
+        videoPreview.src = ".." + url;
+        videoPreview.load();
+
+        updateUIVisibility(videoPreview, true);
+    })
+    
+}
+
 
 // Helper function for Facebook sharing
 function showFacebookShare() {
@@ -263,31 +287,28 @@ const updateUIVisibility = function(e, visible){
     }
 }
 
-addEventListener('initialized', () => {
+addEventListener('started', () => {
     updateUIVisibility(title, false);
     updateUIVisibility(submit, false);
+    updateUIVisibility(progressBar, true);
 });
 
-addEventListener('captured', () => {
+addEventListener('ended', () => {
     updateUIVisibility(exporting, true);
+    updateUIVisibility(progressBar, false);
+   // showVideoPreview();
 });
 
 addEventListener('resetted', () => {
     updateUIVisibility(exporting, false);
-    updateUIVisibility(replay, false);
+    updateUIVisibility(videoPreview, false);
 
     // Clear form
     nameform.reset();
 
+    updateUIVisibility(title, true);
     setTimeout(function(){
+        
         updateUIVisibility(submit, true);
     }, 1000);
 })
-
-addEventListener('restarted', () => {
-    updateUIVisibility(replay, false);
-});
-
-addEventListener('ended', () => {
-    updateUIVisibility(replay, true);
-});

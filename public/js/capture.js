@@ -1,8 +1,9 @@
 "use strict";
 
-var videoContainer;
 
-const onCaptured  = new Event("captured");
+var PHOTOURL = "";
+var VIDEOURL = "";
+
 
 class Capture {
     constructor(name, duration, format){
@@ -28,28 +29,8 @@ class Capture {
     }
 
     beginCapture(fps){
-       /* if(capturing)
-            captures.stop();
-
-        console.log('did it');
-
-        captures.start();
-        capturing = true;*/
-
-
         capturing = true;
         this.captured = [];
-
-        /*let f = this.format; let d = this.duration;
-        saveFrames('frame', f, d, fps, function(arr) {
-            this.captured = arr;
-            this.capturing = false;
-
-            console.log("Frames have been captured => ");
-            console.log(arr);
-
-            dispatchEvent(onCaptured); // Fire captured
-        }.bind(this));*/
     }
 
     addFrame(frame){
@@ -60,24 +41,35 @@ class Capture {
         return new Promise(function(res, rej){
             setTimeout(function(){
                 canvas.elt.toBlob(res, 'image/jpeg', .85);
-            }, dt);
-                
+            }, dt);         
         })
-
-            //res(canvas.elt.toDataURL("image/jpeg"));
     }
 
     stopCapture(){
-        console.log(this.captured);
         capturing  = false;
 
+        this.saveScreen();
         this.photo()
-        .then(function(url){
-            console.log(url);
+        .then((photoURL) => {
+            console.log("Successfully created photo..." + photoURL);
+
+            PHOTOURL = photoURL;
         });
 
-        this.video();
 
+        this.video()
+        .then((videoURL) => {
+            console.log("Succesfully created video..." + videoURL);
+            
+            VIDEOURL = videoURL;
+            dispatchEvent(onEnd);
+        });
+    }
+
+    saveScreen(){
+        let canvasPixels = get();
+        let output = elements.output;
+            output.image(canvasPixels, 0, 0);
     }
 
     photo() {
@@ -111,8 +103,9 @@ class Capture {
             .then((response) => {
                 response.text()
                 .then((result) => {
-                    triggerPhotoDownload(result);
-                    return result;
+                    return new Promise(function(res, rej){
+                        res(result);
+                    })
                 })
                 .catch((err) => {
                     console.log('Error parsing response');
@@ -135,9 +128,8 @@ class Capture {
             let captured = this.captured;
             let promises = [];
 
-            for (let i = 0; i < captured.length; i++) {
+            for (let i = 0; i < captured.length; i++) 
                 promises.push(this.sendFrame(captured[i], i));
-            }
 
             this.name = FIRSTNAME + '_' + LASTNAME;
 
@@ -145,8 +137,10 @@ class Capture {
 
             Promise.all(promises)
             .then(() => {
-                this.encode(this.name);
-                resolve(`/output/${this.name}.mp4`);
+                this.encode(this.name)
+                .then((url) => {
+                    resolve(url);
+                })
             })
             .catch((err) => {
                 reject(err);
