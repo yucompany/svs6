@@ -58,7 +58,7 @@ class Capture {
 
         fetchVideo()
         .then((videoURL) => {
-            console.log("Succesfully fetched video..." + videoURL);
+            console.log("Succesfully created video..." + videoURL);
             
             VIDEOURL = videoURL;
             dispatchEvent(onEnd);

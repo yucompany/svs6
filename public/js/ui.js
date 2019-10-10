@@ -111,6 +111,7 @@ function showTwitterShare() {
 }
 
 function fetchVideo(){
+    console.log("Attempting to fetch video...");
     // Before encoding anything, let's see if this video is already stored in S3.
     const s3Key = generateKeyFromInput();
 
