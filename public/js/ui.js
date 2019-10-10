@@ -114,7 +114,7 @@ function showTwitterShare() {
     }
     for (let prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop]);
 
-    window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0'); 
+    window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
 }
 
 /*function fetchVideo(){
@@ -160,7 +160,7 @@ function prepareExports(){
 
                     capture.video()
                     .then((videoFile) => {
-                        
+
                         beginUploadToS3(videoFile)
                         .then((deeplink) => {
                             resolve(deeplink); // Found cached media, return URL
@@ -175,18 +175,18 @@ function prepareExports(){
                         console.log("Error creating video..." + err);
                         reject(err);
                     })
-    
+
                 })
                 .catch((err) => {
                     console.log("Error creating photo..." + err);
                     reject(err);
                 })
-    
+
             }
             else { // YES => existing data on S3
 
                 let videoFile = s3Key + ".mp4";
-                
+
                 const fetchResponse = fetch('aws/deepLink', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -195,7 +195,7 @@ function prepareExports(){
                         imageFilePath: videoFile.replace('.mp4', '.jpg')
                     })
                 });
-        
+
                 fetchResponse
                 .then((response) => {
                     response.text()
@@ -215,7 +215,7 @@ function prepareExports(){
             }
 
         })
-        
+
     })
     .then((deeplink) => {
         if(deeplink){
@@ -232,7 +232,7 @@ function prepareExports(){
 }
 
 /*
-// Goes throw the motions of uploading a video to S3/Server then returning it to user.
+// Goes through the motions of uploading a video to S3/Server then returning it to user.
 function prepareVideoDownload() {
     // Before encoding anything, let's see if this video is already stored in S3.
     const s3Key = generateKeyFromInput();

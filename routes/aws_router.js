@@ -30,9 +30,6 @@ router.post('/s3upload', (req, res) => {
                 } else {
                     console.log('Upload complete!');
 
-                    console.log('Deleting image from temporary storage.');
-                    fs.unlinkSync(imageFilePath);  // Clear i
-
                     // Now Upload Video
                     fs.readFile(videoFilePath, async (err, data) => {
                         if (err) { throw err; }
@@ -62,7 +59,6 @@ router.post('/s3upload', (req, res) => {
 
                                 console.log('Deleting video from temporary storage.');
                                 fs.unlinkSync(videoFilePath);
-
                             }
                         });
                     });
