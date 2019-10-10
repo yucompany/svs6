@@ -151,9 +151,18 @@ router.post('/processId', (req, res) => {
     });
 });
 
-router.post('/deepLink', async function(req, res){
-    const dl = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
-    res.status(200).send(dl);
+router.post('/deepLink', (req, res) => {
+    try {
+        let fetchlink = async function(){
+            let dl = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
+            res.status(200).send(dl);   
+        }
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).send(err)
+    }
+    
 })
 
 function generateDeepLink(videoFile, imageFile) {
