@@ -1,5 +1,6 @@
 <!-- This is a static file -->
 <!-- served from your routes in server.js -->
+<!-- AZ test -->
 
 <!-- You might want to try something fancier: -->
 <!-- html/nunjucks docs: https://mozilla.github.io/nunjucks/ -->
@@ -44,28 +45,30 @@
   
   <body>
     <div class="d-flex flex-column justify-content-center align-items-center">
-​
       <div id="header" class="mt-0 mt-lg-4 p-4 p-sm-3 p-lg-4 w-50 order-1 order-sm-2 order-lg-1">
         <img src="../images/misc/logo.png" class="img-fluid">
       </div>
-      
-
-
       <div id="bodytext" class="container pt-5 pb-0 px-4 py-sm-0 pb-lg-4 w-100 w-sm-75  order-3 order-sm-3 order-lg-2">
           <h3 class="text-center pt-1 pt-lg-3">Don’t just watch Silicon Valley, BE the Valley.</h3>
           <p class="text-center px-4">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want... within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
-​
-      <div id="canvas-holder" class="d-flex justify-content-center mx-lg-5 mx-0 order-2 order-sm-1 order-lg-3">
-        <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute" src="../images/misc/title card.jpg">
-        <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute hidden"><img id="replay" class="hidden" src="../images/icons/button-replay.png"></div>
-        <div id="progress-bar" class="d-flex w-100 h-100 justify-content-start align-items-end zindex-tooltip position-absolute hidden"><div id="progress" class="text-center bg-success text-white pt-3 pb-2 shown" height="5">37%</div></div>
-        
-        <video id="video-preview" class="hidden" style="width: 100%; height: 100%; position: absolute; z-index: 9999 !important;" src=""></video>
-
+        <div id="content-holder" class="order-2 order-sm-1 order-lg-3">
+          <div id="canvas-holder" class="d-flex justify-content-center mx-lg-5 mx-0" >   
+            <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute" src="../images/misc/title card.jpg">
+          
+              <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute">
+                <img id="replay" class="hidden" src="../images/icons/button-replay.png">
+              </div>
+              <div id="loading-holder" class="d-flex w-100 h-100 flex-column justify-content-center align-items-center zindex-tooltip position-absolute hidden">
+                <img id="loading" class="" width="80" src="../images/icons/loading.gif"><div id="percentage" class="text-light font-weight-bold pt-1" style="font-size:1.2rem">37%</div>
+              </div>
+              <video id="video-preview" class="hidden" style="width: 100%; height: 100%; position: absolute; z-index: 9999 !important;" src="" controls></video>
+              <!--<div id="progress-bar" class="d-flex w-100 h-100 justify-content-start align-items-end zindex-tooltip position-absolute">
+                <div id="progress" class="text-center bg-success text-white pt-3 pb-2 shown" height="5">37%</div>
+              </div>-->
+          </div>
+        </div>
         <!-- p5 canvas goes here -->
-      </div>
-​
       <div id="actionables" class="w-100 w-lg-40 pt-3 pt-sm-4 pt-lg-5 pb-4 flex-fill d-flex justify-content-center position-relative order-4">
           <div id="submission" class="d-flex justify-content-center w-100 h-auto flex-fill shown">
               <div id="namefield" class="px-0 w-100">
@@ -97,7 +100,7 @@
                 </form>
               </div>
           </div>
-​
+
           <div id="exports" class="d-flex justify-content-center flex-fill mb-4 pt-2 row hidden">
                   <div id="downloading" class="has-border col-10 col-sm-4 col-lg-5 flex-fill pt-2 pb-4 px-4 pl-sm-4 pr-sm-1 pl-md-4 pr-md-2 pl-lg-5 pr-lg-3">
                       <h2 class="text-center text-lg-left mx-3 mx-lg-3  mb-1">Download your creation</h2>
@@ -110,7 +113,7 @@
                         </div>
                       </div>
                   </div>
-​
+
                   <div id="sharing" class="has-border col-10 col-sm-5 col-md-4 col-lg-4 flex-fill justify-content-center py-4 px-4 px-sm-2 d-flex ">
                     <div class="col-12 my-auto mx-0 align-self-center">
                       <h2 class="text-center text-lg-left">Share</h2>
@@ -131,7 +134,7 @@
     
           </div>
       </div>
-​
+
       <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-4 order-5">
           <div id="hbo" class="mt-0"> 
             <img src="../images/icons/hbo-logo.png" class="my-4" width="50" height="auto">
@@ -145,7 +148,7 @@
           </div>
   
       </div>
-​
+
     </div>
     
   </body>

@@ -22,7 +22,7 @@ $(document).ready(() => {
     const downloadPhoto = document.getElementById('dlPhoto');
     if (downloadPhoto) {
         downloadPhoto.addEventListener('click', () => {
-            capture.photo();
+            triggerPhotoDownload(PHOTOURL);
         });
     }
 
@@ -30,7 +30,7 @@ $(document).ready(() => {
     const downloadVideo = document.getElementById('dlVideo');
     if (downloadVideo) {
         downloadVideo.addEventListener('click', () => {
-            prepareVideoDownload();
+            triggerVideoDownload(VIDEOURL, false);
         });
     }
 
@@ -51,42 +51,39 @@ $(document).ready(() => {
     }
 
     if(videoPreview){
-        videoPreview.addEventListener('click', () => {
+        /*videoPreview.addEventListener('click', () => {
             videoPreview.pause();
             videoPreview.currentTime = '0';
             videoPreview.play();
-        });
+        });*/
     }
 });
 
 const videoPreview = document.getElementById("video-preview");
 
-const progressBar = document.getElementById("progress-bar");
-const progress = document.getElementById("progress");
+const loading = document.getElementById("loading");
+const loadingHolder = document.getElementById("loading-holder");
+const progress = document.getElementById("percentage");
 
 function updateProgressBar(percent){
-    if(progressBar == undefined || progress == undefined)
+    if(progress == undefined)
         return;
 
     let prg = Math.floor(percent*100);
-
-    progress.style.width = prg+"%";
     progress.innerHTML = prg + "%";
 }
 
+const onPreview = new Event("previewed");
+
+videoPreview.onloadeddata = () => {
+    dispatchEvent(onPreview);
+}
 
 function showVideoPreview(){
+    videoPreview.src = ".." + VIDEOURL
+    videoPreview.load();
 
-    capture.video()
-    .then((url) => {
-        console.log("Received " + url);
-
-        videoPreview.src = ".." + url;
-        videoPreview.load();
-
-        updateUIVisibility(videoPreview, true);
-    })
-    
+    updateUIVisibility(videoPreview, true);
 }
 
 
@@ -112,6 +109,34 @@ function showFacebookShare() {
 function showTwitterShare() {
     window.open(`http://twitter.com/share?text=BE%20THE%20VALLEY&url=${encodeURIComponent('www.google.com')}&hashtags=#BeTheValley&via=leexperiential`, '', 'width=720,height=250');
 }
+
+function fetchVideo(){
+    // Before encoding anything, let's see if this video is already stored in S3.
+    const s3Key = generateKeyFromInput();
+
+    return checkIfVideoExists(s3Key)
+    .then((cacheVideo) => {
+        return new Promise(function(res, rej){
+            if(!cacheVideo){
+                // Encode video
+                console.log('No stored version of this video found - server now encoding to .mp4');
+                capture.video()
+                .then((videoFile) => {
+                    if(videoFile){
+                        res(videoFile);
+                        beginUploadToS3(videoFile);
+                    }
+                })
+            }
+            else{
+                let s3path = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + s3Key;
+                res(s3path); // Found cached video, return this
+            }
+
+        })
+    })
+}
+
 
 // Goes throw the motions of uploading a video to S3/Server then returning it to user.
 function prepareVideoDownload() {
@@ -185,6 +210,11 @@ function beginUploadToS3(videoFile) {
             console.log('Error communicating with server.');
             reject(err);
         });
+    })
+
+    .then((deepLinkId) => {
+        // Show deepLink on client.
+        $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
     });
 }
 
@@ -229,12 +259,14 @@ function generateKeyFromInput() {
 function triggerVideoDownload(videoFile, cached) {
     const link = document.createElement('a');
 
-    if (cached) {
+/*    if (cached) {
         // We'll want to replace this with the client's S3 bucket address.
         link.href = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + videoFile;
     } else {
         link.href = videoFile;
-    }
+    }*/
+
+    link.href = videoFile;
 
     if (link.href) {
         // File name for downloaded file.
@@ -288,18 +320,29 @@ const updateUIVisibility = function(e, visible){
 }
 
 addEventListener('started', () => {
-    updateUIVisibility(title, false);
+    updateTitleCardImage(true);
+
+    updateUIVisibility(loadingHolder, true);
+
     updateUIVisibility(submit, false);
-    updateUIVisibility(progressBar, true);
 });
 
 addEventListener('ended', () => {
+
+    updateUIVisibility(title, false);
+    updateUIVisibility(loadingHolder, false);
+
+    showVideoPreview();
+});
+
+addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
-    updateUIVisibility(progressBar, false);
-   // showVideoPreview();
 });
 
 addEventListener('resetted', () => {
+    updateTitleCardImage(false);
+    updateUIVisibility(title, true);
+
     updateUIVisibility(exporting, false);
     updateUIVisibility(videoPreview, false);
 
@@ -308,7 +351,13 @@ addEventListener('resetted', () => {
 
     updateUIVisibility(title, true);
     setTimeout(function(){
-        
         updateUIVisibility(submit, true);
     }, 1000);
 })
+
+function updateTitleCardImage(blurred, shown){
+    if(blurred)
+        title.src = "../images/misc/title card blurred.jpg";
+    else
+        title.src = "../images/misc/title card.jpg";
+}

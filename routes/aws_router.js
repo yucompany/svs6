@@ -53,7 +53,7 @@ router.post('/s3upload', (req, res) => {
                                 const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
 
                                 console.log('Deleting video from temporary storage.');
-                                fs.unlinkSync(videoFilePath);
+                                //fs.unlinkSync(videoFilePath);
 
                                 res.status(200).send(deepLink);
                             }

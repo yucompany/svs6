@@ -48,7 +48,6 @@ class Capture {
     stopCapture(){
         capturing  = false;
 
-        this.saveScreen();
         this.photo()
         .then((photoURL) => {
             console.log("Successfully created photo..." + photoURL);
@@ -57,19 +56,13 @@ class Capture {
         });
 
 
-        this.video()
+        fetchVideo()
         .then((videoURL) => {
-            console.log("Succesfully created video..." + videoURL);
+            console.log("Succesfully fetched video..." + videoURL);
             
             VIDEOURL = videoURL;
             dispatchEvent(onEnd);
         });
-    }
-
-    saveScreen(){
-        let canvasPixels = get();
-        let output = elements.output;
-            output.image(canvasPixels, 0, 0);
     }
 
     photo() {
@@ -99,28 +92,17 @@ class Capture {
                 })
             });
 
-            fetchRequest
-            .then((response) => {
-                response.text()
-                .then((result) => {
-                    return new Promise(function(res, rej){
-                        res(result);
-                    })
-                })
-                .catch((err) => {
-                    console.log('Error parsing response');
-                    throw err;
-                });
-            })
-            .catch((err) => {
-                console.log('Error communicating with server.');
-                throw err;
-            });
+            return fetchRequest;
         })
-        .catch((err) => {
-            console.log('Error reading frame for Photo download.');
-            throw err;
-        });
+        .then((response) => {
+            return response.text();
+        })
+        .then((result) => {
+            console.log(result);
+            return new Promise(function(res, rej){
+                res(result);
+            })
+        })
     }
 
     video() {

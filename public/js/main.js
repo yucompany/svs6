@@ -19,7 +19,7 @@ const LINEWIDTH = 240;
 
 // Core elements
 
-var canvas; var canvasHolder = document.getElementById('canvas-holder');
+var canvas; const canvasHolder = document.getElementById('canvas-holder');
 const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
 
 var assets = {
@@ -39,7 +39,6 @@ var elements = {
   line1 : "",
   line2 : "",
 
-  output: "",
   masker: ""
 }
 
@@ -98,7 +97,6 @@ function setup(){
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
   let mask = elements.mask = new Mask(0, 0, assets.matte, elements.buffer);
   let fx = elements.fx = assets.flares;
-  let output = elements.output = createGraphics(WIDTH, HEIGHT);
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
@@ -227,12 +225,12 @@ function reset(){
     let matte = assets.matte;
         matte.time(0);
 
-        gTime = 0; f = 0.0;
-        playing = false;
+    gTime = 0; f = 0.0;
+    playing = false;
 
-        elements.line1.clear();
-        elements.line2.clear();
-        $('#shareurl').val('');
+    elements.line1.clear();
+    elements.line2.clear();
+    $('#shareurl').val('');
 
     dispatchEvent(onReset);
 }
