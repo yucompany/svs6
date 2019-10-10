@@ -1,6 +1,7 @@
 'use strict';
 
 let DEEP_LINK_ID = null;
+const S3URL = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo';
 
 // Exec on page load - Adding button action assignments.
 $(document).ready(() => {
@@ -24,7 +25,7 @@ $(document).ready(() => {
     const downloadPhoto = document.getElementById('dlPhoto');
     if (downloadPhoto) {
         downloadPhoto.addEventListener('click', () => {
-            capture.photo();
+            triggerPhotoDownload(PHOTOURL);
         });
     }
 
@@ -32,7 +33,7 @@ $(document).ready(() => {
     const downloadVideo = document.getElementById('dlVideo');
     if (downloadVideo) {
         downloadVideo.addEventListener('click', () => {
-            prepareVideoDownload();
+            triggerVideoDownload(VIDEOURL);
         });
     }
 
@@ -51,7 +52,43 @@ $(document).ready(() => {
             showTwitterShare();
         });
     }
+
+    if(videoPreview){
+        /*videoPreview.addEventListener('click', () => {
+            videoPreview.pause();
+            videoPreview.currentTime = '0';
+            videoPreview.play();
+        });*/
+    }
 });
+
+const videoPreview = document.getElementById("video-preview");
+
+const loading = document.getElementById("loading");
+const loadingHolder = document.getElementById("loading-holder");
+const progress = document.getElementById("percentage");
+
+function updateProgressBar(percent){
+    if(progress == undefined)
+        return;
+
+    let prg = Math.floor(percent*100);
+    progress.innerHTML = prg + "%";
+}
+
+const onPreview = new Event("previewed");
+
+videoPreview.onloadeddata = () => {
+    dispatchEvent(onPreview);
+}
+
+function showVideoPreview(){
+    videoPreview.src = VIDEOURL
+    videoPreview.load();
+
+    updateUIVisibility(videoPreview, true);
+}
+
 
 // Helper function for Facebook sharing
 function showFacebookShare() {
@@ -80,12 +117,127 @@ function showTwitterShare() {
     window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0'); 
 }
 
+/*function fetchVideo(){
+    console.log("Attempting to fetch video...");
+    // Before encoding anything, let's see if this video is already stored in S3.
+    const s3Key = generateKeyFromInput();
+
+    return checkIfKeyExists(s3Key)
+    .then((cacheVideo) => {
+        return new Promise(function(res, rej){
+            if(!cacheVideo){
+                // Encode video
+                console.log('No stored version of this video found - server now encoding to .mp4');
+                capture.video()
+                .then((videoFile) => {
+                    if(videoFile){
+                        res(videoFile);
+                        beginUploadToS3(videoFile);
+                    }
+                })
+            }
+            else{
+                let s3path = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + s3Key;
+                res(s3path); // Found cached video, return this
+            }
+
+        })
+    })
+}*/
+
+function prepareExports(){
+    const s3Key = generateKeyFromInput();
+
+    return checkIfKeyExists(s3Key)
+    .then((cached) => {
+
+        return new Promise(function(resolve, reject){
+
+            if(!cached){  // NO => existing data on S3
+
+                capture.photo()
+                .then((imageFile) => {
+
+                    capture.video()
+                    .then((videoFile) => {
+                        
+                        beginUploadToS3(videoFile)
+                        .then((deeplink) => {
+                            resolve(deeplink); // Found cached media, return URL
+                        })
+                        .catch((err) => {
+                            console.log("Error uploading media to S3!")
+                            reject(err);
+                        })
+
+                    })
+                    .catch((err) => {
+                        console.log("Error creating video..." + err);
+                        reject(err);
+                    })
+    
+                })
+                .catch((err) => {
+                    console.log("Error creating photo..." + err);
+                    reject(err);
+                })
+    
+            }
+            else { // YES => existing data on S3
+
+                let videoFile = s3Key + ".mp4";
+                
+                const fetchResponse = fetch('aws/deepLink', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        videoFilePath: videoFile,
+                        imageFilePath: videoFile.replace('.mp4', '.jpg')
+                    })
+                });
+        
+                fetchResponse
+                .then((response) => {
+                    response.text()
+                    .then((link) => {
+                        console.log("Successfully fetched deeplink = " + link);
+                        resolve(link);
+                    })
+                    .catch((err) => {
+                        console.log("Unable to fetch deeplink..." + err);
+                        reject(err);
+                    })
+                })
+                .catch((err) => {
+                    console.log("Unable to fetch deeplink..." + err);
+                    reject(err);
+                })
+            }
+
+        })
+        
+    })
+    .then((deeplink) => {
+        if(deeplink){
+            console.log("Successfully bound exports!");
+
+            PHOTOURL = S3URL + s3Key + ".jpg";
+            VIDEOURL = S3URL + s3Key + ".mp4";
+
+            $('#shareurl').val(window.location.origin + '?x=' + deeplink);
+        }
+    })
+
+
+}
+
+/*
 // Goes throw the motions of uploading a video to S3/Server then returning it to user.
 function prepareVideoDownload() {
     // Before encoding anything, let's see if this video is already stored in S3.
     const s3Key = generateKeyFromInput();
 
-    checkIfVideoExists(s3Key)
+    checkIfKeyExists(s3Key)
     .then((cacheVideo) => {
         if (!cacheVideo) {
             // Encode video
@@ -121,7 +273,7 @@ function prepareVideoDownload() {
     .catch((err) => {
         throw err;
     });
-}
+}*/
 
 // Begins upload to S3
 function beginUploadToS3(videoFile) {
@@ -153,11 +305,18 @@ function beginUploadToS3(videoFile) {
             console.log('Error communicating with server.');
             reject(err);
         });
+    })
+    .then((deepLinkId) => {
+        return new Promise(function(res, rej){
+            res(deepLinkId);
+        })
     });
 }
 
 // Checks if we already have a generated video stored in S3. Returns boolean.
-function checkIfVideoExists(s3Key) {
+function checkIfKeyExists(s3Key) {
+    s3Key += ".mp4";  // Append mp4 ext to key for video lookup
+
     return new Promise((resolve, reject) => {
         console.log('Note to dev: Show Loading in UI...');
 
@@ -190,23 +349,25 @@ function checkIfVideoExists(s3Key) {
 
 // Creates a key based on the input values - used to check if we already have something stored in S3.
 function generateKeyFromInput() {
-    return `/output/${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}.mp4`;
+    return `/output/${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}`;
 }
 
+
+/* * * * *
+
+    Downloads
+
+* * * * * */
+
 // Starts a video download.
-function triggerVideoDownload(videoFile, cached) {
+function triggerVideoDownload(videoFile) {
     const link = document.createElement('a');
 
-    if (cached) {
-        // We'll want to replace this with the client's S3 bucket address.
-        link.href = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + videoFile;
-    } else {
-        link.href = videoFile;
-    }
+    link.href = videoFile;
 
     if (link.href) {
         // File name for downloaded file.
-        link.download = FIRSTNAME + "_" + LASTNAME +  "_VALLEY.mp4";
+        link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.mp4`;
 
         document.body.appendChild(link);
         link.click();
@@ -222,14 +383,24 @@ function triggerPhotoDownload(imageFile) {
     link.href = imageFile;
 
     // File name for downloaded file.
-    link.download = FIRSTNAME + '_' + LASTNAME + '_VALLEY.jpg';
+    link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.jpg`
+    console.log(link);
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
-// Rick dev
+
+
+
+/* * * * *
+
+    UI
+
+* * * * * */
+
+
 const title = document.getElementById("titlecard");
 const submit = document.getElementById("submission");
 const exporting = document.getElementById("exports");
@@ -255,31 +426,45 @@ const updateUIVisibility = function(e, visible){
     }
 }
 
-addEventListener('initialized', () => {
-    updateUIVisibility(title, false);
+addEventListener('started', () => {
+    updateTitleCardImage(true);
+
+    updateUIVisibility(loadingHolder, true);
+
     updateUIVisibility(submit, false);
 });
 
-addEventListener('captured', () => {
+addEventListener('ended', () => {
+
+    updateUIVisibility(title, false);
+    updateUIVisibility(loadingHolder, false);
+
+    showVideoPreview();
+});
+
+addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
 });
 
 addEventListener('resetted', () => {
+    updateTitleCardImage(false);
+    updateUIVisibility(title, true);
+
     updateUIVisibility(exporting, false);
-    updateUIVisibility(replay, false);
+    updateUIVisibility(videoPreview, false);
 
     // Clear form
     nameform.reset();
 
+    updateUIVisibility(title, true);
     setTimeout(function(){
         updateUIVisibility(submit, true);
     }, 1000);
 })
 
-addEventListener('restarted', () => {
-    updateUIVisibility(replay, false);
-});
-
-addEventListener('ended', () => {
-    updateUIVisibility(replay, true);
-});
+function updateTitleCardImage(blurred, shown){
+    if(blurred)
+        title.src = "../images/misc/title card blurred.jpg";
+    else
+        title.src = "../images/misc/title card.jpg";
+}

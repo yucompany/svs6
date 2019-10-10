@@ -40,8 +40,8 @@ h1 {
 
 h2 {
   font-family: "Helvetica Bold" !important;
-  font-size: 1.2rem !important;
-  line-height: 1em !important;
+  font-size: 1.4rem !important;
+  line-height: 1.2em !important;
 
   color: #231f20 !important;
 }
@@ -52,14 +52,14 @@ h2 span {
 
 h3 {
   font-family: "Helvetica Condensed" !important;
-  font-size: 1.1rem !important;
-  line-height: .87em !important;
+  font-size: 1.6rem !important;
+  line-height: 1.5em !important;
 
   color: #231f20 !important;
 }
 
 p {
-  font-size: .87rem !important;
+  font-size: 1.2rem !important;
 }
 
 small {
@@ -69,11 +69,17 @@ small {
 .btn {
   background-color: #2e9f48 !important;
   border: 0;
+  font-size: 1.4rem !important;
+  width: 60vw;
+  max-width: 200px;
 }
 
-.dlbtn {
-  width: 156px;
-  height: auto; 
+.dlbtn button div {
+  background-image: url("../images/icons/download.svg");
+}
+
+#redo {
+  background-color: #c23030 !important;
 }
 
 .ctoa {
@@ -86,8 +92,11 @@ small {
 }
 
 #replay {
-  width: 156px;
-  height: 156px;
+  width: 30vw;
+  height: 30vw;
+
+  max-width: 149px;
+  max-height: 149px;
 
   -webkit-transition: opacity .33s ease;
     -o-transition: opacity .33s ease;
@@ -99,13 +108,8 @@ small {
   height: 32px;
 }
 
-#hbo-logo {
-  width:64px;
-  height: auto;
-}
-
 .footer {
-  height: auto;
+  height: 150px;
   background-color: #4B4E4D;
 }
 
@@ -131,10 +135,65 @@ button {
     #bodytext { width: 100% !important; }
     #submission { width: 100% !important; }
     #namefield { width: 100% !important; }
-
+  
     #canvas-holder {
       display: npne
     }
+
+    #submission {
+      max-width: 400px !important;
+    }
+    
+    .has-border {
+      border-bottom: 1px solid #dee2e6!important;
+    }
+
+    /*
+    #shareurl {
+      max-width: 150px;
+    }
+    */
+}
+@media (min-width: 576px) and (max-width: 767.98px) {
+  #redo {
+    width: 18vw;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .btn {
+    width: 24vw;
+    max-width: 200px;
+  }
+
+  #redo {
+    max-width: 250px;
+  }
+
+}
+
+@media (min-width: 992px) {
+  .btn {
+    width: 15vw;
+    max-width: 200px;
+  }
+  #redo {
+   
+  }
+}
+
+@media (min-width: 576px) {
+  .has-border {
+    border-right: 1px solid #dee2e6!important;
+  }
+}
+
+#submission {
+  max-width: 400px;
+}
+
+#exports {
+  max-width: 1420px;
 }
 
 #submission {
@@ -158,9 +217,22 @@ button {
 .hidden {
   pointer-events: none !important;
   opacity: 0 !important;
+  display: none !important;
 }
 
 .shown {
   pointer-events: all !important;
   opacity: 1 !important;
+}
+
+#bodytext {
+  max-width: 1280px;
+}
+
+#progress {
+  opacity: 0.85 !important;
+}
+
+#video-preview {
+  z-index: 9999 !important;
 }

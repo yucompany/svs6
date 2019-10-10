@@ -30,6 +30,9 @@ router.post('/s3upload', (req, res) => {
                 } else {
                     console.log('Upload complete!');
 
+                    console.log('Deleting image from temporary storage.');
+                    fs.unlinkSync(imageFilePath);  // Clear i
+
                     // Now Upload Video
                     fs.readFile(videoFilePath, async (err, data) => {
                         if (err) { throw err; }
@@ -151,6 +154,21 @@ router.post('/processId', (req, res) => {
         });
     });
 });
+
+router.post('/deepLink', (req, res) => {
+    try {
+        let fetchlink = async function(){
+            let dl = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
+                res.status(200).send(dl);   
+        }
+        fetchlink();
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).send(err)
+    }
+    
+})
 
 function generateDeepLink(videoFile, imageFile) {
     return new Promise((resolve, reject) => {

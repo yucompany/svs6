@@ -130,7 +130,7 @@ function loadLetter(letter, callback){
       let loaded = 0; let len = name.length;
   
       function onLoadLetter(){
-        ++loaded; console.log(loaded);
+        ++loaded;
         if(loaded >= len)
           callback();
       }

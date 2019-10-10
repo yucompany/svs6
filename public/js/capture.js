@@ -1,8 +1,9 @@
 "use strict";
 
-var videoContainer;
 
-const onCaptured  = new Event("captured");
+var PHOTOURL = "";
+var VIDEOURL = "";
+
 
 class Capture {
     constructor(name, duration, format){
@@ -28,28 +29,8 @@ class Capture {
     }
 
     beginCapture(fps){
-       /* if(capturing)
-            captures.stop();
-
-        console.log('did it');
-
-        captures.start();
-        capturing = true;*/
-
-
         capturing = true;
         this.captured = [];
-
-        /*let f = this.format; let d = this.duration;
-        saveFrames('frame', f, d, fps, function(arr) {
-            this.captured = arr;
-            this.capturing = false;
-
-            console.log("Frames have been captured => ");
-            console.log(arr);
-
-            dispatchEvent(onCaptured); // Fire captured
-        }.bind(this));*/
     }
 
     addFrame(frame){
@@ -60,24 +41,17 @@ class Capture {
         return new Promise(function(res, rej){
             setTimeout(function(){
                 canvas.elt.toBlob(res, 'image/jpeg', .85);
-            }, dt);
-                
+            }, dt);         
         })
-
-            //res(canvas.elt.toDataURL("image/jpeg"));
     }
 
     stopCapture(){
-        console.log(this.captured);
         capturing  = false;
-
-        this.photo()
-        .then(function(url){
-            console.log(url);
+        prepareExports()
+        .then(() => {
+            console.log("Successfully prepared exports after capture! :-)");
+            dispatchEvent(onEnd);
         });
-
-        this.video();
-
     }
 
     photo() {
@@ -107,27 +81,17 @@ class Capture {
                 })
             });
 
-            fetchRequest
-            .then((response) => {
-                response.text()
-                .then((result) => {
-                    triggerPhotoDownload(result);
-                    return result;
-                })
-                .catch((err) => {
-                    console.log('Error parsing response');
-                    throw err;
-                });
-            })
-            .catch((err) => {
-                console.log('Error communicating with server.');
-                throw err;
-            });
+            return fetchRequest;
         })
-        .catch((err) => {
-            console.log('Error reading frame for Photo download.');
-            throw err;
-        });
+        .then((response) => {
+            return response.text();
+        })
+        .then((result) => {
+            console.log(result);
+            return new Promise(function(res, rej){
+                res(result);
+            })
+        })
     }
 
     video() {
@@ -135,9 +99,8 @@ class Capture {
             let captured = this.captured;
             let promises = [];
 
-            for (let i = 0; i < captured.length; i++) {
+            for (let i = 0; i < captured.length; i++) 
                 promises.push(this.sendFrame(captured[i], i));
-            }
 
             this.name = FIRSTNAME + '_' + LASTNAME;
 
@@ -145,8 +108,10 @@ class Capture {
 
             Promise.all(promises)
             .then(() => {
-                this.encode(this.name);
-                resolve(`/output/${this.name}.mp4`);
+                this.encode(this.name)
+                .then((url) => {
+                    resolve(url);
+                })
             })
             .catch((err) => {
                 reject(err);
