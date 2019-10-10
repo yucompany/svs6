@@ -1,5 +1,6 @@
 .DS_Store
 node_modules
+awscli-bundle
 output
 Archive.zip
 *.npmrc
