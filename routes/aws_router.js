@@ -155,8 +155,9 @@ router.post('/deepLink', (req, res) => {
     try {
         let fetchlink = async function(){
             let dl = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
-            res.status(200).send(dl);   
+                res.status(200).send(dl);   
         }
+        fetchlink();
     }
     catch(err) {
         console.log(err);
