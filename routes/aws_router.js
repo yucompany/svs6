@@ -45,14 +45,13 @@ router.post('/s3upload', (req, res) => {
                         console.log(`Uploading ${req.body.videoFilePath} to S3 bucket...`);
                         console.log('Generating deep link');
 
-                        const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
-                        res.status(200).send(deepLink);
-
                         s3.upload(params, (err, data) => {
                             if (err) {
                                 console.log('Error uploading to S3::\n', err);
                             } else {
                                 console.log('Upload complete!');
+                                const deepLink = await generateDeepLink(req.body.videoFilePath, req.body.videoFilePath.replace('.mp4', '.jpg'));
+                                res.status(200).send(deepLink);
 
                                 console.log('Deleting image from temporary storage.');
                                 fs.unlinkSync(imageFilePath);
