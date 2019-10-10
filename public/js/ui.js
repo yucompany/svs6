@@ -163,6 +163,7 @@ function prepareExports(){
 
                         beginUploadToS3(videoFile)
                         .then((deeplink) => {
+                            window.history.replaceState(null, null, '?x=' + deeplink);
                             resolve(deeplink); // Found cached media, return URL
                         })
                         .catch((err) => {

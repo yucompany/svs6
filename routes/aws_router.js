@@ -31,7 +31,7 @@ router.post('/s3upload', (req, res) => {
                     console.log('Upload complete!');
 
                     // Now Upload Video
-                    fs.readFile(videoFilePath, async (err, data) => {
+                    fs.readFile(videoFilePath, (err, data) => {
                         if (err) { throw err; }
 
                         const base64data = new Buffer.from(data, 'binary');
@@ -45,7 +45,7 @@ router.post('/s3upload', (req, res) => {
                         console.log(`Uploading ${req.body.videoFilePath} to S3 bucket...`);
                         console.log('Generating deep link');
 
-                        s3.upload(params, (err, data) => {
+                        s3.upload(params, async (err, data) => {
                             if (err) {
                                 console.log('Error uploading to S3::\n', err);
                             } else {
