@@ -7,7 +7,7 @@ const ffmpeg            = require('fluent-ffmpeg');
 const sprintf           = require('sprintf');
 const fs                = require('fs');
 const tmp               = require('tmp');
-      tempDir = tmp.dirSync({ unsafeCleanup: true });
+    var tempDir = tmp.dirSync({ unsafeCleanup: true });
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
