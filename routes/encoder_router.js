@@ -47,7 +47,6 @@ router.post('/encode', (req, res) => {
 
     var proc = new ffmpeg()
         .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
-        .input(baseDir + '/assets/audio/theme.mp3')
         .outputOptions([
           '-framerate 15',
           '-start_number 0',
