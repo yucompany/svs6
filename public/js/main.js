@@ -72,8 +72,21 @@ function preload(){
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
 
-var lineA = { origin: {x: 540, y:-290}, object: "" }
-var lineB = { origin: {x: 400, y:-220}, object: "" }
+const lineOrigins = 
+[
+  {x: 540, y:-290},
+  {x: 470, y:-255},
+  {x: 400, y:-220}
+];
+
+const lineTimes = 
+[
+  3.625,
+  5.08
+]
+
+var lineA = { origin: "", time: 0, active: true, object: "" }
+var lineB = { origin: "", time: 0, active: true, object: "" }
 var lines = [ lineA, lineB ];
 
 let t0 = Date.now();
@@ -136,7 +149,6 @@ let VIDEOREADY = false;
   function breakPromise(err){
     Promise.reject(err);
   }
-
   let time = gTime;
 
   let bg = assets.background; let bgbf = bg.elt.buffered;
@@ -155,8 +167,6 @@ let VIDEOREADY = false;
     }
   }
 
-   
-
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
   
@@ -164,28 +174,43 @@ let VIDEOREADY = false;
   image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
 
   let buffer = elements.buffer;
-  buffer.clear();
+      buffer.clear();
 
-      let line1 = elements.line1;
-          line1.x = (offset * lineA.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
-          line1.y = (offset * lineA.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
-let sc =  line1.scale = offset;
-      line1.render(buffer, 1, time);
-      let line2 = elements.line2;
-          line2.x = (offset * lineB.origin.x) + lerp(ORIGIN.x, ORIGIN.y, seq) ;
-          line2.y = (offset * lineB.origin.y) + lerp(DESTINATION.x, DESTINATION.y, seq) ;
-          line2.scale = offset;
-      line2.render(buffer, 1, time);
+      let dx = lerp(ORIGIN.x, ORIGIN.y, seq);
+      let dy = lerp(DESTINATION.x, DESTINATION.y, seq);
 
-    let dx = abs(line1.x - line2.x);
-    let dy = abs(line1.y - line2.y);
+      let center = 
+      {
+        x: (offset * lineOrigins[1].x) + dx,
+        y: (offset * lineOrigins[1].y) + dy
+      }
 
-    let h = dy*sc*6;
-    let w = dx*sc*5;
+      if(lineA.active){
+        let line1 = elements.line1;
+          line1.x = (offset * lineA.origin.x) + dx ;
+          line1.y = (offset * lineA.origin.y) + dy ;
+          line1.scale = offset;
+          line1.render(buffer, 1, time);
+      }
+
+      if(lineB.active){
+        let line2 = elements.line2;
+            line2.x = (offset * lineB.origin.x) + dx ;
+            line2.y = (offset * lineB.origin.y) + dy ;
+            line2.scale = offset;
+            line2.render(buffer, 1, time);
+      }
+
+    let sc = offset;  
+
+    let mx = 127;
+    let my = 67;
+
+    let mh = my*sc*8;
+    let mw = mx*sc*7;
 
     let mask = elements.mask;
-  mask.mask(Math.floor(line1.x - w/2), Math.floor(line1.y - h/2), Math.floor(line1.x + w/2), Math.floor(line1.y + h/2), Date.now())
-
+   mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
   .then(function(dt){
       image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
@@ -201,8 +226,10 @@ let sc =  line1.scale = offset;
       capture.addFrame(fr);
 
       if(playing){
-        f += 1.0;
-        gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+        if(VIDEOREADY){
+          f += 1.0;
+          gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+        }
 
         updateProgressBar(clamp(f/tf, 0, 1));
       }
@@ -264,6 +291,41 @@ function construct(first, last){
   loadName(first, loadedLine);
   loadName(last, loadedLine);
 
+
+  if(first != '' && last != ''){
+    console.log("neither empty");
+
+    lineA.origin = lineOrigins[0];
+    lineB.origin = lineOrigins[2];
+
+    lineA.time = lineTimes[0];
+    lineB.time = lineTimes[1];
+
+    lineA.active = true;
+    lineB.active = true;
+  }
+  else{
+    if(first == ''){
+      lineB.origin = lineOrigins[1];
+      lineB.time = lineTimes[0];
+      
+      lineA.active = false;
+      lineB.active = true;
+
+      console.log("first empty");
+    }
+    else { // if last === ''
+      lineA.origin = lineOrigins[1];
+      lineA.time = lineTimes[0];
+
+      lineB.active = false;
+      lineA.active = true;
+
+      console.log("last empty");
+    }
+  }
+
+
   function loadedLine(){
     ++loaded;
     if(loaded <= 1)
@@ -280,11 +342,11 @@ function initialize(){
 
     container = lineA.object;
     container.clear();
-    container.populate(FIRSTNAME);
+    container.populate(FIRSTNAME, lineA.time);
 
     container = lineB.object;
     container.clear();
-    container.populate(LASTNAME);
+    container.populate(LASTNAME, lineB.time);
 
     let bg = assets.background;
     let matte = assets.matte;

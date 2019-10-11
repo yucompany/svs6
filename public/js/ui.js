@@ -429,10 +429,12 @@ const updateUIVisibility = function(e, visible){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
+    updateUIVisibility(title, false);
 
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
+    updateFooterPos();
 });
 
 addEventListener('ended', () => {
@@ -441,10 +443,12 @@ addEventListener('ended', () => {
     updateUIVisibility(loadingHolder, false);
 
     showVideoPreview();
+    updateFooterPos();
 });
 
 addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
+    updateFooterPos();
 });
 
 addEventListener('resetted', () => {
@@ -453,6 +457,8 @@ addEventListener('resetted', () => {
 
     updateUIVisibility(exporting, false);
     updateUIVisibility(videoPreview, false);
+
+    updateFooterPos();
 
     // Clear form
     nameform.reset();
@@ -469,3 +475,26 @@ function updateTitleCardImage(blurred, shown){
     else
         title.src = "../images/misc/title card.jpg";
 }
+
+const updateFooterPos = function(){
+    const actabs = document.getElementById('actionables');
+    var childH = actabs.children[0].clientHeight;
+    var longH = actabs.children[0].clientHeight;
+    let i = 1;
+    while (actabs.children[i]) {
+        if (actabs.children[i].classList.contains("shown")) {
+            childH = actabs.children[i].clientHeight;
+        }
+        if (actabs.children[i].clientHeight > longH) {
+            longH = actabs.children[i].clientHeight;
+        }
+        i += 1;
+    }
+    childH += 30;
+    //if (childH < longH) childH = longH;
+    console.log("newHeight is:" + childH);
+    actabs.style.height = childH + "px";
+}
+
+window.onload = updateFooterPos();
+window.onresize = updateFooterPos();
