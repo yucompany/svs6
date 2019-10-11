@@ -52,37 +52,44 @@ router.post('/screenshot', (req, res) => {
 });
 
 router.post('/encode', (req, res) => {
-    let oldTemp = tempDir;
+    function doEncode() {
+        console.log('Doing encode');
+        let oldTemp = tempDir;
 
-    res.setHeader("Content-Type", "video/mp4");
+        res.setHeader("Content-Type", "video/mp4");
+    
+        var proc = new ffmpeg()
+            .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
+            .outputOptions([
+              '-framerate 15',
+              '-start_number 0',
+              '-refs 5',
+              '-c:v libx264',
+              '-crf 23',
+              '-b:v 1024',
+              '-b:a 128k'
+            ])
+            .output(outputDir + '/' + req.body.path + '.mp4')
+            .on('start', function(){
+              console.log("Begin render!");
+            })
+            .on('error', function(err) {
+              console.log('An error occurred: ' + err.message);
+              console.log('trying again');
+              doEncode();
+            })
+            .on('end', function() {
+              console.log('End render!' + '/output/' + req.body.path + '.mp4');
+              
+              oldTemp.removeCallback();
+              res.status(200).send('/output/' + req.body.path + '.mp4');
+            })
+            .run()
+    
+            tempDir = tmp.dirSync({unsafeCleanup: true});        
+    }
 
-    var proc = new ffmpeg()
-        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
-        .outputOptions([
-          '-framerate 15',
-          '-start_number 0',
-          '-refs 5',
-          '-c:v libx264',
-          '-crf 23',
-          '-b:v 1024',
-          '-b:a 128k'
-        ])
-        .output(outputDir + '/' + req.body.path + '.mp4')
-        .on('start', function(){
-          console.log("Begin render!");
-        })
-        .on('error', function(err) {
-          console.log('An error occurred: ' + err.message);
-        })
-        .on('end', function() {
-          console.log('End render!' + '/output/' + req.body.path + '.mp4');
-          
-          oldTemp.removeCallback();
-          res.status(200).send('/output/' + req.body.path + '.mp4');
-        })
-        .run()
-
-        tempDir = tmp.dirSync({unsafeCleanup: true});
+    doEncode();
 });
 
 module.exports = router;
