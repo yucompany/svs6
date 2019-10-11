@@ -53,6 +53,13 @@ $(document).ready(() => {
         });
     }
 
+    const emailShare = document.getElementById('shareEmail');
+    if(emailShare){
+        emailShare.addEventListener('click', () => {
+            showEmailShare();
+        });
+    }
+
     if(videoPreview){
         /*videoPreview.addEventListener('click', () => {
             videoPreview.pause();
@@ -115,6 +122,23 @@ function showTwitterShare() {
     for (let prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop]);
 
     window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+}
+
+function showEmailShare(){
+    const params = {
+        subject: "Share your BE THE VALLEY experience!",
+        body: `Open the following link in your desktop browser
+               to retrieve generated video: ${VIDEOURL}`
+    }
+
+    const link = document.createElement('a');
+
+    link.href = `mailto:test@example.com?subject=${params.subject}&body=${params.body}`;
+    link.setAttribute('target', '_blank'); //Trigger download in new window
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 /*function fetchVideo(){
@@ -365,6 +389,7 @@ function triggerVideoDownload(videoFile) {
     const link = document.createElement('a');
 
     link.href = videoFile;
+    link.setAttribute('target', '_blank'); //Trigger download in new window
 
     if (link.href) {
         // File name for downloaded file.
@@ -382,6 +407,7 @@ function triggerPhotoDownload(imageFile) {
 
     // We'll want to replace this with the client's S3 bucket address.
     link.href = imageFile;
+    link.setAttribute('target', '_blank'); //Trigger download in new window
 
     // File name for downloaded file.
     link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.jpg`

@@ -39,7 +39,9 @@ var elements = {
   line1 : "",
   line2 : "",
 
-  masker: ""
+  masker: "",
+  aBuffer: "",
+  bBuffer: ""
 }
 
 // Global events
@@ -54,8 +56,11 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.volume(0);  // Ensure volume is set to 1
   });
+  
   bg.hide();
   bg.hideControls();
+  
+
   
   bg.onended(function(){
    if(capturing)
@@ -67,7 +72,6 @@ function preload(){
   });
   matte.hide();
   matte.hideControls();
-
 
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
@@ -108,7 +112,10 @@ function setup(){
   let matte = assets.matte;
   
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
-  let mask = elements.mask = new Mask(0, 0, assets.matte, elements.buffer);
+      elements.aBuffer = createGraphics(WIDTH, HEIGHT);
+      elements.bBuffer = createGraphics(WIDTH, HEIGHT);
+
+  let mask = elements.mask = new Mask(0, 0, elements.bBuffer, elements.buffer);
   let fx = elements.fx = assets.flares;
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
@@ -144,6 +151,10 @@ function draw(){
 }
 
 let VIDEOREADY = false;
+let VIDEOPLAY = false;
+
+
+
 
  function render(){
   function breakPromise(err){
@@ -151,14 +162,14 @@ let VIDEOREADY = false;
   }
   let time = gTime;
 
-  let bg = assets.background; let bgbf = bg.elt.buffered;
-  let matte = assets.matte; let mbf = matte.elt.buffered;
+  let bg = assets.background; let bgbf = bg.elt.seekable;
+  let matte = assets.matte; let mbf = matte.elt.seekable;
 
   VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= time) && (mbf.length > 0 && mbf.end(0) >= time);
 
   if(VIDEOREADY){
     if(playing){
-      bg.time(time)
+      bg.time(time);
       matte.time(time);
     }  
     else{
@@ -169,9 +180,15 @@ let VIDEOREADY = false;
 
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
+
+  let aBuffer = elements.aBuffer;
+  let bBuffer = elements.bBuffer;
   
   blendMode(BLEND);
-  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+    aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
+    image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
+
+    bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
 
   let buffer = elements.buffer;
       buffer.clear();
