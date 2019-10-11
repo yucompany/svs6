@@ -5,8 +5,6 @@ const bodyParser        = require('body-parser');
 const tmp               = require('tmp');
 const fs                = require('fs');
 
-global.tempDir = tmp.dirSync({ unsafeCleanup: true });
-
 // Store all generated videos here.
 global.outputDir = __dirname + '/output';
 global.baseDir = __dirname;

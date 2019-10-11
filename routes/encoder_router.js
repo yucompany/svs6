@@ -10,6 +10,8 @@ const tmp               = require('tmp');
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
+var tempDir = tmp.dirSync({ unsafeCleanup: true });
+
 // POSTs
 router.post('/addFrame', (req, res) => {
     const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
@@ -41,15 +43,9 @@ router.post('/screenshot', (req, res) => {
 router.post('/encode', (req, res) => {
     let oldTemp = tempDir;
 
-    console.log(baseDir);
-
-    console.log(outputDir + '/' + req.body.path + '.mp4');
-
     res.setHeader("Content-Type", "video/mp4");
-
     var proc = new ffmpeg()
         .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
-        .input(baseDir + '/assets/audio/theme.mp3')
         .outputOptions([
           '-framerate 15',
           '-start_number 0',
@@ -67,16 +63,14 @@ router.post('/encode', (req, res) => {
           console.log('An error occurred: ' + err.message);
         })
         .on('end', function() {
-          console.log('End render!');
+          console.log('End render! ' + '/output/' + req.body.path + '.mp4');
+
           oldTemp.removeCallback();
-
-          console.log('/output/' + req.body.path + '.mp4');
-
           res.status(200).send('/output/' + req.body.path + '.mp4');
         })
         .run()
 
-    global.tempDir = tmp.dirSync({unsafeCleanup: true});
+        tempDir = tmp.dirSync({unsafeCleanup: true});
 });
 
 module.exports = router;

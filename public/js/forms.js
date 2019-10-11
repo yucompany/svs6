@@ -1294,7 +1294,7 @@ const verifyName = function(){
         }
     }
 
-    if ($('#firstInput').val().trim() === '' || $('#lastInput').val().trim() === '') {
+    if ($('#firstInput').val().trim() === '' && $('#lastInput').val().trim() === '') {
         throwEmpty();
         return;
     }

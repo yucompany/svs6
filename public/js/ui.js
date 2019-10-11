@@ -429,6 +429,7 @@ const updateUIVisibility = function(e, visible){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
+    updateUIVisibility(title, false);
 
     updateUIVisibility(loadingHolder, true);
 
