@@ -155,8 +155,6 @@ let VIDEOREADY = false;
     }
   }
 
-   
-
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
   
@@ -201,8 +199,10 @@ let sc =  line1.scale = offset;
       capture.addFrame(fr);
 
       if(playing){
-        f += 1.0;
-        gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+        if(VIDEOREADY){
+          f += 1.0;
+          gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+        }
 
         updateProgressBar(clamp(f/tf, 0, 1));
       }
