@@ -1095,6 +1095,8 @@ var PROHIBITED = [
     "SterlingIsJudas", 
     "Strapon", 
     "Suckin", 
+    "Suck",
+    "Sucks",
     "Suckit", 
     "Supersex", 
     "Supertits", 

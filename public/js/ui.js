@@ -187,7 +187,7 @@ function prepareExports(){
 
                         beginUploadToS3(videoFile)
                         .then((deeplink) => {
-                            window.history.replaceState(null, null, '?x=' + deeplink);
+                            // window.history.replaceState(null, null, '?x=' + deeplink);  ?? Removed URL replace, ux-sake
                             resolve(deeplink); // Found cached media, return URL
                         })
                         .catch((err) => {
@@ -255,50 +255,6 @@ function prepareExports(){
 
 
 }
-
-/*
-// Goes through the motions of uploading a video to S3/Server then returning it to user.
-function prepareVideoDownload() {
-    // Before encoding anything, let's see if this video is already stored in S3.
-    const s3Key = generateKeyFromInput();
-
-    checkIfKeyExists(s3Key)
-    .then((cacheVideo) => {
-        if (!cacheVideo) {
-            // Encode video
-            console.log('No stored version of this video found - server now encoding to .mp4');
-
-            capture.video()
-            .then((videoFile) => {
-                // Begin download before we begin the upload to S3 server side..
-                triggerVideoDownload(videoFile, false);
-
-                if (videoFile) {
-                    console.log('Initiating S3 upload.');
-
-                    beginUploadToS3(videoFile)
-                    .then((deepLinkId) => {
-                        DEEP_LINK_ID = deepLinkId;
-                        // Show deepLink on client.
-                        $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
-                    })
-                    .catch((err) => {
-                        throw err;
-                    });
-                }
-            })
-            .catch((err) => {
-                throw err;
-            });
-        } else {
-            console.log('Trigger Download from S3 instead.');
-            triggerVideoDownload(s3Key, true)
-        }
-    })
-    .catch((err) => {
-        throw err;
-    });
-}*/
 
 // Begins upload to S3
 function beginUploadToS3(videoFile) {
@@ -503,23 +459,27 @@ function updateTitleCardImage(blurred, shown){
 
 const updateFooterPos = function(){
     const actabs = document.getElementById('actionables');
-    var childH = actabs.children[0].clientHeight;
+    var shownH = actabs.children[0].clientHeight;
     var longH = actabs.children[0].clientHeight;
     let i = 1;
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
-            childH = actabs.children[i].clientHeight;
+            shownH = actabs.children[i].clientHeight;
         }
-        if (actabs.children[i].clientHeight > longH) {
+        if (actabs.children[i].clientHeight > longH){
             longH = actabs.children[i].clientHeight;
         }
         i += 1;
     }
-    childH += 30;
-    //if (childH < longH) childH = longH;
-    console.log("newHeight is:" + childH);
-    actabs.style.height = childH + "px";
+
+    var marg = shownH - longH; 
+    actabs.style.marginBottom = marg + "px";
 }
 
-window.onload = updateFooterPos();
-window.onresize = updateFooterPos();
+window.addEventListener("resize", () => {
+    updateFooterPos();
+});
+
+window.addEventListener("load", () => {
+    updateFooterPos();
+});

@@ -136,7 +136,6 @@ class Line extends SceneElement {
 
   populate(letters, time){
     this.buildTime = time;
-    console.log(time);
 
     let char, letter;
 
@@ -169,7 +168,6 @@ class Line extends SceneElement {
 
       if(assets.letters.hasOwnProperty(char)){
         letter = new Letter(0, 0, 1, assets.letters[char], char, this.buildTime + Math.random());
-        console.log(this.buildTime + Math.random());
       }
       else
         letter = new Letter(0, 0, 1, null, char, -1);      

@@ -45,16 +45,16 @@
   
   <body>
     <div class="d-flex flex-column justify-content-center align-items-center">
-      <div id="header" class="mt-0 mt-lg-4 p-4 p-sm-3 p-lg-4 w-50 order-1 order-sm-2 order-lg-1">
+      <div id="header" class="mt-0 mt-lg-3 p-4 p-sm-3 p-lg-2 w-50 order-1 order-sm-2 order-lg-1" style="max-width: 576px">
         <img src="../images/misc/logo.png" class="img-fluid">
       </div>
-      <div id="bodytext" class="container pt-5 pb-0 px-4 py-sm-0 pb-lg-4 w-100 w-sm-75  order-3 order-sm-3 order-lg-2">
-          <h3 class="text-center pt-1 pt-lg-3">Don’t just watch Silicon Valley, BE the Valley.</h3>
-          <p class="text-center px-4">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want... within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
+      <div id="bodytext" class="container pt-2 pt-lg-1 pb-0 px-4 py-sm-0 pb-lg-3 w-100 w-sm-75  order-3 order-sm-3 order-lg-2" style="max-width: 1024px">
+          <h3 class="text-center mt-1 m-sm-0 mx-5 pt-2 pt-sm-1">Don’t just watch Silicon Valley, BE the Valley.</h3>
+          <p class="text-center mb-1 px-4 pt-0 pt-sm-1">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want... within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
-      <div id="content-holder" class="order-2 order-sm-1 order-lg-3">
-        <div id="canvas-holder" class="d-flex justify-content-center mx-lg-5 mx-0" >   
-          <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute hidden" src="../images/misc/title card.jpg">
+      <div id="content-holder" class="order-2 order-sm-1 order-lg-3" style="max-width: 1024px">
+        <div id="canvas-holder" class="d-flex justify-content-center mx-lg-5 mx-0" style="height: inherit">   
+          <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute" src="../images/misc/title card.jpg">
           <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute">
             <img id="replay" class="hidden" src="../images/icons/button-replay.png">
           </div>
@@ -69,7 +69,7 @@
       </div>
       <!-- p5 canvas goes here -->
 
-      <div id="actionables" class="w-100 w-lg-40 pt-3 pt-sm-4 pt-lg-5 pb-5 flex-fill d-flex justify-content-center position-relative order-4 overflow-hidden">
+      <div id="actionables" class="w-100 w-lg-40 pt-3 pt-sm-4 pt-lg-4 pb-5 flex-fill d-flex justify-content-center position-relative order-4 overflow-hidden">
           <div id="submission" class="d-flex position-absolute justify-content-center w-100 h-auto flex-fill shown">
               <div id="namefield" class="px-0 w-100">
                 <form id="nameform" name="nameform">
@@ -93,7 +93,7 @@
                           </div>
                           <div class="form-group row">
                               <div class="col-3"></div>
-                              <div class="col-6 pl-0">
+                              <div class="col-6 pl-0 pt-2">
                                   <button id="generate" class="btn btn-primary text-uppercase w-100 pt-3 pb-2 ">Generate</button>
                               </div>
                           </div>
@@ -120,14 +120,14 @@
                 <input id="shareurl" name="shareURL" type="text" class="form-control pt-2" autocomplete="off">
                 <div class="d-flex flex-fill justify-content-center justify-content-lg-start mt-3">
                   <button id="shareTwitter" class="border-0 p-0 bg-transparent">
-                      <img src="../images/icons/twitter.png" class="socialicon mr-1" width="50" height="50">
+                    <img src="../images/icons/twitter.png" class="socialicon mr-1" width="50" height="50">
                   </button>
                   <button id="shareFacebook" class="border-0 p-0 bg-transparent">
-                      <img src="../images/icons/facebook.png" class="socialicon mx-1 " width="50" height="50">
+                    <img src="../images/icons/facebook.png" class="socialicon mx-1 " width="50" height="50">
                   </button>
                   <button id="shareEmail" class="border-0 p-0 bg-transparent">
                     <img src="../images/icons/email.png" class="socialicon ml-1" width="50" height="50">
-                </button>
+                  </button>
                 </div>
               </div>
             </div>
@@ -138,7 +138,7 @@
           </div>
       </div>
       
-      <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-5 order-5" style="bottom: 0;">
+      <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-1 mt-lg-5 order-5" style="bottom: 0;">
         <div id="hbo" class="mt-0"> 
           <img src="../images/icons/hbo-logo.png" class="my-4" width="50" height="auto">
         </div>

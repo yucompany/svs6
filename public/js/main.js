@@ -1,5 +1,12 @@
 'use strict';
 
+
+const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  // Detect Firefox, disable extra graphics buffers if so
+    if(IS_FIREFOX)
+      console.log("Firefox detected!");
+    else
+      console.log("Firefox NOT detected!");
+
 // Global variables
 var FIRSTNAME, LASTNAME;
 
@@ -60,13 +67,6 @@ function preload(){
   bg.hide();
   bg.hideControls();
   
-
-  
-  bg.onended(function(){
-   if(capturing)
-      capture.stopCapture();
-  });
-
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.volume(0);
   });
@@ -112,10 +112,18 @@ function setup(){
   let matte = assets.matte;
   
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
-      elements.aBuffer = createGraphics(WIDTH, HEIGHT);
-      elements.bBuffer = createGraphics(WIDTH, HEIGHT);
+      
+  if(IS_FIREFOX){
+    elements.aBuffer = createGraphics(WIDTH, HEIGHT);
+    elements.bBuffer = createGraphics(WIDTH, HEIGHT);
+  }
 
-  let mask = elements.mask = new Mask(0, 0, elements.bBuffer, elements.buffer);
+  // Set mask buffer to extra buffer IF FIREFOX
+  let maskBuffer = assets.matte;
+  if(IS_FIREFOX)
+    maskBuffer = elements.bBuffer;
+
+  let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
   let fx = elements.fx = assets.flares;
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
@@ -154,8 +162,6 @@ let VIDEOREADY = false;
 let VIDEOPLAY = false;
 
 
-
-
  function render(){
   function breakPromise(err){
     Promise.reject(err);
@@ -181,14 +187,22 @@ let VIDEOPLAY = false;
   let seq = clamp(time / 7.4583, 0, 1);
   let offset = lerp(.66, .97, seq);
 
-  let aBuffer = elements.aBuffer;
-  let bBuffer = elements.bBuffer;
   
   blendMode(BLEND);
-    aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
-    image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
 
-    bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
+    // Draw buffers IF FIREFOX
+    if(IS_FIREFOX){
+      let aBuffer = elements.aBuffer;
+      let bBuffer = elements.bBuffer;
+
+      aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
+      image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
+
+      bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
+    }
+    else 
+      image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+
 
   let buffer = elements.buffer;
       buffer.clear();
@@ -248,7 +262,15 @@ let VIDEOPLAY = false;
           gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
         }
 
-        updateProgressBar(clamp(f/tf, 0, 1));
+        let progress = clamp(f/tf, 0, 1);
+        if(progress >= 1.0){
+          if(capturing){
+            capture.stopCapture();
+            capturing = false;
+          }
+        }
+        
+        updateProgressBar(progress);
       }
       else{
         gTime = 0;
@@ -288,7 +310,6 @@ function restart(){
   bg.time(0);
   matte.time(0);
 
-
   gTime = 0.0;
   f = 0.0;
 
@@ -310,8 +331,6 @@ function construct(first, last){
 
 
   if(first != '' && last != ''){
-    console.log("neither empty");
-
     lineA.origin = lineOrigins[0];
     lineB.origin = lineOrigins[2];
 
@@ -328,8 +347,6 @@ function construct(first, last){
       
       lineA.active = false;
       lineB.active = true;
-
-      console.log("first empty");
     }
     else { // if last === ''
       lineA.origin = lineOrigins[1];
@@ -337,8 +354,6 @@ function construct(first, last){
 
       lineB.active = false;
       lineA.active = true;
-
-      console.log("last empty");
     }
   }
 
@@ -368,9 +383,8 @@ function initialize(){
     let bg = assets.background;
     let matte = assets.matte;
         
-      //bg.time(0);
-      //matte.time(0);
-
+    bg.time(0);
+    matte.time(0);
 
     gTime = 0; f = 0.0;
     playing = true;
