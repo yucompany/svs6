@@ -7,8 +7,10 @@ const ffmpeg            = require('fluent-ffmpeg');
 const sprintf           = require('sprintf');
 const fs                = require('fs');
 const tmp               = require('tmp');
+      tempDir = tmp.dirSync({ unsafeCleanup: true });
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
 
 // POSTs
 router.post('/addFrame', (req, res) => {
@@ -41,10 +43,6 @@ router.post('/screenshot', (req, res) => {
 router.post('/encode', (req, res) => {
     let oldTemp = tempDir;
 
-    console.log(baseDir);
-
-    console.log(outputDir + '/' + req.body.path + '.mp4');
-
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()
@@ -67,16 +65,14 @@ router.post('/encode', (req, res) => {
           console.log('An error occurred: ' + err.message);
         })
         .on('end', function() {
-          console.log('End render!');
+          console.log('End render!' + '/output/' + req.body.path + '.mp4');
+          
           oldTemp.removeCallback();
-
-          console.log('/output/' + req.body.path + '.mp4');
-
           res.status(200).send('/output/' + req.body.path + '.mp4');
         })
         .run()
 
-    global.tempDir = tmp.dirSync({unsafeCleanup: true});
+        tempDir = tmp.dirSync({unsafeCleanup: true});
 });
 
 module.exports = router;
