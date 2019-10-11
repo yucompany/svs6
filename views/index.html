@@ -17,7 +17,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta property="og:image" content="https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo/static/title+card.jpg">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous" defer></script>
@@ -53,25 +52,25 @@
           <h3 class="text-center pt-1 pt-lg-3">Don’t just watch Silicon Valley, BE the Valley.</h3>
           <p class="text-center px-4">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want... within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
-        <div id="content-holder" class="order-2 order-sm-1 order-lg-3">
-          <div id="canvas-holder" class="d-flex justify-content-center mx-lg-5 mx-0" >   
-            <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute hidden" src="../images/misc/title card.jpg">
-          
-              <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute">
-                <img id="replay" class="hidden" src="../images/icons/button-replay.png">
-              </div>
-              <div id="loading-holder" class="d-flex w-100 h-100 flex-column justify-content-center align-items-center zindex-tooltip position-absolute hidden">
-                <img id="loading" class="" width="80" src="../images/icons/loading.gif"><div id="percentage" class="text-light font-weight-bold pt-1" style="font-size:1.2rem">37%</div>
-              </div>
-              <video id="video-preview" class="hidden" style="width: 100%; height: 100%; position: absolute; z-index: 9999 !important;" src="" controls></video>
-              <!--<div id="progress-bar" class="d-flex w-100 h-100 justify-content-start align-items-end zindex-tooltip position-absolute">
-                <div id="progress" class="text-center bg-success text-white pt-3 pb-2 shown" height="5">37%</div>
-              </div>-->
+      <div id="content-holder" class="order-2 order-sm-1 order-lg-3">
+        <div id="canvas-holder" class="d-flex justify-content-center mx-lg-5 mx-0" >   
+          <img id="titlecard" class="w-100 h-auto p-0 zindex-popover position-absolute" src="../images/misc/title card.jpg">
+          <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute">
+            <img id="replay" class="hidden" src="../images/icons/button-replay.png">
           </div>
+          <div id="loading-holder" class="d-flex w-100 h-100 flex-column justify-content-center align-items-center zindex-tooltip position-absolute hidden">
+            <img id="loading" class="" width="80" src="../images/icons/loading.gif"><div id="percentage" class="text-light font-weight-bold pt-1" style="font-size:1.2rem">37%</div>
+          </div>
+          <video id="video-preview" class="hidden" style="width: 100%; height: 100%; position: absolute; z-index: 9999 !important;" src="" controls></video>
+          <!--<div id="progress-bar" class="d-flex w-100 h-100 justify-content-start align-items-end zindex-tooltip position-absolute">
+            <div id="progress" class="text-center bg-success text-white pt-3 pb-2 shown" height="5">37%</div>
+          </div>-->
         </div>
-        <!-- p5 canvas goes here -->
-      <div id="actionables" class="w-100 w-lg-40 pt-3 pt-sm-4 pt-lg-5 pb-4 flex-fill d-flex justify-content-center position-relative order-4">
-          <div id="submission" class="d-flex justify-content-center w-100 h-auto flex-fill shown">
+      </div>
+      <!-- p5 canvas goes here -->
+
+      <div id="actionables" class="w-100 w-lg-40 pt-3 pt-sm-4 pt-lg-5 pb-5 flex-fill d-flex justify-content-center position-relative order-4 overflow-hidden">
+          <div id="submission" class="d-flex position-absolute justify-content-center w-100 h-auto flex-fill shown">
               <div id="namefield" class="px-0 w-100">
                 <form id="nameform" name="nameform">
                           <div class="form-group row mb-2">
@@ -83,19 +82,19 @@
                           <div class="form-group row">
                               <label for="firstInput" class="col-3 col-form-label text-muted text-right">Line 1</label>
                               <div class="col-6 pl-0">
-                                <input id="firstInput" class="form-control" name="firstname" type="text" maxlength="7" autocomplete="off">
+                                <input id="firstInput" class="form-control pt-2" name="firstname" type="text" maxlength="7" autocomplete="off">
                               </div>
                             </div>
                           <div class="form-group row">
                               <label for="lastInput" class="col-3 col-form-label text-muted text-right">Line 2</label>
                               <div class="col-6 pl-0">
-                                <input id="lastInput" class="form-control" name="lastname" type="text" maxlength="7" autocomplete="off">
+                                <input id="lastInput" class="form-control pt-2" name="lastname" type="text" maxlength="7" autocomplete="off">
                               </div>
                           </div>
                           <div class="form-group row">
                               <div class="col-3"></div>
                               <div class="col-6 pl-0">
-                                  <button id="generate" class="btn btn-primary text-uppercase w-100 pt-2">Generate</button>
+                                  <button id="generate" class="btn btn-primary text-uppercase w-100 pt-3 pb-2 ">Generate</button>
                               </div>
                           </div>
                 </form>
@@ -103,50 +102,53 @@
           </div>
 
           <div id="exports" class="d-flex justify-content-center flex-fill mb-4 pt-2 row hidden">
-                  <div id="downloading" class="has-border col-10 col-sm-4 col-lg-5 flex-fill pt-2 pb-4 px-4 pl-sm-4 pr-sm-1 pl-md-4 pr-md-2 pl-lg-5 pr-lg-3">
-                      <h2 class="text-center text-lg-left mx-3 mx-lg-3  mb-1">Download your creation</h2>
-                      <div class="d-flex flex-fill justify-content-center justify-content-lg-start mt-2 flex-column flex-lg-row pt-2 pt-lg-0">
-                        <div class="m-3 text-center text-lg-left">
-                          <button id="dlPhoto" class="btn rounded-lg dlbtn btn-primary text-uppercase flex-fill mx-auto pt-3 pb-2">Image<img src="../images/icons/download.png" class="ml-2 mb-1" width="20" height="19"><div></div></button>
-                        </div>
-                        <div class="m-3 text-center text-lg-left">
-                          <button id="dlVideo" class="btn rounded-lg dlbtn btn-primary text-uppercase flex-fill mx-auto pt-3 pb-2">Video<img src="../images/icons/download.png" class="ml-2 mb-1" width="20" height="19"><div></div></button>
-                        </div>
-                      </div>
+            <div id="downloading" class="has-border col-10 col-sm-4 col-lg-5 flex-fill pt-2 pb-4 px-4 pl-sm-4 pr-sm-1 pl-md-4 pr-md-2 pl-lg-5 pr-lg-3">
+                <h2 class="text-center text-lg-left mx-3 mx-lg-3  mb-1">Download your creation</h2>
+                <div class="d-flex flex-fill justify-content-center justify-content-lg-start mt-2 flex-column flex-lg-row pt-2 pt-lg-0">
+                  <div class="m-3 text-center text-lg-left">
+                    <button id="dlPhoto" class="btn rounded-lg dlbtn btn-primary text-uppercase flex-fill mx-auto pt-3 pb-2">Image<img src="../images/icons/download.png" class="ml-2 mb-1" width="20" height="19"><div></div></button>
                   </div>
+                  <div class="m-3 text-center text-lg-left">
+                    <button id="dlVideo" class="btn rounded-lg dlbtn btn-primary text-uppercase flex-fill mx-auto pt-3 pb-2">Video<img src="../images/icons/download.png" class="ml-2 mb-1" width="20" height="19"><div></div></button>
+                  </div>
+                </div>
+            </div>
 
-                  <div id="sharing" class="has-border col-10 col-sm-5 col-md-4 col-lg-4 flex-fill justify-content-center py-4 px-4 px-sm-2 d-flex ">
-                    <div class="col-12 my-auto mx-0 align-self-center">
-                      <h2 class="text-center text-lg-left">Share</h2>
-                      <input id="shareurl" name="shareURL" type="text" class="form-control " autocomplete="off">
-                      <div class="d-flex flex-fill justify-content-center justify-content-lg-start mt-3">
-                        <button id="shareTwitter" class="border-0 p-0">
-                            <img src="../images/icons/twitter.png" class="socialicon mr-1" width="50" height="50">
-                        </button>
-                        <button id="shareFacebook" class="border-0 p-0">
-                            <img src="../images/icons/facebook.png" class="socialicon ml-1" width="50" height="50">
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div id="redo-container" class="col-10 text-center col-sm-3 col-md-4 col-lg-3 flex-fill d-flex justify-content-center justify-content-lg-end align-self-center py-5 px-2 pl-lg-2 pr-lg-5">
-                    <button id="redo" class="btn rounded-lg btn-primary  mr-sm-2 mr-md-4 mt-2 text-uppercase px-0 pt-3 pb-2">Redo</button>
-                  </div>
+            <div id="sharing" class="has-border col-10 col-sm-5 col-md-4 col-lg-4 flex-fill justify-content-center py-4 px-4 px-sm-2 d-flex ">
+              <div class="col-12 my-auto mx-0 align-self-center">
+                <h2 class="text-center text-lg-left">Share</h2>
+                <input id="shareurl" name="shareURL" type="text" class="form-control pt-2" autocomplete="off">
+                <div class="d-flex flex-fill justify-content-center justify-content-lg-start mt-3">
+                  <button id="shareTwitter" class="border-0 p-0 bg-transparent">
+                      <img src="../images/icons/twitter.png" class="socialicon mr-1" width="50" height="50">
+                  </button>
+                  <button id="shareFacebook" class="border-0 p-0 bg-transparent">
+                      <img src="../images/icons/facebook.png" class="socialicon mx-1 " width="50" height="50">
+                  </button>
+                  <button id="shareEmail" class="border-0 p-0 bg-transparent">
+                    <img src="../images/icons/email.png" class="socialicon ml-1" width="50" height="50">
+                </button>
+                </div>
+              </div>
+            </div>
+            <div id="redo-container" class="col-10 text-center col-sm-3 col-md-4 col-lg-3 flex-fill d-flex justify-content-center justify-content-lg-end align-self-center my-2 py-4 px-2 pl-lg-2 pr-lg-5">
+              <button id="redo" class="btn rounded-lg btn-primary  mr-sm-2 mr-md-4 mt-2 text-uppercase px-0 pt-3 pb-2">Redo</button>
+            </div>
     
           </div>
       </div>
-
-      <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-4 order-5">
-          <div id="hbo" class="mt-0"> 
-            <img src="../images/icons/hbo-logo.png" class="my-4" width="50" height="auto">
-          </div>
-          <div id="footercopy" class="container text-center mw-50">
-            <small>© 2019 Home Box Office, Inc. All Rights Reserved.<br>This website may contain mature content.</small>
-          </div>
-          <div id="footerlinks" class="container d-flex justify-content-center text-center w-25 pt-3 mb-4 font-weight-bold">
-              <a class="px-2" href="https://www.hbo.com/privacy-policy" target="_blank">PRIVACY</a>
-              <a class="px-2" href="https://www.hbo.com/terms-of-use" target="_blank">TERMS</a>
-          </div>
+      
+      <div id="footer" class="footer container-fluid d-flex flex-column justify-content-center align-items-center mt-5 order-5" style="bottom: 0;">
+        <div id="hbo" class="mt-0"> 
+          <img src="../images/icons/hbo-logo.png" class="my-4" width="50" height="auto">
+        </div>
+        <div id="footercopy" class="container text-center mw-50">
+          <small>© 2019 Home Box Office, Inc. All Rights Reserved.<br>This website may contain mature content.</small>
+        </div>
+        <div id="footerlinks" class="container d-flex justify-content-center text-center w-25 pt-3 mb-4 font-weight-bold">
+            <a class="px-2" href="https://www.hbo.com/privacy-policy" target="_blank">PRIVACY</a>
+            <a class="px-2" href="https://www.hbo.com/terms-of-use" target="_blank">TERMS</a>
+        </div>
   
       </div>
 
