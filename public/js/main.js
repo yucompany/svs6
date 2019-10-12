@@ -169,8 +169,8 @@ var PROGRESS = 0.0;
   }
   let time = gTime;
 
-  let bg = assets.background; let bgbf = bg.elt.seekable;
-  let matte = assets.matte; let mbf = matte.elt.seekable;
+  let bg = assets.background; let bgbf = bg.elt.buffered;
+  let matte = assets.matte; let mbf = matte.elt.buffered;
 
   VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= time) && (mbf.length > 0 && mbf.end(0) >= time);
 
