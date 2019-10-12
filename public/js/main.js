@@ -1,5 +1,12 @@
 'use strict';
 
+
+const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  // Detect Firefox, disable extra graphics buffers if so
+    if(IS_FIREFOX)
+      console.log("Firefox detected!");
+    else
+      console.log("Firefox NOT detected!");
+
 // Global variables
 var FIRSTNAME, LASTNAME;
 
@@ -39,7 +46,9 @@ var elements = {
   line1 : "",
   line2 : "",
 
-  masker: ""
+  masker: "",
+  aBuffer: "",
+  bBuffer: ""
 }
 
 // Global events
@@ -54,20 +63,15 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
       bg.volume(0);  // Ensure volume is set to 1
   });
+  
   bg.hide();
   bg.hideControls();
   
-  bg.onended(function(){
-   if(capturing)
-      capture.stopCapture();
-  });
-
   let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
     matte.volume(0);
   });
   matte.hide();
   matte.hideControls();
-
 
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
@@ -102,14 +106,26 @@ function setup(){
 
   canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
-    canvas.class('w-100 h-100');
+    canvas.class('w-100 h-100 hidden');
+    //canvas.hide();
 
   let bg = elements.bg = assets.background; 
   let matte = assets.matte;
   
   let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
-  let mask = elements.mask = new Mask(0, 0, assets.matte, elements.buffer);
-  let fx = elements.fx = assets.flares;
+      
+  if(IS_FIREFOX){
+    elements.aBuffer = createGraphics(WIDTH, HEIGHT);
+    elements.bBuffer = createGraphics(WIDTH, HEIGHT);
+  }
+
+  // Set mask buffer to extra buffer IF FIREFOX
+  let maskBuffer = assets.matte;
+  if(IS_FIREFOX)
+    maskBuffer = elements.bBuffer;
+
+  let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
+  let fx = elements.fx = assets.flares;       
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
@@ -144,6 +160,8 @@ function draw(){
 }
 
 let VIDEOREADY = false;
+var PROGRESS = 0.0;
+
 
  function render(){
   function breakPromise(err){
@@ -158,7 +176,7 @@ let VIDEOREADY = false;
 
   if(VIDEOREADY){
     if(playing){
-      bg.time(time)
+      bg.time(time);
       matte.time(time);
     }  
     else{
@@ -167,11 +185,25 @@ let VIDEOREADY = false;
     }
   }
 
-  let seq = clamp(time / 7.4583, 0, 1);
+  let seq = clamp(PROGRESS * bg.duration() / 7.45833333 - .0133333, 0, 1);
   let offset = lerp(.66, .97, seq);
+
   
   blendMode(BLEND);
-  image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+
+    // Draw buffers IF FIREFOX
+    if(IS_FIREFOX){
+      let aBuffer = elements.aBuffer;
+      let bBuffer = elements.bBuffer;
+
+      aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
+      image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
+
+      bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
+    }
+    else 
+      image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+
 
   let buffer = elements.buffer;
       buffer.clear();
@@ -231,7 +263,15 @@ let VIDEOREADY = false;
           gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
         }
 
-        updateProgressBar(clamp(f/tf, 0, 1));
+        PROGRESS = clamp(f/tf, 0, 1);
+        if(PROGRESS >= 1.0){
+          if(capturing){
+            capture.stopCapture();
+            capturing = false;
+          }
+        }
+        
+        updateProgressBar(PROGRESS);
       }
       else{
         gTime = 0;
@@ -252,6 +292,8 @@ function reset(){
     let matte = assets.matte;
         matte.time(0);
 
+    PROGRESS = 0.0;
+
     gTime = 0; f = 0.0;
     playing = false;
 
@@ -270,7 +312,6 @@ function restart(){
 
   bg.time(0);
   matte.time(0);
-
 
   gTime = 0.0;
   f = 0.0;
@@ -293,8 +334,6 @@ function construct(first, last){
 
 
   if(first != '' && last != ''){
-    console.log("neither empty");
-
     lineA.origin = lineOrigins[0];
     lineB.origin = lineOrigins[2];
 
@@ -311,8 +350,6 @@ function construct(first, last){
       
       lineA.active = false;
       lineB.active = true;
-
-      console.log("first empty");
     }
     else { // if last === ''
       lineA.origin = lineOrigins[1];
@@ -320,8 +357,6 @@ function construct(first, last){
 
       lineB.active = false;
       lineA.active = true;
-
-      console.log("last empty");
     }
   }
 
@@ -351,9 +386,10 @@ function initialize(){
     let bg = assets.background;
     let matte = assets.matte;
         
-      //bg.time(0);
-      //matte.time(0);
+    bg.time(0);
+    matte.time(0);
 
+    PROGRESS = 0.0;
 
     gTime = 0; f = 0.0;
     playing = true;
@@ -406,7 +442,10 @@ $(document).ready(() => {
             $('#lastInput').val(line2);
 
             // Set share URL
-            if (deepLinkId) $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
+            if (deepLinkId){
+                DEEP_LINK_ID = deepLinkId;
+               $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
+            }
 
             // Play/Generate Video with DEEP LINK
             submitForm();

@@ -46,7 +46,6 @@ class Capture {
     }
 
     stopCapture(){
-        capturing  = false;
         prepareExports()
         .then(() => {
             console.log("Successfully prepared exports after capture! :-)");

@@ -53,6 +53,13 @@ $(document).ready(() => {
         });
     }
 
+    const emailShare = document.getElementById('shareEmail');
+    if(emailShare){
+        emailShare.addEventListener('click', () => {
+            showEmailShare();
+        });
+    }
+
     if(videoPreview){
         /*videoPreview.addEventListener('click', () => {
             videoPreview.pause();
@@ -117,33 +124,21 @@ function showTwitterShare() {
     window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
 }
 
-/*function fetchVideo(){
-    console.log("Attempting to fetch video...");
-    // Before encoding anything, let's see if this video is already stored in S3.
-    const s3Key = generateKeyFromInput();
+function showEmailShare(){
+    const params = {
+        subject: "Share your BE THE VALLEY experience!",
+        body: `Open the following link in your desktop browser to retrieve generated video:  ${VIDEOURL}`
+    }
 
-    return checkIfKeyExists(s3Key)
-    .then((cacheVideo) => {
-        return new Promise(function(res, rej){
-            if(!cacheVideo){
-                // Encode video
-                console.log('No stored version of this video found - server now encoding to .mp4');
-                capture.video()
-                .then((videoFile) => {
-                    if(videoFile){
-                        res(videoFile);
-                        beginUploadToS3(videoFile);
-                    }
-                })
-            }
-            else{
-                let s3path = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + s3Key;
-                res(s3path); // Found cached video, return this
-            }
+    const link = document.createElement('a');
 
-        })
-    })
-}*/
+    link.href = `mailto:test@example.com?subject=${params.subject}&body=${params.body}`;
+    link.setAttribute('target', '_blank'); //Trigger download in new window
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 function prepareExports(){
     const s3Key = generateKeyFromInput();
@@ -163,7 +158,7 @@ function prepareExports(){
 
                         beginUploadToS3(videoFile)
                         .then((deeplink) => {
-                            window.history.replaceState(null, null, '?x=' + deeplink);
+                            // window.history.replaceState(null, null, '?x=' + deeplink);  ?? Removed URL replace, ux-sake
                             resolve(deeplink); // Found cached media, return URL
                         })
                         .catch((err) => {
@@ -225,56 +220,13 @@ function prepareExports(){
             PHOTOURL = S3URL + s3Key + ".jpg";
             VIDEOURL = S3URL + s3Key + ".mp4";
 
+            DEEP_LINK_ID = deeplink;
             $('#shareurl').val(window.location.origin + '?x=' + deeplink);
         }
     })
 
 
 }
-
-/*
-// Goes through the motions of uploading a video to S3/Server then returning it to user.
-function prepareVideoDownload() {
-    // Before encoding anything, let's see if this video is already stored in S3.
-    const s3Key = generateKeyFromInput();
-
-    checkIfKeyExists(s3Key)
-    .then((cacheVideo) => {
-        if (!cacheVideo) {
-            // Encode video
-            console.log('No stored version of this video found - server now encoding to .mp4');
-
-            capture.video()
-            .then((videoFile) => {
-                // Begin download before we begin the upload to S3 server side..
-                triggerVideoDownload(videoFile, false);
-
-                if (videoFile) {
-                    console.log('Initiating S3 upload.');
-
-                    beginUploadToS3(videoFile)
-                    .then((deepLinkId) => {
-                        DEEP_LINK_ID = deepLinkId;
-                        // Show deepLink on client.
-                        $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
-                    })
-                    .catch((err) => {
-                        throw err;
-                    });
-                }
-            })
-            .catch((err) => {
-                throw err;
-            });
-        } else {
-            console.log('Trigger Download from S3 instead.');
-            triggerVideoDownload(s3Key, true)
-        }
-    })
-    .catch((err) => {
-        throw err;
-    });
-}*/
 
 // Begins upload to S3
 function beginUploadToS3(videoFile) {
@@ -368,6 +320,7 @@ function triggerVideoDownload(videoFile) {
     const link = document.createElement('a');
 
     link.href = videoFile;
+    link.setAttribute('target', '_blank'); //Trigger download in new window
 
     if (link.href) {
         // File name for downloaded file.
@@ -385,6 +338,7 @@ function triggerPhotoDownload(imageFile) {
 
     // We'll want to replace this with the client's S3 bucket address.
     link.href = imageFile;
+    link.setAttribute('target', '_blank'); //Trigger download in new window
 
     // File name for downloaded file.
     link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.jpg`
@@ -432,7 +386,6 @@ const updateUIVisibility = function(e, visible){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
-
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
@@ -440,7 +393,6 @@ addEventListener('started', () => {
 });
 
 addEventListener('ended', () => {
-
     updateUIVisibility(title, false);
     updateUIVisibility(loadingHolder, false);
 
@@ -479,24 +431,43 @@ function updateTitleCardImage(blurred, shown){
 }
 
 const updateFooterPos = function(){
+    
+    const hboFooter = document.getElementById('footerChecker');
+    const actFooter = document.getElementById('footer');
     const actabs = document.getElementById('actionables');
-    var childH = actabs.children[0].clientHeight;
+    var hboFooterPos = hboFooter.getBoundingClientRect();
+    
+    var shownH = actabs.children[0].clientHeight;
     var longH = actabs.children[0].clientHeight;
     let i = 1;
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
-            childH = actabs.children[i].clientHeight;
+            shownH = actabs.children[i].clientHeight;
         }
-        if (actabs.children[i].clientHeight > longH) {
+        if (actabs.children[i].clientHeight > longH){
             longH = actabs.children[i].clientHeight;
         }
         i += 1;
     }
-    childH += 30;
-    //if (childH < longH) childH = longH;
-    console.log("newHeight is:" + childH);
-    actabs.style.height = childH + "px";
+
+    var marg = shownH - longH; 
+    actabs.style.marginBottom = marg + "px";
+
+    if (hboFooterPos.top + 150 < window.innerHeight) {
+        actFooter.style.position = "fixed";
+    }
+    else{
+        actFooter.style.position = "unset";
+    }
+
 }
 
-window.onload = updateFooterPos();
-window.onresize = updateFooterPos();
+window.addEventListener("resize", () => {
+    updateFooterPos();
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(function(){
+        updateFooterPos();
+    }, 1000);
+});
