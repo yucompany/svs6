@@ -40,7 +40,7 @@ h1 {
 
 h2 {
   font-family: "Helvetica Bold" !important;
-  font-size: 1.4rem !important;
+  font-size: 1.15rem !important;
   line-height: 1.2em !important;
 
   color: #231f20 !important;
@@ -69,9 +69,10 @@ small {
 .btn {
   background-color: #2e9f48 !important;
   border: 0;
-  font-size: 1.4rem !important;
-  width: 60vw;
+  font-size: 1.3rem !important;
+  width: 50vw;
   max-width: 200px;
+  padding: 10px 0px 7px 0px;
 }
 
 .dlbtn button div {
@@ -175,7 +176,7 @@ button {
 @media (min-width: 992px) {
   .btn {
     width: 15vw;
-    max-width: 200px;
+    max-width: 156px;
   }
   #redo {
    
@@ -193,7 +194,7 @@ button {
 }
 
 #exports {
-  max-width: 1136px;
+  max-width: 1065px;
 }
 
 #submission {

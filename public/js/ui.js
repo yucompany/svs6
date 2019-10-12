@@ -127,8 +127,7 @@ function showTwitterShare() {
 function showEmailShare(){
     const params = {
         subject: "Share your BE THE VALLEY experience!",
-        body: `Open the following link in your desktop browser
-               to retrieve generated video: ${VIDEOURL}`
+        body: `Open the following link in your desktop browser to retrieve generated video:  ${VIDEOURL}`
     }
 
     const link = document.createElement('a');
@@ -140,34 +139,6 @@ function showEmailShare(){
     link.click();
     document.body.removeChild(link);
 }
-
-/*function fetchVideo(){
-    console.log("Attempting to fetch video...");
-    // Before encoding anything, let's see if this video is already stored in S3.
-    const s3Key = generateKeyFromInput();
-
-    return checkIfKeyExists(s3Key)
-    .then((cacheVideo) => {
-        return new Promise(function(res, rej){
-            if(!cacheVideo){
-                // Encode video
-                console.log('No stored version of this video found - server now encoding to .mp4');
-                capture.video()
-                .then((videoFile) => {
-                    if(videoFile){
-                        res(videoFile);
-                        beginUploadToS3(videoFile);
-                    }
-                })
-            }
-            else{
-                let s3path = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo' + s3Key;
-                res(s3path); // Found cached video, return this
-            }
-
-        })
-    })
-}*/
 
 function prepareExports(){
     const s3Key = generateKeyFromInput();
@@ -249,6 +220,7 @@ function prepareExports(){
             PHOTOURL = S3URL + s3Key + ".jpg";
             VIDEOURL = S3URL + s3Key + ".mp4";
 
+            DEEP_LINK_ID = deeplink;
             $('#shareurl').val(window.location.origin + '?x=' + deeplink);
         }
     })
@@ -411,7 +383,6 @@ const updateUIVisibility = function(e, visible){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
-
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
@@ -419,7 +390,6 @@ addEventListener('started', () => {
 });
 
 addEventListener('ended', () => {
-
     updateUIVisibility(title, false);
     updateUIVisibility(loadingHolder, false);
 

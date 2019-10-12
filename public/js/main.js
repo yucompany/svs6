@@ -106,7 +106,8 @@ function setup(){
 
   canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
-    canvas.class('w-100 h-100');
+    canvas.class('w-100 h-100 hidden');
+    //canvas.hide();
 
   let bg = elements.bg = assets.background; 
   let matte = assets.matte;
@@ -124,7 +125,7 @@ function setup(){
     maskBuffer = elements.bBuffer;
 
   let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
-  let fx = elements.fx = assets.flares;
+  let fx = elements.fx = assets.flares;       
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
@@ -159,7 +160,7 @@ function draw(){
 }
 
 let VIDEOREADY = false;
-let VIDEOPLAY = false;
+var PROGRESS = 0.0;
 
 
  function render(){
@@ -184,7 +185,7 @@ let VIDEOPLAY = false;
     }
   }
 
-  let seq = clamp(time / 7.4583, 0, 1);
+  let seq = clamp(PROGRESS * bg.duration() / 7.45833333 - .0133333, 0, 1);
   let offset = lerp(.66, .97, seq);
 
   
@@ -262,15 +263,15 @@ let VIDEOPLAY = false;
           gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
         }
 
-        let progress = clamp(f/tf, 0, 1);
-        if(progress >= 1.0){
+        PROGRESS = clamp(f/tf, 0, 1);
+        if(PROGRESS >= 1.0){
           if(capturing){
             capture.stopCapture();
             capturing = false;
           }
         }
         
-        updateProgressBar(progress);
+        updateProgressBar(PROGRESS);
       }
       else{
         gTime = 0;
@@ -290,6 +291,8 @@ function reset(){
         bg.time(0);
     let matte = assets.matte;
         matte.time(0);
+
+    PROGRESS = 0.0;
 
     gTime = 0; f = 0.0;
     playing = false;
@@ -386,6 +389,8 @@ function initialize(){
     bg.time(0);
     matte.time(0);
 
+    PROGRESS = 0.0;
+
     gTime = 0; f = 0.0;
     playing = true;
 
@@ -437,7 +442,10 @@ $(document).ready(() => {
             $('#lastInput').val(line2);
 
             // Set share URL
-            if (deepLinkId) $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
+            if (deepLinkId){
+                DEEP_LINK_ID = deepLinkId;
+               $('#shareurl').val(window.location.origin + '?x=' + deepLinkId);
+            }
 
             // Play/Generate Video with DEEP LINK
             submitForm();
