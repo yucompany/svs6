@@ -13,30 +13,19 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 
 // POSTs
-router.post('/addFrames', (req, res) => {
-    const promise = new Promise((resolve, reject) => {
-        req.body.frames.forEach((newFrame, index) => {
-            const frame = newFrame.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
-            const fName = sprintf('frame-%03d.' + newFrame.format, parseInt(newFrame.index));
-            const dir = tempDir.name + "/" + fName;
+router.post('/addFrame', (req, res) => {
+    const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
+    const fName = sprintf('frame-%03d.' + req.body.format, parseInt(req.body.frame));
+    const dir = tempDir.name + "/" + fName;
 
-            console.log("received " + fName);
+    console.log("received " + fName);
 
-            fs.writeFile(dir, frame, 'base64', (err) => {
-                if (err) {
-                    console.log('there was an error writing file: ' + err);
-                }
-                if (index === req.body.frames.length - 1) resolve();
-            });            
-        });
-    });
-
-    promise.then(() => {
-        res.status(200).send('done writing');
-    })
-    .catch((err) => {
-        throw err;
-    });
+    fs.writeFile(dir, frame, 'base64', (err) => {
+      if (err) {
+          console.log('there was an error writing file: ' + err);
+      }
+      res.status(200).send();
+  });
 });
 
 router.post('/screenshot', (req, res) => {
@@ -52,44 +41,37 @@ router.post('/screenshot', (req, res) => {
 });
 
 router.post('/encode', (req, res) => {
-    function doEncode() {
-        console.log('Doing encode');
-        let oldTemp = tempDir;
+    let oldTemp = tempDir;
 
-        res.setHeader("Content-Type", "video/mp4");
-    
-        var proc = new ffmpeg()
-            .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
-            .outputOptions([
-              '-framerate 15',
-              '-start_number 0',
-              '-refs 5',
-              '-c:v libx264',
-              '-crf 23',
-              '-b:v 1024',
-              '-b:a 128k'
-            ])
-            .output(outputDir + '/' + req.body.path + '.mp4')
-            .on('start', function(){
-              console.log("Begin render!");
-            })
-            .on('error', function(err) {
-              console.log('An error occurred: ' + err.message);
-              console.log('trying again');
-              doEncode();
-            })
-            .on('end', function() {
-              console.log('End render!' + '/output/' + req.body.path + '.mp4');
-              
-              oldTemp.removeCallback();
-              res.status(200).send('/output/' + req.body.path + '.mp4');
-            })
-            .run()
-    
-            tempDir = tmp.dirSync({unsafeCleanup: true});        
-    }
+    res.setHeader("Content-Type", "video/mp4");
 
-    doEncode();
+    var proc = new ffmpeg()
+        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
+        .outputOptions([
+          '-framerate 15',
+          '-start_number 0',
+          '-refs 5',
+          '-c:v libx264',
+          '-crf 23',
+          '-b:v 1024',
+          '-b:a 128k'
+        ])
+        .output(outputDir + '/' + req.body.path + '.mp4')
+        .on('start', function(){
+          console.log("Begin render!");
+        })
+        .on('error', function(err) {
+          console.log('An error occurred: ' + err.message);
+        })
+        .on('end', function() {
+          console.log('End render!' + '/output/' + req.body.path + '.mp4');
+          
+          oldTemp.removeCallback();
+          res.status(200).send('/output/' + req.body.path + '.mp4');
+        })
+        .run()
+
+        tempDir = tmp.dirSync({unsafeCleanup: true});
 });
 
 module.exports = router;
