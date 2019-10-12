@@ -232,10 +232,7 @@ function prepareExports(){
 function beginUploadToS3(videoFile) {
     return new Promise((resolve, reject) => {
         console.log('Note to dev: Show Loading in UI...');
-        console.log({
-            videoFilePath: videoFile,
-            imageFilePath: videoFile.replace('.mp4', '.jpg')
-        });
+
         const fetchResponse = fetch('aws/s3upload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

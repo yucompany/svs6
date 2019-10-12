@@ -95,81 +95,82 @@ class Capture {
 
     video() {
         return new Promise((resolve, reject) => {
-            this.sendFrames()
+            let captured = this.captured;
+            let promises = [];
+
+            for (let i = 0; i < captured.length; i++) 
+                promises.push(this.sendFrame(captured[i], i));
+
+            this.name = FIRSTNAME + '_' + LASTNAME;
+
+            console.log('Sending frames... ' + captured.length);
+
+            Promise.all(promises)
             .then(() => {
-                this.encode()
-                .then(resolve)
-                .catch(reject)
+                this.encode(this.name)
+                .then((url) => {
+                    resolve(url);
+                })
             })
-            .catch(reject);
+            .catch((err) => {
+                reject(err);
+            });
         });
     }
 
-    sendFrames() {
+    sendFrame(frame, i) {
         return new Promise((resolve, reject) => {
-            const capturedFrames = this.captured;
-            const storedFrames = [];
-            
-            const promise = new Promise((resolve, reject) => {
-                capturedFrames.forEach((frame, index) => {
-                    const reader = new FileReader();
+            const reader = new FileReader();
 
-                    reader.onload = () => {
-                        const dataUrl = reader.result;
-                        storedFrames.push({
-                            dat: dataUrl,
-                            index: index + 1,
-                            format: this.format
-                        });
-                        if (index === capturedFrames.length - 1) resolve();
-                    };
+            reader.onload = () => {
+                const dataUrl = reader.result;
+                resolve(dataUrl);
+            };
 
-                    reader.onerror = (err) => {
-                        console.log('Issue reading file');
-                        reject(err);
-                    };
+            reader.onerror = (err) => {
+                console.log('Issue reading file');
+                reject(err);
+            };
 
-                    reader.readAsDataURL(frame);
-                });
+            reader.readAsDataURL(frame);
+        })
+        .then((buffer) => {
+            let format = this.format;
+            const fetchRequest = fetch('/encoder/addFrame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dat: buffer,
+                    frame: (i + 1),
+                    format: format
+                })
             });
 
-            promise.then(() => {
-                resolve(storedFrames);
-
-                let format = this.format;
-                const fetchRequest = fetch('/encoder/addFrames', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        frames: storedFrames
-                    })
-                });
-    
-                fetchRequest
-                .then((response) => {
-                    response.text()
-                    .then((result) => {
-                        return result;
-                    })
-                    .catch((err) => {
-                        console.log('Error parsing response');
-                        throw err;
-                    });
+            fetchRequest
+            .then((response) => {
+                response.text()
+                .then((result) => {
+                    return result;
                 })
                 .catch((err) => {
-                    console.log('Error communicating with server.');
+                    console.log('Error parsing response');
                     throw err;
-                });                
+                });
             })
-            .catch(reject);
+            .catch((err) => {
+                console.log('Error communicating with server.');
+                throw err;
+            });
+        })
+        .catch((err) => {
+            console.log('Error reading frame for Photo download.');
+            throw err;
         });
     }
 
-    encode() {
+    encode(filename) {
         return new Promise((resolve, reject) => {
             console.log('Begin encode');
-            const filename = FIRSTNAME + '_' + LASTNAME;            
-
             const fetchResponse = fetch('/encoder/encode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
