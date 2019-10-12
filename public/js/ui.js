@@ -428,7 +428,12 @@ function updateTitleCardImage(blurred, shown){
 }
 
 const updateFooterPos = function(){
+    
+    const hboFooter = document.getElementById('footerChecker');
+    const actFooter = document.getElementById('footer');
     const actabs = document.getElementById('actionables');
+    var hboFooterPos = hboFooter.getBoundingClientRect();
+    
     var shownH = actabs.children[0].clientHeight;
     var longH = actabs.children[0].clientHeight;
     let i = 1;
@@ -444,12 +449,22 @@ const updateFooterPos = function(){
 
     var marg = shownH - longH; 
     actabs.style.marginBottom = marg + "px";
+
+    if (hboFooterPos.top + 150 < window.innerHeight) {
+        actFooter.style.position = "fixed";
+    }
+    else{
+        actFooter.style.position = "unset";
+    }
+
 }
 
 window.addEventListener("resize", () => {
     updateFooterPos();
 });
 
-window.addEventListener("load", () => {
-    updateFooterPos();
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(function(){
+        updateFooterPos();
+    }, 1000);
 });
