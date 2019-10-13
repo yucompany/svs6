@@ -21,12 +21,8 @@ router.post('/addFrame', (req, res) => {
     console.log("received " + fName);
 
     return new Promise((resolve, reject) => {
-        fs.writeFile(dir, frame, 'base64', (err) => {
-          if(err)
-            reject(err);
-          else
-            resolve();
-        });
+        fs.writeFileSync(dir, frame, 'base64');
+        resolve();
     })
     .then(() => {
       res.status(200).send();
