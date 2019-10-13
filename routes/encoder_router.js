@@ -23,8 +23,10 @@ router.post('/addFrame', (req, res) => {
     fs.writeFile(dir, frame, 'base64', (err) => {
       if (err) {
           console.log('there was an error writing file: ' + err);
-      }
-      res.status(200).send();
+          res.status(500).send();
+        }
+      else
+        res.status(200).send();
   });
 });
 
@@ -42,7 +44,7 @@ router.post('/screenshot', (req, res) => {
 
 router.post('/encode', (req, res) => {
     let oldTemp = tempDir;
-
+    
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()

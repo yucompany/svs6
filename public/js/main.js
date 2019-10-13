@@ -106,7 +106,7 @@ function setup(){
 
   canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
-    canvas.class('w-100 h-100 hidden');
+    canvas.class('w-100 h-100');
     //canvas.hide();
 
   let bg = elements.bg = assets.background; 

@@ -93,49 +93,95 @@ class Capture {
         })
     }
 
-    video() {
+/*
+    function asyncFunc(e) {
         return new Promise((resolve, reject) => {
-            let captured = this.captured;
-            let promises = [];
+          setTimeout(() => resolve(e), e * 1000);
+        });
+      }
+      
+      const arr = [1, 2, 3];
+      let final = [];
+      
+      function workMyCollection(arr) {
+        return arr.reduce((promise, item) => {
+          return promise
+            .then((result) => {
+              console.log(`item ${item}`);
+              return asyncFunc(item).then(result => final.push(result));
+            })
+            .catch(console.error);
+        }, Promise.resolve());
+      }
+      
+      workMyCollection(arr)
+        .then(() => console.log(`FINAL RESULT is ${final}`));
+        */
 
-            for (let i = 0; i < captured.length; i++) 
-                promises.push(this.sendFrame(captured[i], i));
 
-            this.name = FIRSTNAME + '_' + LASTNAME;
+   
 
-            console.log('Sending frames... ' + captured.length);
-
-            Promise.all(promises)
-            .then(() => {
-                this.encode(this.name)
+    video() {
+        let captured = this.captured;
+        console.log('Sending frames... ' + captured.length);
+        
+        return this.sendFrames(captured)
+        .then(() => {
+            return new Promise(function(resolve, reject){
+                let name = FIRSTNAME + '_' + LASTNAME;
+                
+                this.encode(name)
                 .then((url) => {
                     resolve(url);
                 })
-            })
-            .catch((err) => {
-                reject(err);
-            });
-        });
+                .catch((err) => {
+                    reject(err);
+                })
+            }.bind(this))
+            
+        })
+
     }
 
-    sendFrame(frame, i) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
+    sendFrames(frames){
 
-            reader.onload = () => {
-                const dataUrl = reader.result;
-                resolve(dataUrl);
-            };
+        console.log("shit");
 
-            reader.onerror = (err) => {
-                console.log('Issue reading file');
-                reject(err);
-            };
+        return new Promise((res, rej) => {
 
-            reader.readAsDataURL(frame);
-        })
-        .then((buffer) => {
-            let format = this.format;
+            let sent = 0;
+            let sending = false;
+
+            function onSentFrame(frame){
+                sending = false;
+                ++sent;
+            }
+            
+            while(sent <= frames.length){
+                if(!sending){
+                    if(sent == frames.length){
+                        res();
+                        break;
+                    }
+                    else {
+                        console.log("sent frame: " + sent);
+                        this.sendFrame(frames[sent], sent, onSentFrame);
+                        sending = true;
+                    }
+                }
+            }
+
+        });
+        
+    }
+
+    sendFrame(frame, i, callback) {
+
+        function onFailRead(err){
+            console.log('Issue reading file ' + err);
+        }
+
+        function onSuccessRead(url){
             const fetchRequest = fetch('/encoder/addFrame', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -146,26 +192,35 @@ class Capture {
                 })
             });
 
+            console.log(url + "hahhaah")
+
             fetchRequest
             .then((response) => {
                 response.text()
                 .then((result) => {
-                    return result;
+                    console.log("ended frame-" + i);
+                    callback(result);
                 })
                 .catch((err) => {
                     console.log('Error parsing response');
-                    throw err;
+                    console.log(err);
                 });
             })
             .catch((err) => {
                 console.log('Error communicating with server.');
-                throw err;
+                console.log(err);
             });
-        })
-        .catch((err) => {
-            console.log('Error reading frame for Photo download.');
-            throw err;
-        });
+        }
+        
+        const reader = new FileReader();
+        reader.onload = () => {
+            console.log('caigjt');
+            const dataUrl = reader.result;
+            onSuccessRead(dataUrl);
+        };
+        reader.onerror = (err) => { onFailRead(err); };
+
+        reader.readAsDataURL(frame);
     }
 
     encode(filename) {
