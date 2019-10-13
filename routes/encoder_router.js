@@ -20,14 +20,21 @@ router.post('/addFrame', (req, res) => {
 
     console.log("received " + fName);
 
-    fs.writeFile(dir, frame, 'base64', (err) => {
-      if (err) {
-          console.log('there was an error writing file: ' + err);
-          res.status(500).send();
-        }
-      else
-        res.status(200).send();
-  });
+    return new Promise((resolve, reject) => {
+        fs.writeFile(dir, frame, 'base64', (err) => {
+          if(err)
+            reject(err);
+          else
+            resolve();
+        });
+    })
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch((err) => {
+      res.status(500).send();
+    })
+    
 });
 
 router.post('/screenshot', (req, res) => {
