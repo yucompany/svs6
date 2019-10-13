@@ -151,26 +151,29 @@ class Capture {
                 })
             });
 
-            fetchRequest
-            .then((response) => {
-                response.text()
-                .then((result) => {
-                    return result;
+            return new Promise((resolve, reject) => {
+                fetchRequest
+                .then((response) => {
+                    response.text()
+                    .then(setTimeout((result) => {
+                        resolve(result);
+                    }, 100))
+                    .catch((err) => {
+                        console.log('Error parsing response');
+                        reject(err);
+                    });
                 })
                 .catch((err) => {
-                    console.log('Error parsing response');
-                    throw err;
+                    console.log('Error communicating with server.');
+                    reject(err);
                 });
-            })
-            .catch((err) => {
-                console.log('Error communicating with server.');
-                throw err;
-            });
+            }) 
         })
         .catch((err) => {
             console.log('Error reading frame for Photo download.');
-            throw err;
+            reject(err);
         });
+            
     }
 
     encode(filename) {
