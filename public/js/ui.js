@@ -85,7 +85,7 @@ function updateProgressBar(percent){
 
 const onPreview = new Event("previewed");
 
-videoPreview.onloadeddata = () => {
+videoPreview.oncanplay = () => {
     dispatchEvent(onPreview);
 }
 
@@ -404,7 +404,7 @@ addEventListener('previewed', () => {
 
 addEventListener('resetted', () => {
     updateTitleCardImage(false);
-    updateUIVisibility(title, true);
+   // updateUIVisibility(title, true);
 
     updateUIVisibility(exporting, false);
     updateUIVisibility(videoPreview, false);

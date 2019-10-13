@@ -94,20 +94,15 @@ class Capture {
     }
 
     video() {
+
         return new Promise((resolve, reject) => {
             let captured = this.captured;
-            let promises = [];
-
-            for (let i = 0; i < captured.length; i++) 
-                promises.push(this.sendFrame(captured[i], i));
-
-            this.name = FIRSTNAME + '_' + LASTNAME;
-
+            let name = FIRSTNAME + '_' + LASTNAME;
             console.log('Sending frames... ' + captured.length);
 
-            Promise.all(promises)
+            this.sendFrames(captured)
             .then(() => {
-                this.encode(this.name)
+                this.encode(name)
                 .then((url) => {
                     resolve(url);
                 })
@@ -115,7 +110,17 @@ class Capture {
             .catch((err) => {
                 reject(err);
             });
-        });
+        })
+    }
+
+    sendFrames(frames){
+        return frames.reduce((prev, curr, index) => {
+            return prev
+                .then((res) => {
+                    console.log("sent frame: " + index);
+                    return this.sendFrame(frames[index], index);
+                })
+        }, Promise.resolve())
     }
 
     sendFrame(frame, i) {
@@ -171,6 +176,7 @@ class Capture {
     encode(filename) {
         return new Promise((resolve, reject) => {
             console.log('Begin encode');
+
             const fetchResponse = fetch('/encoder/encode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
