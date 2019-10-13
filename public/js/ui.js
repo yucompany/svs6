@@ -404,7 +404,7 @@ addEventListener('previewed', () => {
 
 addEventListener('resetted', () => {
     updateTitleCardImage(false);
-   // updateUIVisibility(title, true);
+    updateUIVisibility(title, true);
 
     updateUIVisibility(exporting, false);
     updateUIVisibility(videoPreview, false);
