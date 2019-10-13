@@ -155,9 +155,9 @@ class Capture {
                 fetchRequest
                 .then((response) => {
                     response.text()
-                    .then(setTimeout((result) => {
+                    .then((result) => {
                         resolve(result);
-                    }, 100))
+                    })
                     .catch((err) => {
                         console.log('Error parsing response');
                         reject(err);
