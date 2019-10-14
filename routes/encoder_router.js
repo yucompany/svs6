@@ -60,28 +60,24 @@ function writeFrameToDisk(fr){
 }
 
 router.post('/addFrames', (req, res) => {
-    const promise = new Promise((resolve, reject) => {
-        let frames = req.body.frames;
+    let frames = req.body.frames;
 
-        frames.reduce((prev, next, index) => {
-            console.log("write frame " + index);
+    frames.reduce((prev, next, index) => {
+        console.log("write frame " + index);
 
-            return prev
-              .then(() => {
-                return writeFrameToDisk(next);
-              })
-        }, resolve());
+        return prev
+          .then(() => {
+            return writeFrameToDisk(next);
+          })
+    }, Promise.resolve())
 
-
+    .then(() => {
+      console.log("wrote all frames to disk");
+      res.status(200).send('done writing');
     })
-
-      .then(() => {
-        console.log("wrote all frames to disk");
-        res.status(200).send('done writing');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .catch((err) => {
+      console.log(err);
+    });
 });
   
 

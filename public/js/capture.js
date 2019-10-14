@@ -26,11 +26,13 @@ class Capture {
     this.totalFrames = 0;
 
     this.captured = [];
+    this.encoded = [];
     }
 
     beginCapture(fps){
         capturing = true;
         this.captured = [];
+        this.encoded = [];
     }
 
     addFrame(frame){
@@ -113,46 +115,43 @@ class Capture {
         })
     }
 
+    encodeFrame(frame, index){
+        return new Promise((resolve, reject) => {
+
+            const reader = new FileReader();
+
+                reader.onload = () => {
+                    const dataUrl = reader.result;
+
+                    let frame = {
+                        dat: dataUrl,
+                        index: index + 1
+                    };
+
+                    //console.log("wrote frame " + index);
+                    resolve(frame);
+                };
+
+                reader.onerror = (err) => {
+                    console.log('Issue reading file');
+                    reject(err);
+                };
+
+                reader.readAsDataURL(frame);
+        });
+    }
+
     encodeFrames(frames){
         let encoded = [];
 
-        function encodeFrame(frame, index){
-            return new Promise((resolve, reject) => {
-
-                const reader = new FileReader();
-
-                    reader.onload = () => {
-                        const dataUrl = reader.result;
-
-                        let frame = {
-                            dat: dataUrl,
-                            index: index + 1
-                        };
-
-                        //console.log("wrote frame " + index);
-                        resolve(frame);
-                    };
-
-                    reader.onerror = (err) => {
-                        console.log('Issue reading file');
-                        reject(err);
-                    };
-
-                    reader.readAsDataURL(frame);
-            });
-        }
-            
-
-
         return frames.reduce((prev, curr, index) => {
             return prev
-                .then(() => {
-                    //console.log("encoded frame: " + index);
-                    return encodeFrame(frames[index], index).then((frame) => {
-                        encoded.push(frame);
-                    });
+                .then((frame) => {
+                    if(frame != undefined)
+                        this.encoded.push(frame);
+                    return this.encodeFrame(frames[index], index);
                 })
-        }, Promise.resolve(encoded)) // Send all encoded frames to resolve
+        }, Promise.resolve()) // Send all encoded frames to resolve
     }
 
     sendFrames() {
@@ -160,34 +159,40 @@ class Capture {
 
         return this.encodeFrames(captured)
     
-        .then((encodes) => {
+        .then(() => {
+            return new Promise((resolve, reject) => {
 
-            console.log("sending " + encodes.length);
-            
-            const fetchRequest = fetch('/encoder/addFrames', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    frames: encodes
-                })
-            });
+                let encodes = this.encoded;
 
-            fetchRequest
-            .then((response) => {
-                response.text()
-                .then((result) => {
-                    return result;
+                console.log(encodes);
+                console.log("sending " + encodes.length);
+                
+                const fetchRequest = fetch('/encoder/addFrames', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        frames: encodes
+                    })
+                });
+
+                fetchRequest
+                .then((response) => {
+                    response.text()
+                    .then((result) => {
+                        resolve(result);
+                    })
+                    .catch((err) => {
+                        console.log('Error parsing response');
+                        reject(err);
+                    });
                 })
                 .catch((err) => {
-                    console.log('Error parsing response');
-                    throw err;
-                });
-            })
-            .catch((err) => {
-                console.log('Error communicating with server.');
-                throw err;
-            });                
+                    console.log('Error communicating with server.');
+                    reject(err);
+                });                
 
+            })
+        
         })
         .catch((err) => {
             console.log("Error when sending frames: " + err);
