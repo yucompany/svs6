@@ -37,6 +37,64 @@ router.post('/addFrame', (req, res) => {
     
 });
 
+router.post('/addFrames', (req, res) => {
+    const promise = new Promise((resolve, reject) => {
+        let frames = req.body.frames;
+
+        console.log(frames);
+
+        frames.reduce((prev, next) => {
+          return prev
+            .then(() => {
+              console.log("added frame ");
+              return writeFrameToDisk(next);
+            })
+        }, resolve());
+
+       /* req.body.frames.forEach((nextFrame, index) => {
+          const frame = nextFrame.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
+          const fName = sprintf('frame-%03d.jpg', parseInt(nextFrame.index));
+          const dir = tempDir.name + "/" + fName;
+          
+          console.log("received " + fName);
+          
+          fs.writeFile(dir, frame, 'base64', (err) => {
+            if (err) {
+              console.log('there was an error writing file: ' + err);
+            }
+            if (index === req.body.frames.length - 1) resolve();
+          });
+        });*/
+    });
+    
+    promise.then(() => {
+      res.status(200).send('done writing');
+    })
+    .catch((err) => {
+      throw err;
+    });
+});
+
+function writeFrameToDisk(fr){
+  return new Promise((resolve, reject) => {
+      const frame = fr.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
+      const fName = sprintf('frame-%03d.jpg', parseInt(fr.index));
+      const dir = tempDir.name + "/" + fName;
+
+      fs.writeFile(dir, frame, 'base64', (err) => {
+        if (err) {
+          console.log('there was an error writing file: ' + err);
+          reject(err);
+        }
+        else {
+          console.log("successfully wrote frame" + fr.index + " to disk");
+          resolve();
+        }
+      });
+  })
+}
+  
+
 router.post('/screenshot', (req, res) => {
   const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
   const dir = outputDir + '/' + req.body.fileName;

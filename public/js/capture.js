@@ -113,67 +113,82 @@ class Capture {
         })
     }
 
-    sendFrames(frames){
+    encodeFrames(frames){
+        let encoded = [];
+
+        function encodeFrame(frame, index){
+            return new Promise((resolve, reject) => {
+
+                const reader = new FileReader();
+
+                    reader.onload = () => {
+                        const dataUrl = reader.result;
+
+                        let frame = {
+                            dat: dataUrl,
+                            index: index + 1
+                        };
+
+                        resolve(frame);
+                    };
+
+                    reader.onerror = (err) => {
+                        console.log('Issue reading file');
+                        reject(err);
+                    };
+
+                    reader.readAsDataURL(frame);
+            });
+        }
+            
+
+
         return frames.reduce((prev, curr, index) => {
             return prev
                 .then((res) => {
-                    console.log("sent frame: " + index);
-                    return this.sendFrame(frames[index], index);
+                    console.log("encoded frame: " + index);
+                    encoded.push(res);
+
+                    return encodeFrame(frames[index], index);
                 })
-        }, Promise.resolve())
+        }, Promise.resolve(encoded)) // Send all encoded frames to resolve
     }
 
-    sendFrame(frame, i) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
+    sendFrames() {
+        let captured = this.captured;
 
-            reader.onload = () => {
-                const dataUrl = reader.result;
-                resolve(dataUrl);
-            };
-
-            reader.onerror = (err) => {
-                console.log('Issue reading file');
-                reject(err);
-            };
-
-            reader.readAsDataURL(frame);
-        })
-        .then((buffer) => {
-            let format = this.format;
-            const fetchRequest = fetch('/encoder/addFrame', {
+        return this.encodeFrames(captured)
+    
+        .then((encodes) => {
+            
+            const fetchRequest = fetch('/encoder/addFrames', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    dat: buffer,
-                    frame: (i + 1),
-                    format: format
+                    frames: encodes
                 })
             });
 
-            return new Promise((resolve, reject) => {
-                fetchRequest
-                .then((response) => {
-                    response.text()
-                    .then((result) => {
-                        resolve(result);
-                    })
-                    .catch((err) => {
-                        console.log('Error parsing response');
-                        reject(err);
-                    });
+            fetchRequest
+            .then((response) => {
+                response.text()
+                .then((result) => {
+                    return result;
                 })
                 .catch((err) => {
-                    console.log('Error communicating with server.');
-                    reject(err);
+                    console.log('Error parsing response');
+                    throw err;
                 });
-            }) 
+            })
+            .catch((err) => {
+                console.log('Error communicating with server.');
+                throw err;
+            });                
+
         })
         .catch((err) => {
-            console.log('Error reading frame for Photo download.');
-            reject(err);
-        });
-            
+            console.log("Error when sending frames: " + err);
+        })
     }
 
     encode(filename) {
