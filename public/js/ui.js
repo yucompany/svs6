@@ -400,6 +400,9 @@ addEventListener('ended', () => {
 addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
     updateFooterPos();
+    setTimeout(function(){
+        updateFooterPos();
+    }, 1000);
 });
 
 addEventListener('resetted', () => {
@@ -463,8 +466,6 @@ window.addEventListener("resize", () => {
     updateFooterPos();
 });
 
-window.addEventListener("onload", () => {
-    setTimeout(function(){
-        updateFooterPos();
-    }, 1000);
+window.addEventListener("load", () => {
+    updateFooterPos();
 });
