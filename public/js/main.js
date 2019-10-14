@@ -145,7 +145,7 @@ let capturing = false;
 let gTime = 0;
 let playing = false;
 
-let f = 0.0;
+let f = 24.0;
 let tf = (framerate * duration * 1.0);
 
 
@@ -303,7 +303,7 @@ function reset(){
 
     PROGRESS = 0.0;
 
-    gTime = 0; f = 0.0;
+    gTime = 0; f = 24.0;
     playing = false;
 
     elements.line1.clear();
@@ -323,7 +323,7 @@ function restart(){
   matte.time(0);
 
   gTime = 0.0;
-  f = 0.0;
+  f = 24.0;
 
     elements.line1.reset();
     elements.line2.reset();
@@ -400,7 +400,7 @@ function initialize(){
 
     PROGRESS = 0.0;
 
-    gTime = 0; f = 0.0;
+    gTime = 0; f = 24.0;
     playing = true;
 
     capture.beginCapture(framerate);
