@@ -63,19 +63,20 @@ router.post('/addFrames', (req, res) => {
     const promise = new Promise((resolve, reject) => {
         let frames = req.body.frames;
 
-        frames.reduce((prev, next) => {
-          return prev
-            .then(() => {
-              console.log("added frame ");
-              return writeFrameToDisk(next);
-            })
+        frames.reduce((prev, next, index) => {
+            console.log("write frame " + index);
+
+            return prev
+              .then(() => {
+                return writeFrameToDisk(next);
+              })
         }, resolve());
 
 
     })
 
       .then(() => {
-        console.log("wrote all");
+        console.log("wrote all frames to disk");
         res.status(200).send('done writing');
       })
       .catch((err) => {

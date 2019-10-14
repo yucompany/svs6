@@ -129,6 +129,7 @@ class Capture {
                             index: index + 1
                         };
 
+                        //console.log("wrote frame " + index);
                         resolve(frame);
                     };
 
@@ -145,11 +146,11 @@ class Capture {
 
         return frames.reduce((prev, curr, index) => {
             return prev
-                .then((res) => {
-                    console.log("encoded frame: " + index);
-                    encoded.push(res);
-
-                    return encodeFrame(frames[index], index);
+                .then(() => {
+                    //console.log("encoded frame: " + index);
+                    return encodeFrame(frames[index], index).then((frame) => {
+                        encoded.push(frame);
+                    });
                 })
         }, Promise.resolve(encoded)) // Send all encoded frames to resolve
     }
@@ -160,6 +161,8 @@ class Capture {
         return this.encodeFrames(captured)
     
         .then((encodes) => {
+
+            console.log("sending " + encodes.length);
             
             const fetchRequest = fetch('/encoder/addFrames', {
                 method: 'POST',
