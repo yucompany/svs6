@@ -10,7 +10,7 @@ const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  /
 // Global variables
 var FIRSTNAME, LASTNAME;
 
-const framerate = 15;
+const framerate = 12;
 const duration = 10;
 
 const WIDTH = 1280;
@@ -102,7 +102,7 @@ function setup(){
   background(0);
   stroke(255);
   imageMode(CENTER);
-  frameRate(15);
+  frameRate(framerate);
 
   canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
@@ -146,7 +146,7 @@ let gTime = 0;
 let playing = false;
 
 let f = 0.0;
-let tf = 150.0;
+let tf = (framerate * duration * 1.0);
 
 
 function draw(){

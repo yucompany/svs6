@@ -99,9 +99,9 @@ router.post('/encode', (req, res) => {
     res.setHeader("Content-Type", "video/mp4");
 
     var proc = new ffmpeg()
-        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(15)
+        .input(tempDir.name + '/frame-%03d.jpg').inputFPS(12)
         .outputOptions([
-          '-framerate 15',
+          '-framerate 12',
           '-start_number 0',
           '-refs 5',
           '-c:v libx264',
