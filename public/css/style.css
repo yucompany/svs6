@@ -87,7 +87,7 @@ small {
   font-size: 1rem !important;
 }
 
-#canvas-holder {
+#content-holder {
   position: relative;
   height: calc(100% * (720/1280));
 }
@@ -236,4 +236,14 @@ button {
 
 #video-preview {
   z-index: 9999 !important;
+}
+
+#defaultCanvas0 {
+  transform: scale(1.1);
+  filter: blur(12px);
+  opacity: 0.8;
+}
+
+#canvas-holder {
+  overflow: hidden;
 }

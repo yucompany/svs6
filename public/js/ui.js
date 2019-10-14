@@ -463,7 +463,7 @@ window.addEventListener("resize", () => {
     updateFooterPos();
 });
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("onload", () => {
     setTimeout(function(){
         updateFooterPos();
     }, 1000);
