@@ -265,27 +265,27 @@ let seeked = false;
     if(fr)
       capture.addFrame(fr);
 
-      if(playing){
-        if(ready){
-          f += 1.0;
-          gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
-          seeked = false;
-        }
+    if(playing){
+      if(ready){
+        f += 1.0;
+        gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+        seeked = false;
+      }
 
-        PROGRESS = clamp(f/tf, 0, 1);
-        if(PROGRESS >= 1.0){
-          if(capturing){
-            capture.stopCapture();
-            capturing = false;
-          }
+      PROGRESS = clamp(f/tf, 0, 1);
+      if(PROGRESS >= 1.0){
+        if(capturing){
+          capture.stopCapture();
+          capturing = false;
         }
-        
-        updateProgressBar(PROGRESS);
       }
-      else{
-        gTime = 0;
-        updateProgressBar(0);
-      }
+      
+      updateProgressBar(PROGRESS);
+    }
+    else{
+      gTime = 0;
+      updateProgressBar(0);
+    }
 
     requestAnimationFrame(render);
   }, breakPromise);
