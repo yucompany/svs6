@@ -26,11 +26,13 @@ class Capture {
     this.totalFrames = 0;
 
     this.captured = [];
+    this.encoded = [];
     }
 
     beginCapture(fps){
         capturing = true;
         this.captured = [];
+        this.encoded = [];
     }
 
     addFrame(frame){
@@ -113,45 +115,66 @@ class Capture {
         })
     }
 
-    sendFrames(frames){
-        return frames.reduce((prev, curr, index) => {
-            return prev
-                .then((res) => {
-                    console.log("sent frame: " + index);
-                    return this.sendFrame(frames[index], index);
-                })
-        }, Promise.resolve())
-    }
-
-    sendFrame(frame, i) {
+    encodeFrame(frame, index){
         return new Promise((resolve, reject) => {
+
             const reader = new FileReader();
 
-            reader.onload = () => {
-                const dataUrl = reader.result;
-                resolve(dataUrl);
-            };
+                reader.onload = () => {
+                    const dataUrl = reader.result;
 
-            reader.onerror = (err) => {
-                console.log('Issue reading file');
-                reject(err);
-            };
+                    let frame = {
+                        dat: dataUrl,
+                        index: index + 1
+                    };
 
-            reader.readAsDataURL(frame);
-        })
-        .then((buffer) => {
-            let format = this.format;
-            const fetchRequest = fetch('/encoder/addFrame', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    dat: buffer,
-                    frame: (i + 1),
-                    format: format
+                    //console.log("wrote frame " + index);
+                    resolve(frame);
+                };
+
+                reader.onerror = (err) => {
+                    console.log('Issue reading file');
+                    reject(err);
+                };
+
+                reader.readAsDataURL(frame);
+        });
+    }
+
+    encodeFrames(frames){
+        let encoded = [];
+
+        return frames.reduce((prev, curr, index) => {
+            return prev
+                .then((frame) => {
+                    if(frame != undefined)
+                        this.encoded.push(frame);
+                    return this.encodeFrame(frames[index], index);
                 })
-            });
+        }, Promise.resolve()) // Send all encoded frames to resolve
+    }
 
+    sendFrames() {
+        let captured = this.captured;
+
+        return this.encodeFrames(captured)
+    
+        .then(() => {
             return new Promise((resolve, reject) => {
+
+                let encodes = this.encoded;
+
+                console.log(encodes);
+                console.log("sending " + encodes.length);
+                
+                const fetchRequest = fetch('/encoder/addFrames', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        frames: encodes
+                    })
+                });
+
                 fetchRequest
                 .then((response) => {
                     response.text()
@@ -166,14 +189,14 @@ class Capture {
                 .catch((err) => {
                     console.log('Error communicating with server.');
                     reject(err);
-                });
-            }) 
+                });                
+
+            })
+        
         })
         .catch((err) => {
-            console.log('Error reading frame for Photo download.');
-            reject(err);
-        });
-            
+            console.log("Error when sending frames: " + err);
+        })
     }
 
     encode(filename) {
