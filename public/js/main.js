@@ -159,8 +159,10 @@ function draw(){
   }
 }
 
-let VIDEOREADY = false;
+let VIDEOREADY = false, VIDEOPLAY = false;
 var PROGRESS = 0.0;
+
+let seeked = false;
 
 
  function render(){
@@ -174,16 +176,20 @@ var PROGRESS = 0.0;
 
   VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= time) && (mbf.length > 0 && mbf.end(0) >= time);
 
-  if(VIDEOREADY){
+  if(VIDEOREADY && !seeked){
     if(playing){
       bg.time(time);
       matte.time(time);
+
+      seeked = true;
     }  
     else{
       bg.time(0);
       matte.time(0);
     }
   }
+
+  VIDEOPLAY = !(bg.elt.seeking || matte.elt.seeking);
 
   let seq = clamp(PROGRESS * bg.duration() / 7.45833333 - .0133333, 0, 1);
   let offset = lerp(.66, .97, seq);
@@ -241,6 +247,8 @@ var PROGRESS = 0.0;
     let mh = my*sc*8;
     let mw = mx*sc*7;
 
+    let ready = VIDEOREADY && VIDEOPLAY;
+
     let mask = elements.mask;
    mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
   .then(function(dt){
@@ -250,7 +258,7 @@ var PROGRESS = 0.0;
       let fx = elements.fx;
       image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-      if(capturing)
+      if(capturing && ready)
         return capture.captureFrame(dt);
   }, breakPromise)
   .then(function(fr){
@@ -258,9 +266,10 @@ var PROGRESS = 0.0;
       capture.addFrame(fr);
 
       if(playing){
-        if(VIDEOREADY){
+        if(ready){
           f += 1.0;
           gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+          seeked = false;
         }
 
         PROGRESS = clamp(f/tf, 0, 1);
