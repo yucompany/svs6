@@ -101,7 +101,7 @@ function showVideoPreview(){
 function showFacebookShare() {
     window.FB.ui({
         method: 'share',
-        href: `http://hbo-bethevalley.us-west-2.elasticbeanstalk.com?x=${DEEP_LINK_ID}`,
+        href: `http://hbo-bethevalley.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
         quote: 'LOOK AT THIS CREATION!'
     }, (response) => {
         console.log(response);
