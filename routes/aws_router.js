@@ -72,27 +72,6 @@ router.post('/s3upload', (req, res) => {
 
 router.post('/s3cacheKey', (req, res) => {
     return new Promise((resolve, reject) => {
-
-        // const params = {
-        //     TableName : 'tec-demo',
-        //     KeyConditionExpression: '#deeplink_id = :deeplink_id',
-        //     ExpressionAttributeNames: {
-        //         '#deeplink_id': 'deeplink_id'
-        //     },
-        //     ExpressionAttributeValues: {
-        //         ':deeplink_id': deepLinkId
-        //     },
-        //     ScanIndexForward: false
-        // };
-
-        // docClient.query(params, (err, data) => {
-        //     if (err) {
-        //         res.status(500).send(err);
-        //     } else {
-        //         res.status(200).send(data.Items[0]);
-        //     }
-        // });
-
         //Check if this key is already stored in S3.
         const s3Key = req.body.s3Key;
         console.log('tec-demo' + s3Key);
@@ -176,8 +155,8 @@ function generateDeepLink(videoFile, imageFile) {
             TableName : 'tec-demo',
             Item: {
                 deeplink_id: uniqueId,
-                line1: line1,
-                line2: line2,
+                line1: (line1 === '') ? undefined : line1,
+                line2: (line2 === '') ? undefined : line2,
                 timestamp: new Date().getTime(),
                 output_video: videoFile,
                 output_image: imageFile
