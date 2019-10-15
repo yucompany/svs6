@@ -179,8 +179,9 @@ button {
     width: 15vw;
     max-width: 142px;
   }
-  #redo {
-   
+
+  #generate {
+    max-width: 200px;
   }
 }
 
