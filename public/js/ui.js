@@ -431,7 +431,7 @@ function updateTitleCardImage(blurred, shown){
     if(blurred)
         title.src = "../images/misc/title card blurred.jpg";
     else
-        title.src = "../images/misc/title card.jpg";
+        title.src = "../images/misc/title_card.jpg";
 }
 
 const updateFooterPos = function(){
