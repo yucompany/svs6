@@ -105,7 +105,7 @@ router.post('/encode', (req, res) => {
           '-start_number 0',
           '-refs 5',
           '-c:v libx264',
-          '-crf 51',
+          '-crf 28',
           '-b:v 1024',
           '-b:a 128k'
         ])

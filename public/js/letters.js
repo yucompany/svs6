@@ -38,7 +38,7 @@ const CHARTABLE = {
 }
 
 const NUMCHARS = 6.0;
-const CHARSIZE = .67 * (6.0 / NUMCHARS); 
+const CHARSIZE = .67 * (6.0 / NUMCHARS) * (.55); 
 const SPACING = CHARSIZE * (.87);
 
 const Kerning = {
