@@ -49,7 +49,7 @@ class Letter extends SceneElement {
         this.built = false;
         for(let i = 0; i < images.length; i++){
           this.buildings.push(timing);
-          timing += (Math.random() * ((Math.random()) / 12.0));
+          timing += (Math.random() * .1);
         }
       }
     }

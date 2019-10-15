@@ -273,8 +273,10 @@ let seeked = false;
 
     if(playing){
       if(ready){
-        f += 1.0;
+        if(f <= tf)
+          f += 1.0;
         gTime = clamp((f/tf)*bg.duration(), 0, bg.duration());
+        console.log(f);
         seeked = false;
       }
 

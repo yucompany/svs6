@@ -1,6 +1,6 @@
 'use strict';
 
-let DEEP_LINK_ID = null;
+let DEEP_LINK_ID = "";
 const S3URL = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo';
 
 // Exec on page load - Adding button action assignments.
@@ -102,7 +102,7 @@ function showFacebookShare() {
     window.FB.ui({
         method: 'share',
         href: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
-        quote: 'LOOK AT THIS CREATION!'
+        quote: 'Celebrate the final season with this custom title sequence generator.'
     }, (response) => {
         console.log(response);
     });
@@ -115,8 +115,8 @@ function showTwitterShare() {
     //params
     const params = {
      url: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
-     text: 'BE THE VALLEY - CHECK THIS LINK OUT ->',
-     via: 'leexperiential',
+     text: 'Celebrate the final season with this custom title sequence generator.',
+     via: 'HBO',
      hashtags: "BeTheValley,Creation"
     }
     for (let prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop]);
