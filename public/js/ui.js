@@ -404,7 +404,7 @@ addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
 
     updateFooterPos();
-    setTimeout(() => {
+    setTimeout(function(){
         updateFooterPos();
     }, 1000);
 });
@@ -417,7 +417,10 @@ addEventListener('resetted', () => {
     updateUIVisibility(videoPreview, false);
 
     updateFooterPos();
-
+    setTimeout(function(){
+        updateFooterPos();
+    }, 1000);
+    
     // Clear form
     nameform.reset();
 
