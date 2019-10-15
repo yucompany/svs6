@@ -471,5 +471,7 @@ window.addEventListener("resize", () => {
 });
 
 window.addEventListener("load", () => {
-    updateFooterPos();
+    setTimeout(function(){
+        updateFooterPos();
+    }, 500);
 });
