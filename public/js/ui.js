@@ -381,6 +381,13 @@ const updateUIVisibility = function(e, visible){
     }
 }
 
+const checkUIVisibility = function(e){
+    if(e.classList.contains("hidden"))
+        return false;
+
+    return true;
+}
+
 addEventListener('started', () => {
     updateTitleCardImage(true);
     updateUIVisibility(document.getElementById("defaultCanvas0"), true);
@@ -470,8 +477,22 @@ const updateFooterPos = function(){
     let page = document.getElementById('pagebody');
     let footer = document.getElementById('footer');
 
+    let submit = document.getElementById("submission");
+    let exporter = document.getElementById("exports");
+
+    
+    let sub = 0;
+    if(checkUIVisibility(submit))
+        sub += (exporter.offsetHeight - submit.offsetHeight);
+
     let th = window.innerHeight;
     let ch = page.offsetHeight;
+
+    footer.style.marginTop = -sub + "px";
+
+    //footer.style.position = 'absolute';
+    //footer.style.position = 'initial';
+    //footer.style.bottom = 'initial';
 
     if(ch < th){
         footer.style.position = 'absolute';

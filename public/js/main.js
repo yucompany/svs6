@@ -13,7 +13,7 @@ var FIRSTNAME, LASTNAME;
 const framerate = 12;
 const duration = 10;
 
-
+const START = 2.0;
 
 const WIDTH = 854;
 const HEIGHT = 480;
@@ -65,14 +65,14 @@ p5.disableFriendlyErrors = true;
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bg480.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bg480brk.mp4'], () => {
       bg.volume(0);  // Ensure volume is set to 1
   });
   
   bg.hide();
   bg.hideControls();
   
-  let matte = assets.matte = createVideo(['../videos/m480.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/matte480brk.mp4'], () => {
     matte.volume(0);
   });
   matte.hide();
@@ -150,7 +150,7 @@ let capturing = false;
 let gTime = 0;
 let playing = false;
 
-let f = 24.0;
+let f = (framerate * START);
 let tf = (framerate * duration * 1.0);
 
 
@@ -294,7 +294,7 @@ let seeked = false;
         }
       }
       else
-        TARGETPROGRESS = ((PROGRESS - (24.0 / tf))/(1.0 - 24.0/tf)) * PHASES[0];
+        TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
       
       updateProgressBar(TOTALPROGRESS);
     }
@@ -317,7 +317,7 @@ function reset(){
         TOTALPROGRESS = 0.0;
         TARGETPROGRESS = 0.0;
 
-    gTime = 0; f = 24.0;
+    gTime = 0; f = (framerate * START);
     playing = false;
 
     elements.line1.clear();
@@ -337,7 +337,7 @@ function restart(){
   matte.time(0);
 
   gTime = 0.0;
-  f = 24.0;
+  f = (framerate * START);
 
     elements.line1.reset();
     elements.line2.reset();
@@ -416,7 +416,7 @@ function initialize(){
     TOTALPROGRESS = 0.0;
     TARGETPROGRESS = 0.0;
 
-    gTime = 0; f = 24.0;
+    gTime = 0; f = (framerate * START);
     playing = true;
 
     capture.beginCapture(framerate);

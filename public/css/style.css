@@ -220,7 +220,6 @@ button {
 .hidden {
   pointer-events: none !important;
   opacity: 0 !important;
-  /*display: none !important;*/
 }
 
 .shown {
