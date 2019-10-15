@@ -90,6 +90,7 @@ small {
 #content-holder {
   position: relative;
   height: calc(100% * (720/1280));
+  overflow: hidden;
 }
 
 #replay {
@@ -242,6 +243,10 @@ button {
   transform: scale(1.1);
   filter: blur(12px);
   opacity: 0.8;
+}
+
+#titlecard {
+  transform: scale(1.1);
 }
 
 #canvas-holder {

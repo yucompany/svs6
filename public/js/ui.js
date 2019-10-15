@@ -383,7 +383,9 @@ const updateUIVisibility = function(e, visible){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
+    updateUIVisibility(document.getElementById("defaultCanvas0"), true);
     updateUIVisibility(title, false);
+
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
@@ -391,7 +393,6 @@ addEventListener('started', () => {
 });
 
 addEventListener('ended', () => {
-    updateUIVisibility(title, false);
     updateUIVisibility(loadingHolder, false);
 
     showVideoPreview();
@@ -399,6 +400,7 @@ addEventListener('ended', () => {
 });
 
 addEventListener('previewed', () => {
+    updateUIVisibility(document.getElementById("defaultCanvas0"), false);
     updateUIVisibility(exporting, true);
 
     updateFooterPos();

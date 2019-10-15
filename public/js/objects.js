@@ -237,7 +237,7 @@ class Line extends SceneElement {
 
         
 
-        letters[i].render(buffer, scale * m * CHARSIZE * this.charModifier, t);
+        letters[i].render(buffer, scale * 2.0 * m * CHARSIZE * this.charModifier, t);
       }
     }
 
