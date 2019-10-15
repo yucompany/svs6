@@ -200,7 +200,7 @@ let seeked = false;
 
   VIDEOPLAY = !(bg.elt.seeking || matte.elt.seeking);
 
-  let seq = clamp(PROGRESS * bg.duration() / 7.45833333 - .0133333, 0, 1);
+  let seq = clamp(PROGRESS * bg.duration() / 7.45833333, 0, 1);
   let offset = lerp(.66, .97, seq);
 
   
