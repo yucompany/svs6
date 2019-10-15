@@ -167,6 +167,10 @@ function draw(){
 let VIDEOREADY = false, VIDEOPLAY = false;
 var PROGRESS = 0.0;
 
+  var TOTALPROGRESS = 0.0, TARGETPROGRESS = 0.0;
+  var PHASES = [.4, .2, .4];
+
+
 let seeked = false;
 
 
@@ -255,6 +259,9 @@ let seeked = false;
 
      // rect(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), mw, mh);
 
+     TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
+
+
     let mask = elements.mask;
    mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
   .then(function(dt){
@@ -286,12 +293,10 @@ let seeked = false;
           capturing = false;
         }
       }
+      else
+        TARGETPROGRESS = ((PROGRESS - (24.0 / tf))/(1.0 - 24.0/tf)) * PHASES[0];
       
-      updateProgressBar(PROGRESS);
-    }
-    else{
-      gTime = 0;
-      updateProgressBar(0);
+      updateProgressBar(TOTALPROGRESS);
     }
 
     requestAnimationFrame(render);
@@ -308,7 +313,9 @@ function reset(){
     let matte = assets.matte;
         matte.time(0);
 
-    PROGRESS = 0.0;
+        PROGRESS = 0.0;
+        TOTALPROGRESS = 0.0;
+        TARGETPROGRESS = 0.0;
 
     gTime = 0; f = 24.0;
     playing = false;
@@ -406,6 +413,8 @@ function initialize(){
     matte.time(0);
 
     PROGRESS = 0.0;
+    TOTALPROGRESS = 0.0;
+    TARGETPROGRESS = 0.0;
 
     gTime = 0; f = 24.0;
     playing = true;
