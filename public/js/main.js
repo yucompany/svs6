@@ -13,8 +13,13 @@ var FIRSTNAME, LASTNAME;
 const framerate = 12;
 const duration = 10;
 
-const WIDTH = 1280;
-const HEIGHT = 720;
+
+
+const WIDTH = 854;
+const HEIGHT = 480;
+
+const SFW = (WIDTH / 1280.0);
+const SFH = (HEIGHT / 720.0);
 
 const WIDTH2 = WIDTH/2;
 const HEIGHT2 = HEIGHT/2;
@@ -60,14 +65,14 @@ p5.disableFriendlyErrors = true;
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/background.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bg480.mp4'], () => {
       bg.volume(0);  // Ensure volume is set to 1
   });
   
   bg.hide();
   bg.hideControls();
   
-  let matte = assets.matte = createVideo(['../videos/matte.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/m480.mp4'], () => {
     matte.volume(0);
   });
   matte.hide();
@@ -210,7 +215,6 @@ let seeked = false;
     else 
       image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
 
-
   let buffer = elements.buffer;
       buffer.clear();
 
@@ -219,22 +223,22 @@ let seeked = false;
 
       let center = 
       {
-        x: (offset * lineOrigins[1].x) + dx,
-        y: (offset * lineOrigins[1].y) + dy
+        x: ((offset * lineOrigins[1].x) + dx)*SFW,
+        y: ((offset * lineOrigins[1].y) + dy)*SFH
       }
 
       if(lineA.active){
         let line1 = elements.line1;
-          line1.x = (offset * lineA.origin.x) + dx ;
-          line1.y = (offset * lineA.origin.y) + dy ;
+          line1.x = ((offset * lineA.origin.x) + dx)*SFW;
+          line1.y = ((offset * lineA.origin.y) + dy)*SFH;
           line1.scale = offset;
           line1.render(buffer, 1, time);
       }
 
       if(lineB.active){
         let line2 = elements.line2;
-            line2.x = (offset * lineB.origin.x) + dx ;
-            line2.y = (offset * lineB.origin.y) + dy ;
+            line2.x = ((offset * lineB.origin.x) + dx)*SFW;
+            line2.y = ((offset * lineB.origin.y) + dy)*SFH;
             line2.scale = offset;
             line2.render(buffer, 1, time);
       }
@@ -244,10 +248,12 @@ let seeked = false;
     let mx = 127;
     let my = 67;
 
-    let mh = my*sc*8;
-    let mw = mx*sc*7;
+    let mh = my*sc*8*SFH;
+    let mw = mx*sc*7*SFW;
 
     let ready = VIDEOREADY && VIDEOPLAY;
+
+     // rect(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), mw, mh);
 
     let mask = elements.mask;
    mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())

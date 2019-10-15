@@ -252,6 +252,9 @@ class Mask extends SceneElement {
   
     this.source = src;
     this.dest = dest;
+
+    console.log(src);
+    console.log(dest);
   }
 
   mask(x1, y1, x2, y2, t){
