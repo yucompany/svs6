@@ -446,7 +446,7 @@ function updateTitleCardImage(blurred, shown){
 
 const updateFooterPos = function(){
     
-    /*const hboFooter = document.getElementById('footerChecker');
+    const hboFooter = document.getElementById('footerChecker');
     const actFooter = document.getElementById('footer');
     const actabs = document.getElementById('actionables');
     var hboFooterPos = hboFooter.getBoundingClientRect();
@@ -468,12 +468,13 @@ const updateFooterPos = function(){
     actabs.style.marginBottom = marg + "px";
 
     if (hboFooterPos.top + 150 < window.innerHeight) {
-        actFooter.style.position = "fixed";
+        actFooter.style.position = "absolute";
+        actFooter.style.bottom = "0";
     }
     else{
         actFooter.style.position = "unset";
-    }*/
-
+    }
+/*
     let page = document.getElementById('pagebody');
     let footer = document.getElementById('footer');
 
@@ -505,7 +506,7 @@ const updateFooterPos = function(){
         footer.style.bottom = 'initial';
 
         console.log('client height is GREATER than total height')
-    }
+    }*/
 }
 
 window.addEventListener("resize", () => {
