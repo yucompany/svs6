@@ -383,6 +383,7 @@ const updateUIVisibility = function(e, visible){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
+    updateUIVisibility(title, false);
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
@@ -399,7 +400,11 @@ addEventListener('ended', () => {
 
 addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
+
     updateFooterPos();
+    setTimeout(() => {
+        updateFooterPos();
+    }, 1000);
 });
 
 addEventListener('resetted', () => {
@@ -463,8 +468,6 @@ window.addEventListener("resize", () => {
     updateFooterPos();
 });
 
-window.addEventListener("onload", () => {
-    setTimeout(function(){
-        updateFooterPos();
-    }, 1000);
+window.addEventListener("load", () => {
+    updateFooterPos();
 });
