@@ -13,7 +13,7 @@ var FIRSTNAME, LASTNAME;
 const framerate = 12;
 const duration = 10;
 
-const START = 2.0;
+const START = 3.0;
 
 const WIDTH = 854;
 const HEIGHT = 480;
