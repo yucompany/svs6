@@ -473,6 +473,7 @@ const updateFooterPos = function(){
     }
     else{
         actFooter.style.position = "unset";
+        actFooter.style.bottom = "unset";
     }
 /*
     let page = document.getElementById('pagebody');
@@ -514,6 +515,7 @@ window.addEventListener("resize", () => {
 });
 
 window.addEventListener("load", () => {
+    updateFooterPos();
     setTimeout(function(){
         updateFooterPos();
     }, 500);
