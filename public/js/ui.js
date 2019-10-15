@@ -101,8 +101,8 @@ function showVideoPreview(){
 function showFacebookShare() {
     window.FB.ui({
         method: 'share',
-        href: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
-        quote: 'Celebrate the final season with this custom title sequence generator.'
+        href: `http://hbo-bethevalley.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
+        quote: 'LOOK AT THIS CREATION!'
     }, (response) => {
         console.log(response);
     });
@@ -115,8 +115,8 @@ function showTwitterShare() {
     //params
     const params = {
      url: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
-     text: 'Celebrate the final season with this custom title sequence generator.',
-     via: 'HBO',
+     text: 'BE THE VALLEY - CHECK THIS LINK OUT ->',
+     via: 'leexperiential',
      hashtags: "BeTheValley,Creation"
     }
     for (let prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop]);
