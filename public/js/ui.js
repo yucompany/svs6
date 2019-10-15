@@ -390,6 +390,8 @@ addEventListener('started', () => {
 
     updateUIVisibility(submit, false);
     updateFooterPos();
+
+
 });
 
 addEventListener('ended', () => {
@@ -461,10 +463,14 @@ const updateFooterPos = function(){
     actabs.style.marginBottom = marg + "px";
 
     if (hboFooterPos.top + 150 < window.innerHeight) {
-        actFooter.style.position = "fixed";
+        actFooter.style.position = "absolute";
+        actFooter.style.bottom = "0";
+        console.log("ch is less");
     }
     else{
         actFooter.style.position = "unset";
+        actFooter.style.bottom = "unset";
+        console.log("ch is more");
     }
 
 }
@@ -474,6 +480,7 @@ window.addEventListener("resize", () => {
 });
 
 window.addEventListener("load", () => {
+    updateFooterPos();
     setTimeout(function(){
         updateFooterPos();
     }, 500);
