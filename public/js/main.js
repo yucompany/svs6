@@ -71,8 +71,7 @@ function preload(){
 
 window.addEventListener("load", () => {
   console.log("bg try load");
-  let bg = assets.background = createVideo(['../videos/bg480brk.mp4']);
-  bg.elt.addEventListener("loadeddata", () => {
+  let bg = assets.background = createVideo(['../videos/bg480.mp4'], () => {
     console.log("bg loaded");
 
     bg.attribute('playsinline', '');
@@ -85,14 +84,12 @@ window.addEventListener("load", () => {
     bg.play();
 
     DURATION = bg.duration();
-  })
-  bg.elt.load();
+  });
 
   bg.hide();
   bg.hideControls();
   
-  let matte = assets.matte = createVideo(['../videos/matte480brk.mp4']);
-  matte.elt.addEventListener("loadeddata", () => {
+  let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
     matte.attribute('playsinline', '');
     matte.attribute('autoplay', '');
     matte.attribute('muted', '');
@@ -102,7 +99,6 @@ window.addEventListener("load", () => {
 
     matte.play();
   });
-  matte.elt.load();
 
   matte.hide();
   matte.hideControls();
