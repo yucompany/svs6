@@ -520,23 +520,19 @@ const updateFooterPos = function(){
 window.addEventListener("resize", () => {
     if (window.innerWidth != windowWidth) {
         updateFooterPos();
-        console.log('resize1');
         setTimeout(function(){
             updateFooterPos();
-             console.log('resize2');
          }, 200);
     }
 });
 
 window.addEventListener("DOMContentLoaded", () => {
     updateFooterPos();
-    console.log('load1');
     setTimeout(function(){
        updateFooterPos();
        
        setTimeout(function(){
             updateUIVisibility(footerHolder, true);
        }, 100);
-        console.log('load2');
     }, 500);
 });
