@@ -183,6 +183,9 @@ button {
   #generate {
     max-width: 200px;
   }
+  #redo {
+   
+  }
 }
 
 @media (min-width: 576px) {
@@ -220,6 +223,7 @@ button {
 .hidden {
   pointer-events: none !important;
   opacity: 0 !important;
+  /*display: none !important;*/
 }
 
 .shown {

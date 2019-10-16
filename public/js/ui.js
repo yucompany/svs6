@@ -445,27 +445,30 @@ function updateTitleCardImage(blurred, shown){
 }
 
 const updateFooterPos = function(){
-    
     const hboFooter = document.getElementById('footerChecker');
     const actFooter = document.getElementById('footer');
     const actabs = document.getElementById('actionables');
     var hboFooterPos = hboFooter.getBoundingClientRect();
     
     var shownH = actabs.children[0].clientHeight;
-    var longH = actabs.children[0].clientHeight;
     let i = 1;
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
-            shownH = actabs.children[i].clientHeight;
-        }
-        if (actabs.children[i].clientHeight > longH){
-            longH = actabs.children[i].clientHeight;
+            let tempH = 0;
+            if (window.innerWidth < 576) {
+                for (let j = 0; actabs.children[i].children[j]; j += 1) {
+                    tempH += actabs.children[i].children[j].clientHeight;
+                }
+            }
+            else {
+                tempH += actabs.children[i].children[0].clientHeight + 20;
+            }
+            shownH = tempH;
         }
         i += 1;
     }
 
-    var marg = shownH - longH; 
-    actabs.style.marginBottom = marg + "px";
+    actabs.style.height = String(shownH + 80) + "px";
 
     if (hboFooterPos.top + 150 < window.innerHeight) {
         actFooter.style.position = "absolute";
@@ -511,7 +514,9 @@ const updateFooterPos = function(){
 }
 
 window.addEventListener("resize", () => {
-    updateFooterPos();
+    if (window.innerWidth != windowWidth) {
+        updateFooterPos();
+    }
 });
 
 window.addEventListener("load", () => {
