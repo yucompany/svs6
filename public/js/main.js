@@ -81,6 +81,8 @@ function preload(){
   matte.hide();
   matte.hideControls();
 
+  console.log("");
+
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
 
