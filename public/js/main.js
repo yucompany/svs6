@@ -69,12 +69,6 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
       bg.volume(0);  // Ensure volume is set to 1
 
-      bg.attribute('playsinline', '');
-      bg.attribute('autoplay', '');
-      bg.attribute('muted', '');
-
-      bg.play();
-
       DURATION = bg.duration();
   });
   
@@ -83,12 +77,6 @@ function preload(){
   
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
     matte.volume(0);
-
-    matte.attribute('playsinline', '');
-    matte.attribute('autoplay', '');
-    matte.attribute('muted', '');
-
-    matte.play();
   });
   matte.hide();
   matte.hideControls();
@@ -150,6 +138,14 @@ function setup(){
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
 
+  bg.attribute('playsinline', '');
+  bg.attribute('autoplay', '');
+  bg.attribute('muted', '');
+
+  matte.attribute('playsinline', '');
+  matte.attribute('autoplay', '');
+  matte.attribute('muted', '');
+
 }
 
 let ready = false;
@@ -166,8 +162,8 @@ let visible = false;
 
 function draw(){
   if(!ready){
-   // assets.background.play();
-   // assets.matte.play();
+    assets.background.play();
+    assets.matte.play();
 
     render();
     ready = true;
