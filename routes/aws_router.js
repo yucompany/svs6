@@ -11,6 +11,8 @@ router.post('/s3upload', (req, res) => {
         const videoFilePath = outputDir.split('/output')[0] + req.body.videoFilePath;
         const imageFilePath = outputDir.split('/output')[0] + req.body.imageFilePath;
 
+        console.log(imageFilePath);
+
         // Now Upload Image
         fs.readFile(imageFilePath, (err, data) => {
             if (err) { throw err; }
@@ -148,8 +150,8 @@ function generateDeepLink(videoFile, imageFile) {
     return new Promise((resolve, reject) => {
         const uniqueId = Math.random().toString(24).slice(2);
 
-        const line1 = videoFile.split('output/')[1].split('_')[0];
-        const line2 = videoFile.split('output/')[1].split('_')[1].split('.mp4')[0];
+        const line1 = videoFile.split('output/')[1].split('~')[0];
+        const line2 = videoFile.split('output/')[1].split('~')[1].split('.mp4')[0];
 
         const paramsObj = {
             TableName : 'tec-demo',

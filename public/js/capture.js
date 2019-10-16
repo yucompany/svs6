@@ -73,12 +73,15 @@ class Capture {
             reader.readAsDataURL(captured[captured.length-1]);
         })
         .then((buffer) => {
+            let f = FIRSTNAME.trim().split(' ').join('_').replace('#', '.');
+            let l = LASTNAME.trim().split(' ').join('_').replace('#', '.');
+
             const fetchRequest = fetch('/encoder/screenshot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     dat: buffer,
-                    fileName: FIRSTNAME + '_' + LASTNAME + '.jpg'
+                    fileName: f + '~' + l + '.jpg'
                 })
             });
 
@@ -99,7 +102,11 @@ class Capture {
 
         return new Promise((resolve, reject) => {
             let captured = this.captured;
-            let name = FIRSTNAME + '_' + LASTNAME;
+
+            let f = FIRSTNAME.trim().split(' ').join('_').replace('#', '.');
+            let l = LASTNAME.trim().split(' ').join('_').replace('#', '.');
+
+            let name = f + '~' + l;
             console.log('Sending frames... ' + captured.length);
 
             this.sendFrames(captured)
