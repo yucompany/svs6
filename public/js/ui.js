@@ -302,7 +302,7 @@ function checkIfKeyExists(s3Key) {
 
 // Creates a key based on the input values - used to check if we already have something stored in S3.
 function generateKeyFromInput() {
-    return `/output/${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}`;
+    return `/output/${$('#firstInput').val().toUpperCase().trim().split(' ').join('_').replace('#', '.')}~${$('#lastInput').val().toUpperCase().trim().split(' ').join('_').replace('#', '.')}`;
 }
 
 
@@ -321,7 +321,7 @@ function triggerVideoDownload(videoFile) {
 
     if (link.href) {
         // File name for downloaded file.
-        link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.mp4`;
+        link.download = `${$('#firstInput').val().toUpperCase().trim()}_${$('#lastInput').val().toUpperCase().trim()}~VALLEY.mp4`;
 
         document.body.appendChild(link);
         link.click();
@@ -338,7 +338,7 @@ function triggerPhotoDownload(imageFile) {
     link.setAttribute('target', '_blank'); //Trigger download in new window
 
     // File name for downloaded file.
-    link.download = `${$('#firstInput').val().toUpperCase()}_${$('#lastInput').val().toUpperCase()}_VALLEY.jpg`
+    link.download = `${$('#firstInput').val().toUpperCase().trim()}~${$('#lastInput').val().toUpperCase().trim()}~VALLEY.jpg`
     console.log(link);
 
     document.body.appendChild(link);

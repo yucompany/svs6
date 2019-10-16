@@ -98,6 +98,8 @@ router.post('/encode', (req, res) => {
     
     res.setHeader("Content-Type", "video/mp4");
 
+    console.log("xx: " + req.body.path)
+
     var proc = new ffmpeg()
         .input(tempDir.name + '/frame-%03d.jpg').inputFPS(12)
         .outputOptions([
