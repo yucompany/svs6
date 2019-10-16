@@ -461,7 +461,7 @@ const updateFooterPos = function(){
                 }
             }
             else {
-                tempH += actabs.children[i].children[0].clientHeight + 15;
+                tempH += actabs.children[i].children[0].clientHeight + 25;
             }
             shownH = tempH;
         }
