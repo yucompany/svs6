@@ -455,7 +455,7 @@ function initialize(){
 
 // Exec on page load
 $(document).ready(() => {
-    setTimeout(async () => {
+    setTimeout(() => {
         const urlParams = getAllUrlParams(window.location.href);
 
         let line1, line2;
@@ -463,17 +463,18 @@ $(document).ready(() => {
         // Check if we have the x parameter passed to prepopulate the input.
         if (urlParams.x) {
             console.log('Check if id x', urlParams.x, 'for deeplink exists');
-            const response = await checkDeepLinkId(urlParams.x);
+            const response = checkDeepLinkId(urlParams.x);
 
-            if (response && response.line1 && response.line2) {
-                line1 = response.line1;
-                line2 = response.line2;
-                deepLinkId = response.deeplink_id;
+            response
+            .then((dl) => {
 
-                console.log('deeplink', deepLinkId);
+              line1 = dl.line1;
+              line2 = dl.line2;
+              let deepLinkId = dl.deeplink_id;
 
-                populatePage(deepLinkId);
-            }
+              console.log('deeplink', deepLinkId);
+              populatePage(deepLinkId);
+            })
         }
 
         // Check if we have the i parameter passed to prepopulate the input.
@@ -507,28 +508,38 @@ $(document).ready(() => {
 });
 
 // Checks if we already have a generated video stored in S3. Returns boolean.
-async function checkDeepLinkId(id) {
-    try {
-        console.log('Note to dev: Show Loading in UI...');
+function checkDeepLinkId(id) {
+  console.log('Note to dev: Show Loading in UI...');
 
-        const result = await fetch('aws/processId', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                deepLinkId: id
-            })
-        });
+  return new Promise((resolve, reject) => {
 
-        const response = await result.json();
+    const result = fetch('aws/processId', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+          deepLinkId: id
+      })
+    });
+  
+    result
+  
+      .then((response) => {
+          response.json()
+  
+          .then((r) => {
+            resolve(r);
+          })
+          .catch((err) => {
+            reject(err);
+          })
+      })
+      .catch((err) =>{
+        reject(err);
+      })
 
-        console.log('Note to dev: End Loading in UI...');
-
-        return response;
-    } catch (err) {
-        console.log(err);
-        console.log('Error uploading::\n', err);
-    }
+  });
 }
+  
 
 // Get params from URL
 function getAllUrlParams(url) {
