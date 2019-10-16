@@ -73,8 +73,8 @@ class Capture {
             reader.readAsDataURL(captured[captured.length-1]);
         })
         .then((buffer) => {
-            let f = FIRSTNAME.trim().split(' ').join('_').replaceAll('#', '.');
-            let l = LASTNAME.trim().split(' ').join('_').replaceAll('#', '.');
+            let f = FIRSTNAME.trim().split(' ').join('_').replace(/#/g, '.');
+            let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.');
 
             const fetchRequest = fetch('/encoder/screenshot', {
                 method: 'POST',
@@ -103,8 +103,8 @@ class Capture {
         return new Promise((resolve, reject) => {
             let captured = this.captured;
 
-            let f = FIRSTNAME.trim().split(' ').join('_').replaceAll('#', '.');
-            let l = LASTNAME.trim().split(' ').join('_').replaceAll('#', '.');
+            let f = FIRSTNAME.trim().split(' ').join('_').replace(/#/g, '.');
+            let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.');
 
             let name = f + '~' + l;
             console.log('Sending frames... ' + captured.length);
