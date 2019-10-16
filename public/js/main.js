@@ -66,23 +66,46 @@ p5.disableFriendlyErrors = true;
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bg480brk.mp4'], () => {
-      bg.volume(0);  // Ensure volume is set to 1
+   // Do nothing
+}
 
-      DURATION = bg.duration();
+window.addEventListener("load", () => {
+  let bg = assets.background = createVideo(['../videos/bg480brk.mp4'], () => {
+    bg.volume(0);  // Ensure volume is set to 1
+    bg.play();
+    DURATION = bg.duration();
   });
-  
+
   bg.hide();
   bg.hideControls();
-  
+
   let matte = assets.matte = createVideo(['../videos/matte480brk.mp4'], () => {
     matte.volume(0);
+    matte.play();
+
+    let maskBuffer = matte;
+    if(IS_FIREFOX)
+      maskBuffer = elements.bBuffer;
+
+    let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
   });
+
   matte.hide();
   matte.hideControls();
 
-  let flares = assets.flares = loadImage("../images/misc/optics.png");
-}
+
+  bg.attribute('playsinline', '');
+  bg.attribute('autoplay', '');
+  bg.attribute('muted', '');
+
+  matte.attribute('playsinline', '');
+  matte.attribute('autoplay', '');
+  matte.attribute('muted', '');
+
+  let flares = assets.flares = loadImage("../images/misc/optics.png", () => {
+    let fx = elements.fx = assets.flares;   
+  });
+})
 
 const lineOrigins = 
 [
@@ -115,7 +138,6 @@ function setup(){
   canvas = createCanvas(WIDTH, HEIGHT);
     canvas.parent(canvasHolder);
     canvas.class('w-100 h-100 hidden');
-    //canvas.hide();
 
   let bg = elements.bg = assets.background; 
   let matte = assets.matte;
@@ -128,23 +150,11 @@ function setup(){
   }
 
   // Set mask buffer to extra buffer IF FIREFOX
-  let maskBuffer = assets.matte;
-  if(IS_FIREFOX)
-    maskBuffer = elements.bBuffer;
-
-  let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
-  let fx = elements.fx = assets.flares;       
+  
+      
 
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
-
-  bg.attribute('playsinline', '');
-  bg.attribute('autoplay', '');
-  bg.attribute('muted', '');
-
-  matte.attribute('playsinline', '');
-  matte.attribute('autoplay', '');
-  matte.attribute('muted', '');
 }
 
 let ready = false;
@@ -161,9 +171,6 @@ let visible = false;
 
 function draw(){
   if(!ready){
-    assets.background.play();
-    assets.matte.play();
-
     render();
     ready = true;
   }
