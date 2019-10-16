@@ -302,7 +302,7 @@ function checkIfKeyExists(s3Key) {
 
 // Creates a key based on the input values - used to check if we already have something stored in S3.
 function generateKeyFromInput() {
-    return `/output/${$('#firstInput').val().toUpperCase().trim().split(' ').join('_').replace('#', '.')}~${$('#lastInput').val().toUpperCase().trim().split(' ').join('_').replace('#', '.')}`;
+    return `/output/${$('#firstInput').val().toUpperCase().trim().split(' ').join('_').replaceAll('#', '.')}~${$('#lastInput').val().toUpperCase().trim().split(' ').join('_').replaceAll('#', '.')}`;
 }
 
 

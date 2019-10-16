@@ -70,6 +70,7 @@ function preload(){
 }
 
 window.addEventListener("load", () => {
+  console.log("try load bg");
   let bg = assets.background = createVideo(['../videos/bg480brk.mp4'], () => {
     bg.attribute('playsinline', '');
     bg.attribute('autoplay', '');
@@ -80,6 +81,8 @@ window.addEventListener("load", () => {
     bg.hideControls();
     
     bg.play();
+
+    console.log("loaded bg");
 
     DURATION = bg.duration();
   });
@@ -289,7 +292,6 @@ function oncapture(t){
         let mw = mx*offset*7*SFW;
 
         let mask = elements.mask;
-
         mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
 
               .then(function(dt){
