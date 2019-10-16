@@ -108,7 +108,7 @@ router.post('/encode', (req, res) => {
           '-refs 5',
           '-c:v libx264',
           '-crf 23',
-          '-b:v 2500'
+          '-b:v 1024'
         ])
         .output(outputDir + '/' + req.body.path + '.mp4')
         .on('start', function(){
