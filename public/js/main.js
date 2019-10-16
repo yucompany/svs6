@@ -69,7 +69,7 @@ function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     console.log("loaded")
       bg.volume(0);  // Ensure volume is set to 1
-      //bg.play();
+      bg.play();
 
       DURATION = bg.duration();
   });
@@ -79,7 +79,7 @@ function preload(){
   
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
     matte.volume(0);
-    //matte.play();
+    matte.play();
   });
   matte.hide();
   matte.hideControls();
@@ -164,8 +164,8 @@ let visible = false;
 
 function draw(){
   if(!ready){
-    assets.background.play();
-    assets.matte.play();
+    //assets.background.play();
+    //assets.matte.play();
 
     render();
     ready = true;
