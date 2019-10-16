@@ -163,7 +163,7 @@ class Line extends SceneElement {
       else 
         len = this.charModifier = 1;
 
-      console.log("char modifier: " + this.charModifier);
+        //console.log("char mod: " + len);
 
     for(let i = 0; i < letters.length; i++){
       char = letters[i];
@@ -175,8 +175,8 @@ class Line extends SceneElement {
         letter = new Letter(0, 0, 1, null, char, -1);      
       
         
-      let sz = this.sizes[i] * CHARSIZE * this.segment * len;
-      let kz = this.spaces[i] * SPACING * this.segment * len;
+      let sz = this.sizes[i] * CHARSIZE * this.segment * len * SFW;
+      let kz = this.spaces[i] * SPACING * this.segment * len * SFW;
 
       this.stretch += (sz+kz);
 
@@ -239,7 +239,7 @@ class Line extends SceneElement {
 
         
 
-        letters[i].render(buffer, scale * 2.0 * m * CHARSIZE * this.charModifier, t);
+        letters[i].render(buffer, scale * SFW * 2.0 * m * CHARSIZE * this.charModifier, t);
       }
     }
 
@@ -254,9 +254,6 @@ class Mask extends SceneElement {
   
     this.source = src;
     this.dest = dest;
-
-    console.log(src);
-    console.log(dest);
   }
 
   mask(x1, y1, x2, y2, t){

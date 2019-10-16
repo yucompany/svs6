@@ -179,10 +179,10 @@ function draw(){
     TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
     updateProgressBar(TOTALPROGRESS);
 
+    //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
+
     if(capturing){
       let time = gTime;
-
-      console.log("capture");
 
       oncapture(time)
 

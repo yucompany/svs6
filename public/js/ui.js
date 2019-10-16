@@ -461,14 +461,14 @@ const updateFooterPos = function(){
                 }
             }
             else {
-                tempH += actabs.children[i].children[0].clientHeight + 20;
+                tempH += actabs.children[i].children[0].clientHeight + 15;
             }
             shownH = tempH;
         }
         i += 1;
     }
 
-    actabs.style.height = String(shownH + 80) + "px";
+    actabs.style.height = String(shownH + 60) + "px";
 
     if (hboFooterPos.top + 150 < window.innerHeight) {
         actFooter.style.position = "absolute";
