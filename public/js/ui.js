@@ -444,12 +444,14 @@ function updateTitleCardImage(blurred, shown){
         title.src = "../images/misc/title_card.jpg";
 }
 
+var footerHolder;
 const updateFooterPos = function(){
     const hboFooter = document.getElementById('footerChecker');
     const actFooter = document.getElementById('footer');
     const actabs = document.getElementById('actionables');
+    footerHolder = document.getElementById('footer-holder');
     var hboFooterPos = hboFooter.getBoundingClientRect();
-    
+    actabs.style.height = "auto";
     var shownH = actabs.children[0].clientHeight;
     let i = 1;
     while (actabs.children[i]) {
@@ -461,23 +463,25 @@ const updateFooterPos = function(){
                 }
             }
             else {
-                tempH += actabs.children[i].children[0].clientHeight + 25;
+                for (let j = 0; actabs.children[i].children[0].children[j]; j += 1) {
+                    tempH += actabs.children[i].children[0].children[j].clientHeight;
+                }
+                tempH += 25;
             }
             shownH = tempH;
         }
         i += 1;
     }
 
-    actabs.style.height = String(shownH + 60) + "px";
+    actabs.style.height = String(shownH + 65) + "px";
 
     if (hboFooterPos.top + 150 < window.innerHeight) {
-        actFooter.style.position = "absolute";
-        actFooter.style.bottom = "0";
+        footerHolder.style.height = String(window.innerHeight - hboFooterPos.top) + "px";
     }
     else{
-        actFooter.style.position = "unset";
-        actFooter.style.bottom = "unset";
+        footerHolder.style.height = "150px";
     }
+/*
 /*
     let page = document.getElementById('pagebody');
     let footer = document.getElementById('footer');
@@ -516,12 +520,23 @@ const updateFooterPos = function(){
 window.addEventListener("resize", () => {
     if (window.innerWidth != windowWidth) {
         updateFooterPos();
+        console.log('resize1');
+        setTimeout(function(){
+            updateFooterPos();
+             console.log('resize2');
+         }, 200);
     }
 });
 
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
     updateFooterPos();
+    console.log('load1');
     setTimeout(function(){
-        updateFooterPos();
+       updateFooterPos();
+       
+       setTimeout(function(){
+            updateUIVisibility(footerHolder, true);
+       }, 100);
+        console.log('load2');
     }, 500);
 });

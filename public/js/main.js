@@ -70,40 +70,48 @@ function preload(){
 }
 
 window.addEventListener("load", () => {
-  console.log("try load bg");
-  let bg = assets.background = createVideo(['../videos/bg480brk.mp4'], () => {
+  console.log("bg try load");
+  let bg = assets.background = createVideo(['../videos/bg480brk.mp4']);
+  bg.elt.addEventListener("loadeddata", () => {
+    console.log("bg loaded");
+
     bg.attribute('playsinline', '');
     bg.attribute('autoplay', '');
     bg.attribute('muted', '');
 
     bg.volume(0);  // Ensure volume is set to 1
-    bg.hide();
-    bg.hideControls();
+    
     
     bg.play();
 
-    console.log("loaded bg");
-
     DURATION = bg.duration();
-  });
+  })
+  bg.elt.load();
+
+  bg.hide();
+  bg.hideControls();
   
-  let matte = assets.matte = createVideo(['../videos/matte480brk.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/matte480brk.mp4']);
+  matte.elt.addEventListener("loadeddata", () => {
     matte.attribute('playsinline', '');
     matte.attribute('autoplay', '');
     matte.attribute('muted', '');
 
     matte.volume(0);
-    matte.hide();
-    matte.hideControls();
+   
 
     matte.play();
-
-    let maskBuffer = matte;
-    if(IS_FIREFOX)
-      maskBuffer = elements.bBuffer;
-
-    let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
   });
+  matte.elt.load();
+
+  matte.hide();
+  matte.hideControls();
+
+  let maskBuffer = matte;
+  if(IS_FIREFOX)
+    maskBuffer = elements.bBuffer;
+
+  let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
   
   let flares = assets.flares = loadImage("../images/misc/optics.png", () => {
     let fx = elements.fx = assets.flares;   
@@ -292,6 +300,7 @@ function oncapture(t){
         let mw = mx*offset*7*SFW;
 
         let mask = elements.mask;
+
         mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
 
               .then(function(dt){
