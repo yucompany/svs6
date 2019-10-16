@@ -26,6 +26,8 @@
   src: url("../fonts/OpenSans-Regular.ttf");
 }
 
+html{ overflow-y: scroll;}
+
 html * {
   font-family: "Helvetica Roman" !important;
 }
