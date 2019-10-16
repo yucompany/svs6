@@ -71,16 +71,28 @@ function preload(){
 
 window.addEventListener("load", () => {
   let bg = assets.background = createVideo(['../videos/bg480brk.mp4'], () => {
+    bg.attribute('playsinline', '');
+    bg.attribute('autoplay', '');
+    bg.attribute('muted', '');
+
     bg.volume(0);  // Ensure volume is set to 1
+    bg.hide();
+    bg.hideControls();
+    
     bg.play();
+
     DURATION = bg.duration();
   });
-
-  bg.hide();
-  bg.hideControls();
-
+  
   let matte = assets.matte = createVideo(['../videos/matte480brk.mp4'], () => {
+    matte.attribute('playsinline', '');
+    matte.attribute('autoplay', '');
+    matte.attribute('muted', '');
+
     matte.volume(0);
+    matte.hide();
+    matte.hideControls();
+
     matte.play();
 
     let maskBuffer = matte;
@@ -89,19 +101,7 @@ window.addEventListener("load", () => {
 
     let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
   });
-
-  matte.hide();
-  matte.hideControls();
-
-
-  bg.attribute('playsinline', '');
-  bg.attribute('autoplay', '');
-  bg.attribute('muted', '');
-
-  matte.attribute('playsinline', '');
-  matte.attribute('autoplay', '');
-  matte.attribute('muted', '');
-
+  
   let flares = assets.flares = loadImage("../images/misc/optics.png", () => {
     let fx = elements.fx = assets.flares;   
   });
