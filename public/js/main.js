@@ -175,9 +175,6 @@ function draw(){
   var PHASES = [.4, .2, .4];
 
 
-
-
-
  function render(){
     TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
     updateProgressBar(TOTALPROGRESS);
