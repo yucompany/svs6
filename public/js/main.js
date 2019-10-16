@@ -81,8 +81,6 @@ function preload(){
   matte.hide();
   matte.hideControls();
 
-  console.log("");
-
   let flares = assets.flares = loadImage("../images/misc/optics.png");
 }
 
@@ -147,7 +145,6 @@ function setup(){
   matte.attribute('playsinline', '');
   matte.attribute('autoplay', '');
   matte.attribute('muted', '');
-
 }
 
 let ready = false;
