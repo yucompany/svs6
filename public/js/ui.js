@@ -102,7 +102,7 @@ function showFacebookShare() {
     window.FB.ui({
         method: 'share',
         href: `http://hbo-bethevalley.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
-        quote: 'LOOK AT THIS CREATION!'
+        quote: 'Celebrate the final season with this custom title sequence generator.'
     }, (response) => {
         console.log(response);
     });
@@ -115,9 +115,9 @@ function showTwitterShare() {
     //params
     const params = {
      url: `http://bethevalley-test.us-west-2.elasticbeanstalk.com/?x=${DEEP_LINK_ID}`,
-     text: 'BE THE VALLEY - CHECK THIS LINK OUT ->',
-     via: 'leexperiential',
-     hashtags: "BeTheValley,Creation"
+     text: 'Celebrate the final season with this custom title sequence generator.',
+     via: 'HBO',
+     hashtags: "BeTheValley,SiliconValley,HBO"
     }
     for (let prop in params) shareURL += '&' + prop + '=' + encodeURIComponent(params[prop]);
 
@@ -126,8 +126,8 @@ function showTwitterShare() {
 
 function showEmailShare(){
     const params = {
-        subject: "Share your BE THE VALLEY experience!",
-        body: `Open the following link in your desktop browser to retrieve generated video:  ${VIDEOURL}`
+        subject: "Be The Valley",
+        body: `Here is a link to your video: ${VIDEOURL}`
     }
 
     const link = document.createElement('a');
@@ -381,6 +381,13 @@ const updateUIVisibility = function(e, visible){
     }
 }
 
+const checkUIVisibility = function(e){
+    if(e.classList.contains("hidden"))
+        return false;
+
+    return true;
+}
+
 addEventListener('started', () => {
     updateTitleCardImage(true);
     updateUIVisibility(document.getElementById("defaultCanvas0"), true);
@@ -390,8 +397,6 @@ addEventListener('started', () => {
 
     updateUIVisibility(submit, false);
     updateFooterPos();
-
-
 });
 
 addEventListener('ended', () => {
@@ -440,43 +445,78 @@ function updateTitleCardImage(blurred, shown){
 }
 
 const updateFooterPos = function(){
-    
     const hboFooter = document.getElementById('footerChecker');
     const actFooter = document.getElementById('footer');
     const actabs = document.getElementById('actionables');
     var hboFooterPos = hboFooter.getBoundingClientRect();
     
     var shownH = actabs.children[0].clientHeight;
-    var longH = actabs.children[0].clientHeight;
     let i = 1;
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
-            shownH = actabs.children[i].clientHeight;
-        }
-        if (actabs.children[i].clientHeight > longH){
-            longH = actabs.children[i].clientHeight;
+            let tempH = 0;
+            if (window.innerWidth < 576) {
+                for (let j = 0; actabs.children[i].children[j]; j += 1) {
+                    tempH += actabs.children[i].children[j].clientHeight;
+                }
+            }
+            else {
+                tempH += actabs.children[i].children[0].clientHeight + 20;
+            }
+            shownH = tempH;
         }
         i += 1;
     }
 
-    var marg = shownH - longH; 
-    actabs.style.marginBottom = marg + "px";
+    actabs.style.height = String(shownH + 80) + "px";
 
     if (hboFooterPos.top + 150 < window.innerHeight) {
         actFooter.style.position = "absolute";
         actFooter.style.bottom = "0";
-        console.log("ch is less");
     }
     else{
         actFooter.style.position = "unset";
         actFooter.style.bottom = "unset";
-        console.log("ch is more");
     }
+/*
+    let page = document.getElementById('pagebody');
+    let footer = document.getElementById('footer');
 
+    let submit = document.getElementById("submission");
+    let exporter = document.getElementById("exports");
+
+    
+    let sub = 0;
+    if(checkUIVisibility(submit))
+        sub += (exporter.offsetHeight - submit.offsetHeight);
+
+    let th = window.innerHeight;
+    let ch = page.offsetHeight;
+
+    footer.style.marginTop = -sub + "px";
+
+    //footer.style.position = 'absolute';
+    //footer.style.position = 'initial';
+    //footer.style.bottom = 'initial';
+
+    if(ch < th){
+        footer.style.position = 'absolute';
+        footer.style.bottom = '0px'
+
+        console.log('client height is LESSER than total height')
+    }
+    else {
+        footer.style.position = 'initial';
+        footer.style.bottom = 'initial';
+
+        console.log('client height is GREATER than total height')
+    }*/
 }
 
 window.addEventListener("resize", () => {
-    updateFooterPos();
+    if (window.innerWidth != windowWidth) {
+        updateFooterPos();
+    }
 });
 
 window.addEventListener("load", () => {
