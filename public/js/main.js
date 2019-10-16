@@ -66,7 +66,7 @@ p5.disableFriendlyErrors = true;
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bg2500.mp4'], () => {
       bg.volume(0);  // Ensure volume is set to 1
 
       DURATION = bg.duration();
@@ -75,7 +75,7 @@ function preload(){
   bg.hide();
   bg.hideControls();
   
-  let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/m2500.mp4'], () => {
     matte.volume(0);
   });
   matte.hide();
