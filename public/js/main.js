@@ -281,8 +281,6 @@ function oncapture(t){
                 
                   blendMode(SCREEN);
 
-                  console.log(`mask completed in ${dt/1000} seconds`);
-
                   let fx = elements.fx;
                       image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
