@@ -63,22 +63,19 @@ const onEnd = new Event("ended");
 
 p5.disableFriendlyErrors = true;
 
-var LOADED = 0;
-
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     //  bg.volume(0);
-    LOADED += 1; console.log("loaded bg");
   });
-  
+  bg.elt.load();
   bg.hide();
   bg.hideControls();
   
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
    // matte.volume(0);
-   LOADED += 1; console.log("loaded mat");
   });
+  matte.elt.load();
   matte.hide();
   matte.hideControls();
 
@@ -162,8 +159,8 @@ let visible = false;
 
 function draw(){
   if(!ready){
-    //assets.background.play();
-    //assets.matte.play();
+    assets.background.play();
+    assets.matte.play();
     
     render();
     ready = true;
@@ -176,7 +173,7 @@ function draw(){
   var PHASES = [.4, .2, .4];
 
 
-  var VIDEOPLAYS = false, VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
+  var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
   var PROGRESS = 0.0, SEQ = 0.0;
 
  function render(){
@@ -187,7 +184,7 @@ function draw(){
 
     let t = gTime;
 
-    if(capturing && LOADED >= 2){
+    if(capturing){
 
       let bg = assets.background; 
       let matte = assets.matte; 
@@ -196,11 +193,7 @@ function draw(){
       
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
-      if(!VIDEOPLAYS){
-          bg.play();
-          matte.play();
-          VIDEOPLAYS = true;
-      }
+      
 
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOREADY && !SEEKED){
