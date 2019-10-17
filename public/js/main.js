@@ -11,10 +11,9 @@ const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  /
 var FIRSTNAME, LASTNAME;
 
 const framerate = 12;
-const duration = 10;
 
 const START = 3.0;
-var   DURATION = 1.0;
+const DURATION = 10.0;
 
 const WIDTH = 854;
 const HEIGHT = 480;
@@ -67,16 +66,14 @@ p5.disableFriendlyErrors = true;
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
-      bg.volume(0);  // Ensure volume is set to 1
-
-      DURATION = bg.duration();
+    //  bg.volume(0);
   });
   
   bg.hide();
   bg.hideControls();
   
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
-    matte.volume(0);
+   // matte.volume(0);
   });
   matte.hide();
   matte.hideControls();
@@ -113,9 +110,8 @@ function setup(){
   frameRate(framerate);
 
   canvas = createCanvas(WIDTH, HEIGHT);
-    canvas.parent(canvasHolder);
-    canvas.class('w-100 h-100');
-    //canvas.hide();
+           canvas.parent(canvasHolder);
+           canvas.class('w-100 h-100');
 
   let bg = elements.bg = assets.background; 
   let matte = assets.matte;
@@ -154,16 +150,13 @@ let gTime = 0;
 let playing = false;
 
 let f = (framerate * START);
-let tf = (framerate * duration * 1.0);
+let tf = (framerate * DURATION);
 
 let visible = false;
 
 
 function draw(){
   if(!ready){
-    assets.background.play();
-    assets.matte.play();
-
     render();
     ready = true;
   }
@@ -181,10 +174,10 @@ function draw(){
 
     //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
 
-    if(capturing){
-      let time = gTime;
+    gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
-      oncapture(time)
+    if(capturing){
+      oncapture(gTime)
 
         .then(() => {
           requestAnimationFrame(render);
@@ -194,7 +187,7 @@ function draw(){
       requestAnimationFrame(render);
 }
 
-
+var VIDEOLOAD = false;
 var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
 var PROGRESS = 0.0, SEQ = 0.0;
 
@@ -206,11 +199,21 @@ var center = {x:0, y:0};
 function oncapture(t){
 
   return new Promise((resolve, reject) => {
+      let bg = assets.background; 
+      let matte = assets.matte; 
+
+      if(!VIDEOLOAD){
+        bg.play();
+        matte.play();
+
+        VIDEOLOAD = true;
+      }
+      let bgbf = bg.elt.buffered;
+      let mbf = matte.elt.buffered;
+      
 
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
-      let bg = assets.background; let bgbf = bg.elt.buffered;
-      let matte = assets.matte; let mbf = matte.elt.buffered;
 
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOREADY && !SEEKED){
@@ -226,7 +229,7 @@ function oncapture(t){
         }
       }
       VIDEOPLAY = !(bg.elt.seeking || matte.elt.seeking);
-
+      
 
       // DRAWING
 
@@ -288,13 +291,17 @@ function oncapture(t){
               .then(function(dt){
                   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
+                  console.log(`masked in ${dt/1000} seconds`);
+
                   blendMode(SCREEN);
 
                   let fx = elements.fx;
                       image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-                  if(VIDEOREADY && VIDEOPLAY)
+                  if(VIDEOREADY && VIDEOPLAY) {
+                    console.log("capture frame");
                     return capture.captureFrame(dt);
+                  }
               })
                 
               .then(function(fr){
@@ -302,6 +309,8 @@ function oncapture(t){
                     capture.addFrame(fr);
 
                   if(VIDEOPLAY && VIDEOREADY){
+                    console.log("next frame");
+
                     if(f <= tf)
                       f += 1.0;
 
@@ -314,7 +323,7 @@ function oncapture(t){
                       capture.stopCapture();
                       capturing = false;
                   }
-                  else
+                  else 
                     TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
                 })
 
