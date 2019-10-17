@@ -63,12 +63,20 @@ const onEnd = new Event("ended");
 
 p5.disableFriendlyErrors = true;
 
+let seekers = 0;
+function onVideoSeek(){
+  seekers++;
+  console.log("seek: " + seekers);
+}
+
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     //  bg.volume(0);
   });
   bg.elt.load();
+  bg.elt.addEventListener("seeked", onVideoSeek);
+
   bg.hide();
   bg.hideControls();
   
@@ -76,6 +84,8 @@ function preload(){
    // matte.volume(0);
   });
   matte.elt.load();
+  matte.elt.addEventListener("seeked", onVideoSeek);
+
   matte.hide();
   matte.hideControls();
 
@@ -169,6 +179,7 @@ function draw(){
 
 
 
+
   var TOTALPROGRESS = 0.0, TARGETPROGRESS = 0.0;
   var PHASES = [.4, .2, .4];
 
@@ -193,14 +204,12 @@ function draw(){
       
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
-      
-
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOREADY && !SEEKED){
         if(playing){
           bg.time(t);
           matte.time(t);
-    
+
           SEEKED = true;
         }  
         else{
@@ -208,7 +217,7 @@ function draw(){
           matte.time(0);
         }
       }
-      VIDEOPLAY = !(bg.elt.seeking || matte.elt.seeking);
+      VIDEOPLAY = (seekers >= 2);
 
       blendMode(BLEND);
       
@@ -303,6 +312,7 @@ function oncapture(t){
 
                     gTime = clamp((f/tf)*DURATION, 0, DURATION);
                     SEEKED = false;
+                    seekers = 0;
                   }
 
                   PROGRESS = clamp(f/tf, 0, 1);
