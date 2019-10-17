@@ -11,10 +11,9 @@ const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  /
 var FIRSTNAME, LASTNAME;
 
 const framerate = 12;
-const duration = 10;
 
 const START = 3.0;
-var   DURATION = 1.0;
+const DURATION = 10.0;
 
 const WIDTH = 854;
 const HEIGHT = 480;
@@ -67,16 +66,14 @@ p5.disableFriendlyErrors = true;
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
-      bg.volume(0);  // Ensure volume is set to 1
-
-      DURATION = bg.duration();
+    //  bg.volume(0);
   });
   
   bg.hide();
   bg.hideControls();
   
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
-    matte.volume(0);
+   // matte.volume(0);
   });
   matte.hide();
   matte.hideControls();
@@ -113,9 +110,8 @@ function setup(){
   frameRate(framerate);
 
   canvas = createCanvas(WIDTH, HEIGHT);
-    canvas.parent(canvasHolder);
-    canvas.class('w-100 h-100');
-    //canvas.hide();
+           canvas.parent(canvasHolder);
+           canvas.class('w-100 h-100');
 
   let bg = elements.bg = assets.background; 
   let matte = assets.matte;
@@ -150,11 +146,12 @@ function setup(){
 let ready = false;
 let capturing = false;
 
-let gTime = 0;
 let playing = false;
 
 let f = (framerate * START);
-let tf = (framerate * duration * 1.0);
+let tf = (framerate * DURATION);
+
+let gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
 let visible = false;
 
@@ -163,7 +160,7 @@ function draw(){
   if(!ready){
     assets.background.play();
     assets.matte.play();
-
+    
     render();
     ready = true;
   }
@@ -175,42 +172,25 @@ function draw(){
   var PHASES = [.4, .2, .4];
 
 
+  var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
+  var PROGRESS = 0.0, SEQ = 0.0;
+
  function render(){
     TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
     updateProgressBar(TOTALPROGRESS);
 
     //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
 
+    let t = gTime;
+
     if(capturing){
-      let time = gTime;
 
-      oncapture(time)
-
-        .then(() => {
-          requestAnimationFrame(render);
-        })
-    }
-    else
-      requestAnimationFrame(render);
-}
-
-
-var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
-var PROGRESS = 0.0, SEQ = 0.0;
-
-
-// Sequence variables
-var offset = 0.0;
-var center = {x:0, y:0};
-
-function oncapture(t){
-
-  return new Promise((resolve, reject) => {
-
+      let bg = assets.background; 
+      let matte = assets.matte; 
+      let bgbf = bg.elt.buffered;
+      let mbf = matte.elt.buffered;
+      
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
-
-      let bg = assets.background; let bgbf = bg.elt.buffered;
-      let matte = assets.matte; let mbf = matte.elt.buffered;
 
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOREADY && !SEEKED){
@@ -227,54 +207,65 @@ function oncapture(t){
       }
       VIDEOPLAY = !(bg.elt.seeking || matte.elt.seeking);
 
-
-      // DRAWING
-
-        blendMode(BLEND);
-         // Draw buffers IF FIREFOX
-        if(IS_FIREFOX){
-          let aBuffer = elements.aBuffer;
-          let bBuffer = elements.bBuffer;
-
-          aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
-          image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
-
-          bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
-        }
-        else 
-          image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
-
-
-        let buffer = elements.buffer;
-            buffer.clear();
-
-
-        let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
-        let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
-
-
-        offset = lerp(.66, .97, SEQ);
-        
-        center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
-        center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
-
-        if(lineA.active){
-          let line1 = elements.line1;
-            line1.x = ((offset * lineA.origin.x) + dx)*SFW;
-            line1.y = ((offset * lineA.origin.y) + dy)*SFH;
-            line1.scale = offset;
-            line1.render(buffer, 1, t);
-        }
+      blendMode(BLEND);
       
-        if(lineB.active){
-          let line2 = elements.line2;
-              line2.x = ((offset * lineB.origin.x) + dx)*SFW;
-              line2.y = ((offset * lineB.origin.y) + dy)*SFH;
-              line2.scale = offset;
-              line2.render(buffer, 1, t);
-        }
+      // Draw buffers IF FIREFOX
+      if(IS_FIREFOX){
+        let aBuffer = elements.aBuffer;
+        let bBuffer = elements.bBuffer;
+
+        aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
+        image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
+
+        bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
+      }
+      else 
+        image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
 
 
+      let buffer = elements.buffer;
+          buffer.clear();
+
+      let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
+      let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
+
+      offset = lerp(.66, .97, SEQ);
+      
+      center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
+      center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
+
+      if(lineA.active){
+        let line1 = elements.line1;
+          line1.x = ((offset * lineA.origin.x) + dx)*SFW;
+          line1.y = ((offset * lineA.origin.y) + dy)*SFH;
+          line1.scale = offset;
+          line1.render(buffer, 1, t);
+      }
+    
+      if(lineB.active){
+        let line2 = elements.line2;
+            line2.x = ((offset * lineB.origin.x) + dx)*SFW;
+            line2.y = ((offset * lineB.origin.y) + dy)*SFH;
+            line2.scale = offset;
+            line2.render(buffer, 1, t);
+      }
+
+      oncapture(t)
+        .then(() => {
+          requestAnimationFrame(render);
+        })
+    }
+    else
+      requestAnimationFrame(render);
+}
+
+
+// Sequence variables
+var offset = 0.0;
+var center = {x:0, y:0};
+
+function oncapture(t){
+  return new Promise((resolve, reject) => {
         let mx = 127;
         let my = 67;
 
@@ -282,19 +273,20 @@ function oncapture(t){
         let mw = mx*offset*7*SFW;
 
         let mask = elements.mask;
-
         mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
+              .then(function(dt){ 
+                  let buffer = elements.buffer;
+                  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
 
-              .then(function(dt){
-                  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
-
+                
                   blendMode(SCREEN);
 
                   let fx = elements.fx;
                       image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-                  if(VIDEOREADY && VIDEOPLAY)
+                  if(VIDEOREADY && VIDEOPLAY) {
                     return capture.captureFrame(dt);
+                  }
               })
                 
               .then(function(fr){
@@ -302,6 +294,7 @@ function oncapture(t){
                     capture.addFrame(fr);
 
                   if(VIDEOPLAY && VIDEOREADY){
+
                     if(f <= tf)
                       f += 1.0;
 
@@ -314,15 +307,13 @@ function oncapture(t){
                       capture.stopCapture();
                       capturing = false;
                   }
-                  else
+                  else 
                     TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
                 })
 
               .then(() => {
                 resolve();
               })
-
-
     });
 }
 
