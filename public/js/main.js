@@ -146,11 +146,12 @@ function setup(){
 let ready = false;
 let capturing = false;
 
-let gTime = 0;
 let playing = false;
 
 let f = (framerate * START);
 let tf = (framerate * DURATION);
+
+let gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
 let visible = false;
 
@@ -174,7 +175,7 @@ function draw(){
 
     //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
 
-    gTime = clamp((f/tf)*DURATION, 0, DURATION);
+    //gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
     if(capturing){
       oncapture(gTime)
@@ -291,15 +292,12 @@ function oncapture(t){
               .then(function(dt){
                   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-                  console.log(`masked in ${dt/1000} seconds`);
-
                   blendMode(SCREEN);
 
                   let fx = elements.fx;
                       image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
                   if(VIDEOREADY && VIDEOPLAY) {
-                    console.log("capture frame");
                     return capture.captureFrame(dt);
                   }
               })
@@ -309,7 +307,6 @@ function oncapture(t){
                     capture.addFrame(fr);
 
                   if(VIDEOPLAY && VIDEOREADY){
-                    console.log("next frame");
 
                     if(f <= tf)
                       f += 1.0;

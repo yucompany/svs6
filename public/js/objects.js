@@ -274,12 +274,7 @@ class Mask extends SceneElement {
       }
 
       dest.updatePixels();
-
-      setTimeout(() => {
-        res((Date.now() - t));
-      }, 0);
-      
-
+      res((Date.now() - t));
     });
     
   }
