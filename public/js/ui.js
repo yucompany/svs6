@@ -404,6 +404,10 @@ addEventListener('ended', () => {
     updateFooterPos();
 });
 
+addEventListener('loadcomplete', () => {
+    updateUIVisibility(submit, true);
+})
+
 addEventListener('previewed', () => {
     updateUIVisibility(document.getElementById("defaultCanvas0"), false);
     updateUIVisibility(exporting, true);

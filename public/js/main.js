@@ -60,22 +60,30 @@ var elements = {
 
 const onStart = new Event("started");
 const onEnd = new Event("ended");
-const onLoad = new Event("loaded");
+const onLoad = new Event("loadcomplete");
 
 p5.disableFriendlyErrors = true;
 
 var VIDEOLOAD = false;
 var loadA = false, loadB = false;
 
+function onload(){
+  if(!VIDEOLOAD){
+    assets.background.play();
+    assets.matte.play();
+
+    VIDEOLOAD = true;
+    dispatchEvent(onLoad);
+  }
+}
+
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     //  bg.volume(0);
     loadA = true;
-    if(loadB){
-      VIDEOLOAD = true;
-      dispatchEvent(onLoad);
-    }
+    if(loadB)
+      onload();
   });
   bg.elt.load();
 
@@ -86,10 +94,8 @@ function preload(){
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
     // matte.volume(0);
     loadB = true;
-    if(loadA){
-      VIDEOLOAD = true;
-      dispatchEvent(onLoad);
-    }
+    if(loadA)
+      onload();
   });
   matte.elt.load();
 
@@ -176,9 +182,6 @@ let visible = false;
 
 function draw(){
   if(!ready){
-    assets.background.play();
-    assets.matte.play();
-    
     render();
     ready = true;
   }
