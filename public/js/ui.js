@@ -368,6 +368,8 @@ const updateUIVisibility = function(e, visible){
         e.classList.remove("hidden");
 
       e.classList.add("shown");
+
+      updateFooterPos();
     }
     else{
       if(e.classList.contains("hidden")) return;
@@ -376,6 +378,8 @@ const updateUIVisibility = function(e, visible){
         e.classList.remove("shown");
 
       e.classList.add("hidden");
+
+      updateFooterPos();
     }
 }
 
@@ -394,10 +398,10 @@ addEventListener('started', () => {
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
-    updateFooterPos();
+    //updateFooterPos();
     console.log("started");
     setTimeout(function(){
-        updateFooterPos();
+        //updateFooterPos();
         console.log("started2");
      }, 200);
 });
@@ -406,10 +410,10 @@ addEventListener('ended', () => {
     updateUIVisibility(loadingHolder, false);
 
     showVideoPreview();
-    updateFooterPos();
+    //updateFooterPos();
     console.log("ended1");
     setTimeout(function(){
-        updateFooterPos();
+        //updateFooterPos();
         console.log("ended2");
      }, 200);
 });
@@ -422,10 +426,10 @@ addEventListener('previewed', () => {
     updateUIVisibility(document.getElementById("defaultCanvas0"), false);
     updateUIVisibility(exporting, true);
 
-    updateFooterPos();
+    //updateFooterPos();
     console.log("Previewed1");
     setTimeout(function(){
-        updateFooterPos();
+        //updateFooterPos();
         console.log("previewed2");
     }, 1000);
 });
@@ -437,7 +441,7 @@ addEventListener('resetted', () => {
     updateUIVisibility(exporting, false);
     updateUIVisibility(videoPreview, false);
 
-    updateFooterPos();
+  //  updateFooterPos();
     console.log("reset1");
     
     // Clear form
@@ -507,19 +511,19 @@ const updateFooterPos = function(){
 
 window.addEventListener("resize", () => {
     if (window.innerWidth != windowWidth) {
-        updateFooterPos();
+       // updateFooterPos();
         console.log("resize1");
         setTimeout(function(){
-            updateFooterPos();
+         //   updateFooterPos();
             console.log("resize2");
          }, 200);
     }
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-    updateFooterPos();
+   // updateFooterPos();
     setTimeout(function(){
-       updateFooterPos();
+     //  updateFooterPos();
        
        console.log("DOMCLoad1");
        setTimeout(function(){
