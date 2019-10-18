@@ -102,23 +102,22 @@ function tryVideo(video){
     return video.play()
 
     .then(() => {
-      console.log("success play video");
       return;
     })
     .catch((err) => {
-      console.log("could not play video");
       return err;
     }) 
 }
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgnew.mp4']);
-    bg.elt.src = '../videos/bgnew.mp4';
+  let bg = assets.background = createVideo(['../videos/bgold.mp4'], () => {
+    bg.volume(0);
+  });
+    bg.elt.src = '../videos/bgold.mp4';
     bg.elt.removeChild(bg.elt.childNodes[0]);
 
     bg.elt.addEventListener("loadeddata", () => {
-      console.log("background can play");
       loadA = true;
       if(loadB)
         onload();
@@ -129,12 +128,13 @@ function preload(){
     bg.hideControls();
   
 
-  let matte = assets.matte = createVideo(['../videos/mlat.mp4']);
-    matte.elt.src = '../videos/mlat.mp4';
+  let matte = assets.matte = createVideo(['../videos/matteold.mp4'], () => {
+    matte.volume(0);
+  });
+    matte.elt.src = '../videos/matteold.mp4';
     matte.elt.removeChild(matte.elt.childNodes[0]);
 
     matte.elt.addEventListener("loadeddata", () => {
-      console.log("matte can play");
       loadB = true;
       if(loadA)
         onload();
@@ -267,7 +267,7 @@ function draw(){
           matte.time(0);
         }
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3);
 
       blendMode(BLEND);
       
@@ -313,11 +313,11 @@ function draw(){
       }
 
       if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
-        oncapture(t)
+          oncapture(t)
           .then(() => {
-            console.log("captured frame");
             requestAnimationFrame(render);
           })
+        
       }
       else
         requestAnimationFrame(render);
@@ -341,8 +341,6 @@ function oncapture(t){
   let mask = elements.mask;
   return mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
         .then(function(dt){ 
-            console.log("masked frame");
-
             let buffer = elements.buffer;
             image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
           
