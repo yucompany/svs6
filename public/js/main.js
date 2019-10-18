@@ -193,8 +193,8 @@ function draw(){
 
       let bg = assets.background; 
       let matte = assets.matte; 
-      let bgbf = bg.elt.seekable;
-      let mbf = matte.elt.seekable;
+      let bgbf = bg.elt.buffered;
+      let mbf = matte.elt.buffered;
       
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
