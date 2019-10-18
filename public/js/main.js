@@ -63,36 +63,22 @@ const onEnd = new Event("ended");
 
 p5.disableFriendlyErrors = true;
 
-let seekers = 0;
-function onVideoSeek(){
-  seekers++;
-  console.log("seek: " + seekers);
-}
 
 // Load all base assets here
 function preload(){
-  let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
-    // matte.volume(0);
-   });
-   matte.elt.load();
-   matte.elt.addEventListener("seeked", onVideoSeek);
-
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     //  bg.volume(0);
   });
   bg.elt.load();
-  bg.elt.addEventListener("seeked", onVideoSeek);
-  bg.elt.addEventListener("timeupdate", () => {
-    let bgt = bg.time();
-    console.log(`bg time is ${bgt}`)
-
-    matte.time(bgt);
-  })
 
   bg.hide();
   bg.hideControls();
   
- 
+
+  let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
+    // matte.volume(0);
+  });
+  matte.elt.load();
 
   matte.hide();
   matte.hideControls();
@@ -207,8 +193,8 @@ function draw(){
 
       let bg = assets.background; 
       let matte = assets.matte; 
-      let bgbf = bg.elt.buffered;
-      let mbf = matte.elt.buffered;
+      let bgbf = bg.elt.seekable;
+      let mbf = matte.elt.seekable;
       
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
@@ -216,16 +202,16 @@ function draw(){
       if(VIDEOREADY && !SEEKED){
         if(playing){
           bg.time(t);
-          //matte.time(t);
+          matte.time(t);
 
           SEEKED = true;
         }  
         else{
           bg.time(0);
-          //matte.time(0);
+          matte.time(0);
         }
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
 
       blendMode(BLEND);
       
@@ -320,7 +306,6 @@ function oncapture(t){
 
                     gTime = clamp((f/tf)*DURATION, 0, DURATION);
                     SEEKED = false;
-                    seekers = 0;
                   }
 
                   PROGRESS = clamp(f/tf, 0, 1);
