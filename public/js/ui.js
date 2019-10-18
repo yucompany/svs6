@@ -369,7 +369,6 @@ const updateUIVisibility = function(e, visible){
 
       e.classList.add("shown");
 
-      updateFooterPos();
     }
     else{
       if(e.classList.contains("hidden")) return;
@@ -379,8 +378,8 @@ const updateUIVisibility = function(e, visible){
 
       e.classList.add("hidden");
 
-      updateFooterPos();
     }
+    updateFooterPos();
 }
 
 const checkUIVisibility = function(e){
