@@ -69,11 +69,8 @@ var loadA = false, loadB = false;
 
 function onload(){
   if(!VIDEOLOAD){
-      playVideos()
-      .then(() => {
-        VIDEOLOAD = true;
-        dispatchEvent(onLoad);
-      })
+    VIDEOLOAD = true;
+    dispatchEvent(onLoad);
   }
 }
 
@@ -83,45 +80,21 @@ function playVideos(){
       videos.push(assets.background.elt);
       videos.push(assets.matte.elt);
 
-  return videos.reduce((prev, curr, index) => {
-    return prev
-        .then(() => {
-          console.log("success video");
-          return tryVideo(curr);
-        })
-        .catch((err) => {
-          console.log("fail video");
-          return tryVideo(prev)
-        })
-  }, Promise.resolve()) // Send all encoded frames to resolve
-
-
   return new Promise((resolve, reject) => {
-    while(played < 2){
-      if(played == 0){
-        return tryVideo((assets.background.elt))
-        .then(() => {
-          console.log("success bg play");
-          ++played;
-        })
-        .catch((err) => {
-          played = 0;
-        })
-      }
-      else if(played == 1){
-        return tryVideo((assets.matte.elt))
-        .then(() => {
-          console.log("success matte play");
-          ++played;
-        })
-        .catch((err) => {
-          played = 1;
-        })
-      }
-    }
-
-    resolve();
-  })
+    tryVideo(videos[0])
+    .then(() => {
+      tryVideo(videos[1])
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        reject(err);
+      })
+    })
+    .catch((err) => {
+      reject(err);
+    })
+  });
   
 }
 
@@ -506,21 +479,30 @@ function initialize(){
     container.clear();
     container.populate(LASTNAME, lineB.time);
 
-    let bg = assets.background;
-    let matte = assets.matte;
-        
-    bg.time(0);
-    matte.time(0);
+    function begin(){
+      let bg = assets.background;
+      let matte = assets.matte;
+          
+      bg.time(0);
+      matte.time(0);
 
-    PROGRESS = 0.0;
-    TOTALPROGRESS = 0.0;
-    TARGETPROGRESS = 0.0;
+      PROGRESS = 0.0;
+      TOTALPROGRESS = 0.0;
+      TARGETPROGRESS = 0.0;
 
-    gTime = 0; f = (framerate * START);
-    playing = true;
+      gTime = 0; f = (framerate * START);
+      playing = true;
 
-    capture.beginCapture(framerate);
-    dispatchEvent(onStart); // Fire initialized event
+      capture.beginCapture(framerate);
+      dispatchEvent(onStart); // Fire initialized event
+    }
+
+    function attemptStart(){
+      playVideos()
+      .then(begin)
+      .catch(attemptStart)
+    }
+    attemptStart();
 }
 
 // Exec on page load
