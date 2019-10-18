@@ -496,7 +496,7 @@ const updateFooterPos = function(){
     }
 
     actabs.style.height = String(shownH + 65) + "px";
-    console.log("final height is :" + tempH);
+    console.log("final height is :" + shownH);
     var hboFooterPos = hboFooter.getBoundingClientRect();
     console.log("adjusting footer box, since footerPos is " + hboFooterPos.top + " window height is: " + window.innerHeight);
     if (hboFooterPos.top + 150 < window.innerHeight) {
