@@ -317,7 +317,6 @@ function triggerVideoDownload(videoFile) {
     const link = document.createElement('a');
 
     link.href = videoFile;
-    link.setAttribute('target'); //Trigger download in new window
 
     if (link.href) {
         // File name for downloaded file.
@@ -335,7 +334,6 @@ function triggerPhotoDownload(imageFile) {
 
     // We'll want to replace this with the client's S3 bucket address.
     link.href = imageFile;
-    link.setAttribute('target'); //Trigger download in new window
 
     // File name for downloaded file.
     link.download = `${$('#firstInput').val().toUpperCase().trim()}~${$('#lastInput').val().toUpperCase().trim()}~VALLEY.jpg`
