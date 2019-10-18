@@ -69,35 +69,104 @@ var loadA = false, loadB = false;
 
 function onload(){
   if(!VIDEOLOAD){
-    assets.background.play();
-    assets.matte.play();
-
-    VIDEOLOAD = true;
-    dispatchEvent(onLoad);
+      playVideos()
+      .then(() => {
+        VIDEOLOAD = true;
+        dispatchEvent(onLoad);
+      })
   }
+}
+
+function playVideos(){
+  let played = 0;
+  let videos = [];  
+      videos.push(assets.background.elt);
+      videos.push(assets.matte.elt);
+
+  return videos.reduce((prev, curr, index) => {
+    return prev
+        .then(() => {
+          console.log("success video");
+          return tryVideo(curr);
+        })
+        .catch((err) => {
+          console.log("fail video");
+          return tryVideo(prev)
+        })
+  }, Promise.resolve()) // Send all encoded frames to resolve
+
+
+  return new Promise((resolve, reject) => {
+    while(played < 2){
+      if(played == 0){
+        return tryVideo((assets.background.elt))
+        .then(() => {
+          console.log("success bg play");
+          ++played;
+        })
+        .catch((err) => {
+          played = 0;
+        })
+      }
+      else if(played == 1){
+        return tryVideo((assets.matte.elt))
+        .then(() => {
+          console.log("success matte play");
+          ++played;
+        })
+        .catch((err) => {
+          played = 1;
+        })
+      }
+    }
+
+    resolve();
+  })
+  
+}
+
+function tryVideo(video){
+    return video.play()
+
+    .then(() => {
+      console.log("success play video");
+      return;
+    })
+    .catch((err) => {
+      console.log("could not play video");
+      return err;
+    }) 
 }
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
-    //  bg.volume(0);
-    loadA = true;
-    if(loadB)
-      onload();
-  });
-  bg.elt.load();
+  let bg = assets.background = createVideo(['../videos/bgnew.mp4']);
+    bg.elt.src = '../videos/bgnew.mp4';
+    bg.elt.removeChild(bg.elt.childNodes[0]);
 
-  bg.hide();
-  bg.hideControls();
+    bg.elt.addEventListener("loadeddata", () => {
+      console.log("background can play");
+      loadA = true;
+      if(loadB)
+        onload();
+    })
+    bg.elt.load();
+
+    bg.hide();
+    bg.hideControls();
   
 
-  let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
-    // matte.volume(0);
-    loadB = true;
-    if(loadA)
-      onload();
-  });
-  matte.elt.load();
+  let matte = assets.matte = createVideo(['../videos/mlat.mp4']);
+    matte.elt.src = '../videos/mlat.mp4';
+    matte.elt.removeChild(matte.elt.childNodes[0]);
+
+    matte.elt.addEventListener("loadeddata", () => {
+      console.log("matte can play");
+      loadB = true;
+      if(loadA)
+        onload();
+    });
+    matte.elt.load();
 
   matte.hide();
   matte.hideControls();
@@ -186,8 +255,6 @@ function draw(){
     ready = true;
   }
 }
-
-
 
 
   var TOTALPROGRESS = 0.0, TARGETPROGRESS = 0.0;
