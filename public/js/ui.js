@@ -439,10 +439,6 @@ addEventListener('resetted', () => {
 
     updateFooterPos();
     console.log("reset1");
-    setTimeout(function(){
-        updateFooterPos();
-        console.log("reset2");
-    }, 1000);
     
     // Clear form
     nameform.reset();
@@ -462,27 +458,33 @@ function updateTitleCardImage(blurred, shown){
 
 var footerHolder;
 const updateFooterPos = function(){
+    const actabs = document.getElementById('actionables');
+    actabs.style.height = "fit-content";
+    console.log("freed actabs is :" + actabs.clientHeight);
     const hboFooter = document.getElementById('footerChecker');
     const actFooter = document.getElementById('footer');
-    const actabs = document.getElementById('actionables');
     footerHolder = document.getElementById('footer-holder');
-    var hboFooterPos = hboFooter.getBoundingClientRect();
-    actabs.style.height = "auto";
     var shownH = 5;
     let i = 0;
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
             let tempH = 0;
+            console.log("got a shown" + i);
             if (window.innerWidth < 576) {
                 for (let j = 0; actabs.children[i].children[j]; j += 1) {
                     tempH += actabs.children[i].children[j].clientHeight;
+                    console.log("vertical height at " + j + " is :" + tempH);
                 }
+                console.log("vertical height is :" + tempH);
             }
             else {
                 for (let j = 0; actabs.children[i].children[0].children[j]; j += 1) {
                     tempH += actabs.children[i].children[0].children[j].clientHeight;
+                    console.log("landscape height at " + j + " is :" + tempH);
                 }
                 tempH += 25;
+
+                console.log("landscape height is :" + tempH);
             }
             shownH = tempH;
         }
@@ -490,13 +492,17 @@ const updateFooterPos = function(){
     }
 
     actabs.style.height = String(shownH + 65) + "px";
-
+    console.log("final height is :" + tempH);
+    var hboFooterPos = hboFooter.getBoundingClientRect();
+    console.log("adjusting footer box, since footerPos is " + hboFooterPos.top + " window height is: " + window.innerHeight);
     if (hboFooterPos.top + 150 < window.innerHeight) {
         footerHolder.style.height = String(window.innerHeight - hboFooterPos.top) + "px";
+        
     }
     else{
         footerHolder.style.height = "150px";
     }
+    console.log("====================");
 }
 
 window.addEventListener("resize", () => {
