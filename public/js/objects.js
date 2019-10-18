@@ -274,7 +274,7 @@ class Mask extends SceneElement {
       }
 
       dest.updatePixels();
-      res((Date.now() - t));
+      res((Date.now() - t)*2);
     });
     
   }

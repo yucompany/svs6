@@ -1264,6 +1264,9 @@ const verifyName = function(){
     var throwRepeat = function(){
         reset();
     }
+    var throwOverflow = function(){
+        alert("Oops! You tried to submit more than 7 characters per line. Try again!");
+    }
 
     let first = firstname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
     let last = lastname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
@@ -1291,6 +1294,13 @@ const verifyName = function(){
     let trimBoth = trimFirst+trimLast;
     if(PROHIBIGEX.test(trimBoth)){
         throwProfanity();
+        return;
+    }
+
+    /* Test for OVERFLOW */
+
+    if(first.length > 7 || last.length > 7){
+        throwOverflow();
         return;
     }
 

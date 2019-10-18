@@ -60,14 +60,30 @@ var elements = {
 
 const onStart = new Event("started");
 const onEnd = new Event("ended");
+const onLoad = new Event("loadcomplete");
 
 p5.disableFriendlyErrors = true;
 
+var VIDEOLOAD = false;
+var loadA = false, loadB = false;
+
+function onload(){
+  if(!VIDEOLOAD){
+    assets.background.play();
+    assets.matte.play();
+
+    VIDEOLOAD = true;
+    dispatchEvent(onLoad);
+  }
+}
 
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     //  bg.volume(0);
+    loadA = true;
+    if(loadB)
+      onload();
   });
   bg.elt.load();
 
@@ -77,6 +93,9 @@ function preload(){
 
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
     // matte.volume(0);
+    loadB = true;
+    if(loadA)
+      onload();
   });
   matte.elt.load();
 
@@ -163,9 +182,6 @@ let visible = false;
 
 function draw(){
   if(!ready){
-    assets.background.play();
-    assets.matte.play();
-    
     render();
     ready = true;
   }
@@ -199,7 +215,7 @@ function draw(){
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
-      if(VIDEOREADY && !SEEKED){
+      if(VIDEOLOAD && VIDEOREADY && !SEEKED){
         if(playing){
           bg.time(t);
           matte.time(t);
@@ -256,7 +272,7 @@ function draw(){
             line2.render(buffer, 1, t);
       }
 
-      if(VIDEOREADY && VIDEOPLAY && SEEKED){
+      if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
         oncapture(t)
           .then(() => {
             requestAnimationFrame(render);

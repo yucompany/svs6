@@ -414,6 +414,10 @@ addEventListener('ended', () => {
      }, 200);
 });
 
+addEventListener('loadcomplete', () => {
+    updateUIVisibility(submit, true);
+})
+
 addEventListener('previewed', () => {
     updateUIVisibility(document.getElementById("defaultCanvas0"), false);
     updateUIVisibility(exporting, true);
