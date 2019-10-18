@@ -60,14 +60,17 @@ var elements = {
 
 const onStart = new Event("started");
 const onEnd = new Event("ended");
+const onLoad = new Event("loaded");
 
 p5.disableFriendlyErrors = true;
 
+var loadA = false, loadB = false;
 
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgnew.mp4'], () => {
     //  bg.volume(0);
+    loadA = true;
   });
   bg.elt.load();
 
@@ -77,6 +80,7 @@ function preload(){
 
   let matte = assets.matte = createVideo(['../videos/mlat.mp4'], () => {
     // matte.volume(0);
+    loadB = true;
   });
   matte.elt.load();
 
@@ -178,6 +182,7 @@ function draw(){
   var PHASES = [.4, .2, .4];
 
 
+  var VIDEOLOAD = false;
   var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
   var PROGRESS = 0.0, SEQ = 0.0;
 
@@ -198,6 +203,7 @@ function draw(){
       
       SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
+      VIDEOLOAD = (loadA && loadB);
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOREADY && !SEEKED){
         if(playing){
