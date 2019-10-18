@@ -332,48 +332,46 @@ var offset = 0.0;
 var center = {x:0, y:0};
 
 function oncapture(t){
-  return new Promise((resolve, reject) => {
-        let mx = 127;
-        let my = 67;
+  let mx = 127;
+  let my = 67;
 
-        let mh = my*offset*8*SFH;
-        let mw = mx*offset*7*SFW;
+  let mh = my*offset*8*SFH;
+  let mw = mx*offset*7*SFW;
 
-        let mask = elements.mask;
-        return mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
-              .then(function(dt){ 
-                  console.log("masked frame");
+  let mask = elements.mask;
+  return mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
+        .then(function(dt){ 
+            console.log("masked frame");
 
-                  let buffer = elements.buffer;
-                  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
-                
-                  blendMode(SCREEN);
+            let buffer = elements.buffer;
+            image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
+          
+            blendMode(SCREEN);
 
-                  let fx = elements.fx;
-                      image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+            let fx = elements.fx;
+                image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-                    return capture.captureFrame(dt);
-              })
-                
-              .then(function(fr){
-                  if(fr) 
-                    capture.addFrame(fr);
+              return capture.captureFrame(dt);
+        })
+          
+        .then(function(fr){
+            if(fr) 
+              capture.addFrame(fr);
 
-                  if(f <= tf)
-                    f += 1.0;
+            if(f <= tf)
+              f += 1.0;
 
-                  gTime = clamp((f/tf)*DURATION, 0, DURATION);
-                  SEEKED = false;
+            gTime = clamp((f/tf)*DURATION, 0, DURATION);
+            SEEKED = false;
 
-                  PROGRESS = clamp(f/tf, 0, 1);
-                  if(PROGRESS >= 1.0){
-                      capture.stopCapture();
-                      capturing = false;
-                  }
-                  else 
-                    TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
-              })
-    });
+            PROGRESS = clamp(f/tf, 0, 1);
+            if(PROGRESS >= 1.0){
+                capture.stopCapture();
+                capturing = false;
+            }
+            else 
+              TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
+        })
 }
 
 
