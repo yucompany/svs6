@@ -256,10 +256,14 @@ function draw(){
             line2.render(buffer, 1, t);
       }
 
-      oncapture(t)
-        .then(() => {
-          requestAnimationFrame(render);
-        })
+      if(VIDEOREADY && VIDEOPLAY && SEEKED){
+        oncapture(t)
+          .then(() => {
+            requestAnimationFrame(render);
+          })
+      }
+      else
+        requestAnimationFrame(render);
     }
     else
       requestAnimationFrame(render);
@@ -290,23 +294,18 @@ function oncapture(t){
                   let fx = elements.fx;
                       image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
 
-                  if(VIDEOREADY && VIDEOPLAY) {
                     return capture.captureFrame(dt);
-                  }
               })
                 
               .then(function(fr){
                   if(fr) 
                     capture.addFrame(fr);
 
-                  if(VIDEOPLAY && VIDEOREADY){
+                  if(f <= tf)
+                    f += 1.0;
 
-                    if(f <= tf)
-                      f += 1.0;
-
-                    gTime = clamp((f/tf)*DURATION, 0, DURATION);
-                    SEEKED = false;
-                  }
+                  gTime = clamp((f/tf)*DURATION, 0, DURATION);
+                  SEEKED = false;
 
                   PROGRESS = clamp(f/tf, 0, 1);
                   if(PROGRESS >= 1.0){
@@ -315,10 +314,8 @@ function oncapture(t){
                   }
                   else 
                     TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
-                })
 
-              .then(() => {
-                resolve();
+                  resolve();
               })
     });
 }
