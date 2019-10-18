@@ -535,4 +535,4 @@ window.addEventListener("DOMContentLoaded", () => {
             updateUIVisibility(footerHolder, true);
        }, 100);
     }, 500);
-});
+}); 
