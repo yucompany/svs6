@@ -158,7 +158,7 @@ function prepareExports(){
 
                         beginUploadToS3(videoFile)
                         .then((deeplink) => {
-                            // window.history.replaceState(null, null, '?x=' + deeplink);  ?? Removed URL replace, ux-sake
+                            window.history.replaceState(null, null, '?x=' + deeplink);
                             resolve(deeplink); // Found cached media, return URL
                         })
                         .catch((err) => {
@@ -314,9 +314,7 @@ function generateKeyFromInput() {
 
 // Starts a video download.
 function triggerVideoDownload(videoFile) {
-
-    window.open(videoFile, "_blank");
-    /*const link = document.createElement('a');
+    const link = document.createElement('a');
 
     link.href = videoFile;
     link.setAttribute('target', '_blank'); //Trigger download in new window
@@ -329,14 +327,12 @@ function triggerVideoDownload(videoFile) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    }*/
+    }
 }
 
 // Starts a photo download.
 function triggerPhotoDownload(imageFile) {
-
-    window.open(imageFile, "_blank");
-    /*const link = document.createElement('a');
+    const link = document.createElement('a');
 
     // We'll want to replace this with the client's S3 bucket address.
     link.href = imageFile;
@@ -349,7 +345,7 @@ function triggerPhotoDownload(imageFile) {
 
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);*/
+    document.body.removeChild(link);
 }
 
 
