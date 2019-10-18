@@ -395,6 +395,11 @@ addEventListener('started', () => {
 
     updateUIVisibility(submit, false);
     updateFooterPos();
+    console.log("started");
+    setTimeout(function(){
+        updateFooterPos();
+        console.log("started2");
+     }, 200);
 });
 
 addEventListener('ended', () => {
@@ -402,6 +407,11 @@ addEventListener('ended', () => {
 
     showVideoPreview();
     updateFooterPos();
+    console.log("ended1");
+    setTimeout(function(){
+        updateFooterPos();
+        console.log("ended2");
+     }, 200);
 });
 
 addEventListener('loadcomplete', () => {
@@ -413,8 +423,10 @@ addEventListener('previewed', () => {
     updateUIVisibility(exporting, true);
 
     updateFooterPos();
+    console.log("Previewed1");
     setTimeout(function(){
         updateFooterPos();
+        console.log("previewed2");
     }, 1000);
 });
 
@@ -426,8 +438,10 @@ addEventListener('resetted', () => {
     updateUIVisibility(videoPreview, false);
 
     updateFooterPos();
+    console.log("reset1");
     setTimeout(function(){
         updateFooterPos();
+        console.log("reset2");
     }, 1000);
     
     // Clear form
@@ -454,8 +468,8 @@ const updateFooterPos = function(){
     footerHolder = document.getElementById('footer-holder');
     var hboFooterPos = hboFooter.getBoundingClientRect();
     actabs.style.height = "auto";
-    var shownH = actabs.children[0].clientHeight;
-    let i = 1;
+    var shownH = 5;
+    let i = 0;
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
             let tempH = 0;
@@ -483,47 +497,15 @@ const updateFooterPos = function(){
     else{
         footerHolder.style.height = "150px";
     }
-/*
-/*
-    let page = document.getElementById('pagebody');
-    let footer = document.getElementById('footer');
-
-    let submit = document.getElementById("submission");
-    let exporter = document.getElementById("exports");
-
-    
-    let sub = 0;
-    if(checkUIVisibility(submit))
-        sub += (exporter.offsetHeight - submit.offsetHeight);
-
-    let th = window.innerHeight;
-    let ch = page.offsetHeight;
-
-    footer.style.marginTop = -sub + "px";
-
-    //footer.style.position = 'absolute';
-    //footer.style.position = 'initial';
-    //footer.style.bottom = 'initial';
-
-    if(ch < th){
-        footer.style.position = 'absolute';
-        footer.style.bottom = '0px'
-
-        console.log('client height is LESSER than total height')
-    }
-    else {
-        footer.style.position = 'initial';
-        footer.style.bottom = 'initial';
-
-        console.log('client height is GREATER than total height')
-    }*/
 }
 
 window.addEventListener("resize", () => {
     if (window.innerWidth != windowWidth) {
         updateFooterPos();
+        console.log("resize1");
         setTimeout(function(){
             updateFooterPos();
+            console.log("resize2");
          }, 200);
     }
 });
@@ -533,8 +515,10 @@ window.addEventListener("DOMContentLoaded", () => {
     setTimeout(function(){
        updateFooterPos();
        
+       console.log("DOMCLoad1");
        setTimeout(function(){
             updateUIVisibility(footerHolder, true);
+            console.log("DOMCLoad2");
        }, 100);
     }, 500);
 }); 
