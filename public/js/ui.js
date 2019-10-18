@@ -380,6 +380,10 @@ const updateUIVisibility = function(e, visible){
 
     }
     updateFooterPos();
+    setTimeout(function(){
+        updateFooterPos();
+        console.log("previewed2");
+    }, 1000);
 }
 
 const checkUIVisibility = function(e){
