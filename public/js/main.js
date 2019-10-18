@@ -315,6 +315,7 @@ function draw(){
       if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
         oncapture(t)
           .then(() => {
+            console.log("captured frame");
             requestAnimationFrame(render);
           })
       }
@@ -339,11 +340,12 @@ function oncapture(t){
         let mw = mx*offset*7*SFW;
 
         let mask = elements.mask;
-        mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
+        return mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
               .then(function(dt){ 
+                  console.log("masked frame");
+
                   let buffer = elements.buffer;
                   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
-
                 
                   blendMode(SCREEN);
 
@@ -370,8 +372,6 @@ function oncapture(t){
                   }
                   else 
                     TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
-
-                  resolve();
               })
     });
 }
