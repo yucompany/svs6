@@ -1,5 +1,10 @@
 "use strict";
 
+var ACCEPTED = [
+    "hello"
+]
+var ACCEPTIGEX = new RegExp(ACCEPTED.join("|", "i"));
+
 var PROHIBITED = [
     "_96WasntEnough", 
     "_H1tIer", 
@@ -1271,25 +1276,29 @@ const verifyName = function(){
     let first = firstname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
     let last = lastname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
 
+
     // Check for repeat from last input, don't test again
     if(first == FIRSTNAME && last == LASTNAME){
         throwRepeat();
         return;
     }
 
-    /* Test for PROFANITY */
-    
-    let trimFirst = first.replace(/\s+/g, '');
-    if(PROHIBIGEX.test(trimFirst)){
-        throwProfanity();
-        return;
+    /* Test for WHITELIST */
+    let acceptfirst = first;
+    let acceptlast = last;
+
+    let acceptigex;
+    for(let k = 0; k < ACCEPTED.length; k++){
+        acceptigex = new RegExp(ACCEPTED[k], "gi");
+        
+        acceptfirst = first.replace(acceptigex, "");
+        acceptlast = last.replace(acceptigex, "");
     }
 
-    let trimLast = last.replace(/\s+/g, '');
-    if(PROHIBIGEX.test(trimLast)){
-        throwProfanity();
-        return;
-    }
+    /* Test for PROFANITY */
+    
+    let trimFirst = acceptfirst.replace(/\s+/g, '');
+    let trimLast = acceptlast.replace(/\s+/g, '');
 
     let trimBoth = trimFirst+trimLast;
     if(PROHIBIGEX.test(trimBoth)){

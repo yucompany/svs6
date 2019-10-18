@@ -380,10 +380,6 @@ const updateUIVisibility = function(e, visible){
 
     }
     updateFooterPos();
-    setTimeout(function(){
-        updateFooterPos();
-        console.log("previewed2");
-    }, 1000);
 }
 
 const checkUIVisibility = function(e){
@@ -401,24 +397,13 @@ addEventListener('started', () => {
     updateUIVisibility(loadingHolder, true);
 
     updateUIVisibility(submit, false);
-    //updateFooterPos();
-    console.log("started");
-    setTimeout(function(){
-        //updateFooterPos();
-        console.log("started2");
-     }, 200);
+    toTop();
 });
 
 addEventListener('ended', () => {
     updateUIVisibility(loadingHolder, false);
 
     showVideoPreview();
-    //updateFooterPos();
-    console.log("ended1");
-    setTimeout(function(){
-        //updateFooterPos();
-        console.log("ended2");
-     }, 200);
 });
 
 addEventListener('loadcomplete', () => {
@@ -429,12 +414,6 @@ addEventListener('previewed', () => {
     updateUIVisibility(document.getElementById("defaultCanvas0"), false);
     updateUIVisibility(exporting, true);
 
-    //updateFooterPos();
-    console.log("Previewed1");
-    setTimeout(function(){
-        //updateFooterPos();
-        console.log("previewed2");
-    }, 1000);
 });
 
 addEventListener('resetted', () => {
@@ -443,9 +422,6 @@ addEventListener('resetted', () => {
 
     updateUIVisibility(exporting, false);
     updateUIVisibility(videoPreview, false);
-
-  //  updateFooterPos();
-    console.log("reset1");
     
     // Clear form
     nameform.reset();
@@ -467,7 +443,6 @@ var footerHolder;
 const updateFooterPos = function(){
     const actabs = document.getElementById('actionables');
     actabs.style.height = "fit-content";
-    console.log("freed actabs is :" + actabs.clientHeight);
     const hboFooter = document.getElementById('footerChecker');
     const actFooter = document.getElementById('footer');
     footerHolder = document.getElementById('footer-holder');
@@ -476,62 +451,45 @@ const updateFooterPos = function(){
     while (actabs.children[i]) {
         if (actabs.children[i].classList.contains("shown")) {
             let tempH = 0;
-            console.log("got a shown" + i);
             if (window.innerWidth < 576) {
                 for (let j = 0; actabs.children[i].children[j]; j += 1) {
                     tempH += actabs.children[i].children[j].clientHeight;
-                    console.log("vertical height at " + j + " is :" + tempH);
                 }
-                console.log("vertical height is :" + tempH);
             }
             else {
                 for (let j = 0; actabs.children[i].children[0].children[j]; j += 1) {
                     tempH += actabs.children[i].children[0].children[j].clientHeight;
-                    console.log("landscape height at " + j + " is :" + tempH);
                 }
                 tempH += 25;
-
-                console.log("landscape height is :" + tempH);
             }
             shownH = tempH;
         }
         i += 1;
     }
 
+    var height = window.innerHeight ? window.innerHeight : $(window).height();
+
     actabs.style.height = String(shownH + 65) + "px";
-    console.log("final height is :" + shownH);
     var hboFooterPos = hboFooter.getBoundingClientRect();
-    console.log("adjusting footer box, since footerPos is " + hboFooterPos.top + " window height is: " + window.innerHeight);
-    if (hboFooterPos.top + 150 < window.innerHeight) {
-        footerHolder.style.height = String(window.innerHeight - hboFooterPos.top) + "px";
+    if (hboFooter.offsetTop + 150 < window.innerHeight) {
+        footerHolder.style.height = String(window.innerHeight - hboFooter.offsetTop) + "px";
         
     }
     else{
         footerHolder.style.height = "150px";
     }
-    console.log("====================");
 }
 
 window.addEventListener("resize", () => {
     if (window.innerWidth != windowWidth) {
-       // updateFooterPos();
-        console.log("resize1");
-        setTimeout(function(){
-         //   updateFooterPos();
-            console.log("resize2");
-         }, 200);
+        updateFooterPos();
     }
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-   // updateFooterPos();
-    setTimeout(function(){
-     //  updateFooterPos();
-       
-       console.log("DOMCLoad1");
-       setTimeout(function(){
-            updateUIVisibility(footerHolder, true);
-            console.log("DOMCLoad2");
-       }, 100);
-    }, 500);
+    updateUIVisibility(footerHolder, true);
 }); 
+
+function toTop() {
+    window.scrollTo(0, 0);  
+}
