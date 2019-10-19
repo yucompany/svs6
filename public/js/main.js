@@ -111,10 +111,10 @@ function tryVideo(video){
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgold.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bgbraker.mp4'], () => {
     bg.volume(0);
   });
-    bg.elt.src = '../videos/bgold.mp4';
+    bg.elt.src = '../videos/bgbraker.mp4';
     bg.elt.removeChild(bg.elt.childNodes[0]);
 
     bg.elt.addEventListener("loadeddata", () => {
@@ -128,10 +128,10 @@ function preload(){
     bg.hideControls();
   
 
-  let matte = assets.matte = createVideo(['../videos/matteold.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/mattebraker.mp4'], () => {
     matte.volume(0);
   });
-    matte.elt.src = '../videos/matteold.mp4';
+    matte.elt.src = '../videos/mattebraker.mp4';
     matte.elt.removeChild(matte.elt.childNodes[0]);
 
     matte.elt.addEventListener("loadeddata", () => {
