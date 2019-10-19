@@ -268,7 +268,7 @@ class Mask extends SceneElement {
         for(let j = y1; j < y2; j++){
           let ind = (j * WIDTH + i) * 4;
 
-          if(source.pixels[ind] > 100)
+          if(source.pixels[ind] > 67)
             dest.pixels[ind + 3] = 0;
         }
       }

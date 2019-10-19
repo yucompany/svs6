@@ -6,6 +6,14 @@ const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  /
       console.log("Firefox detected!");
     else
       console.log("Firefox NOT detected!");
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if(IS_IOS){
+      console.log("iOS is detected!");
+    }
+    else {
+      dlVideoIOSNote.style.display = "none";
+      console.log("iOS NOT detected!");
+    }
 
 // Global variables
 var FIRSTNAME, LASTNAME;
@@ -111,10 +119,10 @@ function tryVideo(video){
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgbraker.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bgweb2.mp4'], () => {
     bg.volume(0);
   });
-    bg.elt.src = '../videos/bgbraker.mp4';
+    bg.elt.src = '../videos/bgweb2.mp4';
     bg.elt.removeChild(bg.elt.childNodes[0]);
 
     bg.elt.addEventListener("loadeddata", () => {
@@ -128,10 +136,10 @@ function preload(){
     bg.hideControls();
   
 
-  let matte = assets.matte = createVideo(['../videos/mattebraker.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/matteweb2.mp4'], () => {
     matte.volume(0);
   });
-    matte.elt.src = '../videos/mattebraker.mp4';
+    matte.elt.src = '../videos/matteweb2.mp4';
     matte.elt.removeChild(matte.elt.childNodes[0]);
 
     matte.elt.addEventListener("loadeddata", () => {
@@ -313,14 +321,26 @@ function draw(){
       }
 
       if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
+        console.log("ready");
           oncapture(t)
           .then(() => {
             requestAnimationFrame(render);
           })
         
       }
-      else
+      else {
+        console.log("not ready");
+        let buffer = elements.buffer;
+            image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
+          
+            blendMode(SCREEN);
+
+            let fx = elements.fx;
+                image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+
         requestAnimationFrame(render);
+      }
     }
     else
       requestAnimationFrame(render);
