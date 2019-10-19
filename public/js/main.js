@@ -275,7 +275,7 @@ function draw(){
           matte.time(0);
         }
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
 
       blendMode(BLEND);
       
@@ -330,15 +330,6 @@ function draw(){
       }
       else {
         console.log("not ready");
-        let buffer = elements.buffer;
-            image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
-          
-            blendMode(SCREEN);
-
-            let fx = elements.fx;
-                image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
-
-
         requestAnimationFrame(render);
       }
     }
