@@ -119,10 +119,10 @@ function tryVideo(video){
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgfresh3.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bgfresh5.mp4'], () => {
     bg.volume(0);
   });
-    bg.elt.src = '../videos/bgfresh3.mp4';
+    bg.elt.src = '../videos/bgfresh5.mp4';
     bg.elt.removeChild(bg.elt.childNodes[0]);
 
     bg.elt.addEventListener("loadeddata", () => {
@@ -136,10 +136,10 @@ function preload(){
     bg.hideControls();
   
 
-  let matte = assets.matte = createVideo(['../videos/mattefresh3.mp4'], () => {
+  let matte = assets.matte = createVideo(['../videos/mattefresh5.mp4'], () => {
     matte.volume(0);
   });
-    matte.elt.src = '../videos/mattefresh3.mp4';
+    matte.elt.src = '../videos/mattefresh5.mp4';
     matte.elt.removeChild(matte.elt.childNodes[0]);
 
     matte.elt.addEventListener("loadeddata", () => {
@@ -268,14 +268,14 @@ function draw(){
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOLOAD && VIDEOREADY && !SEEKED){
         if(playing){
-          bg.elt.currentTime = t;
-          matte.elt.currentTime = t;
+          bg.time(t);
+          matte.time(t);
 
           SEEKED = true;
         }  
         else{
-          bg.elt.currentTime = 0;
-          matte.elt.currentTime = 0;
+          bg.time(0);
+          matte.time(0);
         }
       }
       VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
