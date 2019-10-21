@@ -251,8 +251,6 @@ function draw(){
 
     //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
 
-    //DURATION = assets.background.duration();
-    //tf = (framerate * DURATION);
     gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
     let t = gTime;
@@ -278,7 +276,7 @@ function draw(){
           matte.time(0);
         }
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3);
 
       if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
         console.log("ready");
