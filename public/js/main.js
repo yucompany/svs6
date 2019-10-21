@@ -256,10 +256,10 @@ function draw(){
     //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
 
     gTime = clamp((f/tf)*DURATION, 0, DURATION);
-
-    let t = gTime;
+    PROGRESS = clamp(f/tf, 0, 1);
 
     if(capturing){
+      let t = gTime;
 
       let bg = assets.background; 
       let matte = assets.matte; 
@@ -275,10 +275,6 @@ function draw(){
 
           SEEKED = true;
         }  
-        else{
-          bg.time(0);
-          matte.time(0);
-        }
       }
       VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
 
@@ -381,22 +377,13 @@ function draw(){
     }
     else
       requestAnimationFrame(render);
-}// Sequence variables
-var offset = 0.0;
-var center = {x:0, y:0};
+}
 
 
 const onReset = new Event("resetted");
 
 function reset(){
-    let bg = assets.background;
-        bg.time(0);
-    let matte = assets.matte;
-        matte.time(0);
-        
-
-    gTime = 0; f = (framerate * START);
-    PROGRESS = clamp(f/tf, 0, 1);
+    f = (framerate * START);
     TOTALPROGRESS = 0.0;
     TARGETPROGRESS = 0.0;
 
@@ -412,13 +399,6 @@ function reset(){
 const onRestart = new Event("restarted");
 
 function restart(){
-  let bg = assets.background;
-  let matte = assets.matte;
-
-  bg.time(0);
-  matte.time(0);
-
-  gTime = 0.0;
   f = (framerate * START);
 
     elements.line1.reset();
@@ -495,8 +475,7 @@ function initialize(){
       bg.time(0);
       matte.time(0);
 
-      gTime = 0; f = (framerate * START);
-      PROGRESS = clamp(f/tf, 0, 1);
+      f = (framerate * START);
       TOTALPROGRESS = 0.0;
       TARGETPROGRESS = 0.0;
 

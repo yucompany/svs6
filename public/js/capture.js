@@ -41,7 +41,9 @@ class Capture {
 
     captureFrame(dt){
         return new Promise(function(res, rej){
-            canvas.elt.toBlob(res, 'image/jpeg', .85);
+            setTimeout(function(){
+                canvas.elt.toBlob(res, 'image/jpeg', .85);
+            }, dt*2);
         })
     }
 
