@@ -297,35 +297,36 @@ function draw(){
         image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
 
 
-      let buffer = elements.buffer;
+      
+      if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
+        let buffer = elements.buffer;
           buffer.clear();
 
-      let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
-      let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
+        let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
+        let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
 
-      offset = lerp(.66, .97, SEQ);
-      
-      center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
-      center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
+        offset = lerp(.66, .97, SEQ);
+        
+        center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
+        center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
 
-      if(lineA.active){
-        let line1 = elements.line1;
-          line1.x = ((offset * lineA.origin.x) + dx)*SFW;
-          line1.y = ((offset * lineA.origin.y) + dy)*SFH;
-          line1.scale = offset;
-          line1.render(buffer, 1, t);
-      }
+        if(lineA.active){
+          let line1 = elements.line1;
+            line1.x = ((offset * lineA.origin.x) + dx)*SFW;
+            line1.y = ((offset * lineA.origin.y) + dy)*SFH;
+            line1.scale = offset;
+            line1.render(buffer, 1, t);
+        }
 
-      if(lineB.active){
-        let line2 = elements.line2;
-            line2.x = ((offset * lineB.origin.x) + dx)*SFW;
-            line2.y = ((offset * lineB.origin.y) + dy)*SFH;
-            line2.scale = offset;
-            line2.render(buffer, 1, t);
-      }
+        if(lineB.active){
+          let line2 = elements.line2;
+              line2.x = ((offset * lineB.origin.x) + dx)*SFW;
+              line2.y = ((offset * lineB.origin.y) + dy)*SFH;
+              line2.scale = offset;
+              line2.render(buffer, 1, t);
+        }
 
 
-      if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
         console.log("ready");
           
         let mx = 127;
@@ -372,6 +373,15 @@ function draw(){
       }
       else {
         console.log("not ready");
+        
+        let buffer = elements.buffer;
+        image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
+
+        blendMode(SCREEN);
+
+        let fx = elements.fx;
+            image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
         requestAnimationFrame(render);
       }
     }
