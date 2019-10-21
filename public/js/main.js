@@ -245,6 +245,10 @@ function draw(){
   var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
   var PROGRESS = clamp(f/tf, 0, 1), SEQ = 0.0;
 
+  // Sequence variables
+  var offset = 0.0;
+  var center = {x:0, y:0};
+
  function render(){
     TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
     updateProgressBar(TOTALPROGRESS);
@@ -276,14 +280,99 @@ function draw(){
           matte.time(0);
         }
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
+
+
+      SEQ = clamp((PROGRESS) * DURATION / 7.45833333, 0, 1);
+
+      blendMode(BLEND);
+        
+      // Draw buffers IF FIREFOX
+      if(IS_FIREFOX){
+        let aBuffer = elements.aBuffer;
+        let bBuffer = elements.bBuffer;
+
+        aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
+        image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
+
+        bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
+      }
+      else 
+        image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+
+
+      let buffer = elements.buffer;
+          buffer.clear();
+
+      let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
+      let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
+
+      offset = lerp(.66, .97, SEQ);
+      
+      center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
+      center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
+
+      if(lineA.active){
+        let line1 = elements.line1;
+          line1.x = ((offset * lineA.origin.x) + dx)*SFW;
+          line1.y = ((offset * lineA.origin.y) + dy)*SFH;
+          line1.scale = offset;
+          line1.render(buffer, 1, t);
+      }
+
+      if(lineB.active){
+        let line2 = elements.line2;
+            line2.x = ((offset * lineB.origin.x) + dx)*SFW;
+            line2.y = ((offset * lineB.origin.y) + dy)*SFH;
+            line2.scale = offset;
+            line2.render(buffer, 1, t);
+      }
+
 
       if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
         console.log("ready");
-          oncapture(t)
-          .then(() => {
-            requestAnimationFrame(render);
-          })
+          
+        let mx = 127;
+        let my = 67;
+
+        let mh = my*offset*8*SFH;
+        let mw = mx*offset*7*SFW;
+
+        
+        let mask = elements.mask;
+        mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
+              .then(function(dt){ 
+                  let buffer = elements.buffer;
+                  image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
+                
+                  blendMode(SCREEN);
+
+                  let fx = elements.fx;
+                      image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+
+                    return capture.captureFrame(dt);
+              })
+                
+              .then(function(fr){
+                  if(fr) 
+                    capture.addFrame(fr);
+
+                  if(f < tf)
+                    f += 1.0;
+
+                  gTime = clamp((f/tf)*DURATION, 0, DURATION);
+                  SEEKED = false;
+
+                  PROGRESS = clamp(f/tf, 0, 1);
+                  if(PROGRESS >= 1.0){
+                      capture.stopCapture();
+                      capturing = false;
+                  }
+                  else 
+                    TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
+
+                    requestAnimationFrame(render);
+              })
       }
       else {
         console.log("not ready");
@@ -292,101 +381,9 @@ function draw(){
     }
     else
       requestAnimationFrame(render);
-}
-
-
-// Sequence variables
+}// Sequence variables
 var offset = 0.0;
 var center = {x:0, y:0};
-
-function oncapture(t){
-  let mx = 127;
-  let my = 67;
-
-  let mh = my*offset*8*SFH;
-  let mw = mx*offset*7*SFW;
-
-  let bg = elements.bg;
-  let mask = elements.mask;
-  
-  SEQ = clamp((PROGRESS) * DURATION / 7.45833333, 0, 1);
-
-  blendMode(BLEND);
-      
-  // Draw buffers IF FIREFOX
-  if(IS_FIREFOX){
-    let aBuffer = elements.aBuffer;
-    let bBuffer = elements.bBuffer;
-
-    aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
-    image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
-
-    bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
-  }
-  else 
-    image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
-
-
-  let buffer = elements.buffer;
-      buffer.clear();
-
-  let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
-  let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
-
-  offset = lerp(.66, .97, SEQ);
-  
-  center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
-  center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
-
-  if(lineA.active){
-    let line1 = elements.line1;
-      line1.x = ((offset * lineA.origin.x) + dx)*SFW;
-      line1.y = ((offset * lineA.origin.y) + dy)*SFH;
-      line1.scale = offset;
-      line1.render(buffer, 1, t);
-  }
-
-  if(lineB.active){
-    let line2 = elements.line2;
-        line2.x = ((offset * lineB.origin.x) + dx)*SFW;
-        line2.y = ((offset * lineB.origin.y) + dy)*SFH;
-        line2.scale = offset;
-        line2.render(buffer, 1, t);
-  }
-
-  return mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
-        .then(function(dt){ 
-            let buffer = elements.buffer;
-            image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
-          
-            blendMode(SCREEN);
-
-            let fx = elements.fx;
-                image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
-
-              return capture.captureFrame(dt);
-        })
-          
-        .then(function(fr){
-            if(fr) 
-              capture.addFrame(fr);
-
-            if(f < tf)
-              f += 1.0;
-
-            gTime = clamp((f/tf)*DURATION, 0, DURATION);
-            SEEKED = false;
-
-            PROGRESS = clamp(f/tf, 0, 1);
-            if(PROGRESS >= 1.0){
-                capture.stopCapture();
-                capturing = false;
-            }
-            else 
-              TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
-        })
-}
-
 
 
 const onReset = new Event("resetted");
