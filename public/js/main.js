@@ -110,6 +110,7 @@ function tryVideo(video){
     return video.play()
 
     .then(() => {
+      video.pause();
       return;
     })
     .catch((err) => {
