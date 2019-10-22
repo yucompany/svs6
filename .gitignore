@@ -3,7 +3,6 @@ node_modules
 awscli-bundle
 output
 Archive.zip
-*.npmrc
 
 # local env files
 .env.local
