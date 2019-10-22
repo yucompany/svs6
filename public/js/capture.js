@@ -50,7 +50,7 @@ class Capture {
     stopCapture(){
         prepareExports()
         .then(() => {
-            console.log("Successfully prepared exports after capture! :-)");
+            //console.log("Successfully prepared exports after capture! :-)");
             dispatchEvent(onEnd);
         });
     }
@@ -91,7 +91,7 @@ class Capture {
             return response.text();
         })
         .then((result) => {
-            console.log(result);
+            //console.log(result);
             return new Promise(function(res, rej){
                 res(result);
             })
@@ -107,7 +107,7 @@ class Capture {
             let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
 
             let name = f + '~' + l;
-            console.log('Sending frames... ' + captured.length);
+            //console.log('Sending frames... ' + captured.length);
 
             this.sendFrames(captured)
             .then(() => {
@@ -171,8 +171,8 @@ class Capture {
 
                 let encodes = this.encoded;
 
-                console.log(encodes);
-                console.log("sending " + encodes.length);
+                //console.log(encodes);
+                //console.log("sending " + encodes.length);
 
                 TARGETPROGRESS += PHASES[1];
                 
@@ -210,7 +210,7 @@ class Capture {
 
     encode(filename) {
         return new Promise((resolve, reject) => {
-            console.log('Begin encode');
+            //console.log('Begin encode');
 
             TARGETPROGRESS += PHASES[2];
 
@@ -226,7 +226,7 @@ class Capture {
             .then((response) => {
                 response.text()
                 .then((result) => {
-                    console.log('Done encoding ' + result);
+                    //console.log('Done encoding ' + result);
                     resolve(result);
                 })
                 .catch((err) => {

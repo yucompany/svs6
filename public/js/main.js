@@ -2,17 +2,17 @@
 
 
 const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  // Detect Firefox, disable extra graphics buffers if so
-    if(IS_FIREFOX)
-      console.log("Firefox detected!");
-    else
-      console.log("Firefox NOT detected!");
+   // if(IS_FIREFOX)
+     // console.log("Firefox detected!");
+   // else
+    //  console.log("Firefox NOT detected!");
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     if(IS_IOS){
-      console.log("iOS is detected!");
+      //console.log("iOS is detected!");
     }
     else {
       dlVideoIOSNote.style.display = "none";
-      console.log("iOS NOT detected!");
+      //console.log("iOS NOT detected!");
     }
 
 // Global variables
@@ -327,7 +327,7 @@ function draw(){
         }
 
 
-        console.log("ready");
+        //console.log("ready");
           
         let mx = 127;
         let my = 67;
@@ -372,7 +372,7 @@ function draw(){
               })
       }
       else {
-        console.log("not ready");
+        //console.log("not ready");
         
         let buffer = elements.buffer;
         image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
@@ -530,7 +530,7 @@ $(document).ready(() => {
 
         // Check if we have the x parameter passed to prepopulate the input.
         if (urlParams.x) {
-            console.log('Check if id x', urlParams.x, 'for deeplink exists');
+            //console.log('Check if id x', urlParams.x, 'for deeplink exists');
             const response = checkDeepLinkId(urlParams.x);
 
             response
@@ -540,7 +540,7 @@ $(document).ready(() => {
               line2 = dl.line2;
               let deepLinkId = dl.deeplink_id;
 
-              console.log('deeplink', deepLinkId);
+              //console.log('deeplink', deepLinkId);
               populatePage(deepLinkId);
             })
         }
@@ -577,7 +577,7 @@ $(document).ready(() => {
 
 // Checks if we already have a generated video stored in S3. Returns boolean.
 function checkDeepLinkId(id) {
-  console.log('Note to dev: Show Loading in UI...');
+  //console.log('Note to dev: Show Loading in UI...');
 
   return new Promise((resolve, reject) => {
 

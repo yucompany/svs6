@@ -104,7 +104,7 @@ function showFacebookShare() {
         href: `http://sv6.yuco.com/?x=${DEEP_LINK_ID}`,
         quote: 'Celebrate the final season with this custom title sequence generator.'
     }, (response) => {
-        console.log(response);
+        //console.log(response);
     });
 }
 
@@ -196,7 +196,7 @@ function prepareExports(){
                 .then((response) => {
                     response.text()
                     .then((link) => {
-                        console.log("Successfully fetched deeplink = " + link);
+                        //console.log("Successfully fetched deeplink = " + link);
                         resolve(link);
                     })
                     .catch((err) => {
@@ -215,7 +215,7 @@ function prepareExports(){
     })
     .then((deeplink) => {
         if(deeplink){
-            console.log("Successfully bound exports!");
+            //console.log("Successfully bound exports!");
 
             PHOTOURL = S3URL + s3Key + ".jpg";
             VIDEOURL = S3URL + s3Key + ".mp4";
@@ -231,7 +231,7 @@ function prepareExports(){
 // Begins upload to S3
 function beginUploadToS3(videoFile) {
     return new Promise((resolve, reject) => {
-        console.log('Note to dev: Show Loading in UI...');
+        //console.log('Note to dev: Show Loading in UI...');
 
         const fetchResponse = fetch('aws/s3upload', {
             method: 'POST',
@@ -246,7 +246,7 @@ function beginUploadToS3(videoFile) {
         .then((response) => {
             response.text()
             .then((result) => {
-                console.log('Note to dev: End Loading in UI...');
+                //console.log('Note to dev: End Loading in UI...');
                 resolve(result);
             })
             .catch((err) => {
@@ -271,7 +271,7 @@ function checkIfKeyExists(s3Key) {
     s3Key += ".mp4";  // Append mp4 ext to key for video lookup
 
     return new Promise((resolve, reject) => {
-        console.log('Note to dev: Show Loading in UI...');
+        //console.log('Note to dev: Show Loading in UI...');
 
         const fetchResponse = fetch('aws/s3cacheKey', {
             method: 'POST',
@@ -285,7 +285,7 @@ function checkIfKeyExists(s3Key) {
         .then((response) => {
             response.json()
             .then((result) => {
-                console.log('Note to dev: End Loading in UI...');
+                //console.log('Note to dev: End Loading in UI...');
                 resolve(result);
             })
             .catch((err) => {
@@ -337,7 +337,7 @@ function triggerPhotoDownload(imageFile) {
 
     // File name for downloaded file.
     link.download = `${$('#firstInput').val().toUpperCase().trim()}~${$('#lastInput').val().toUpperCase().trim()}~VALLEY.jpg`
-    console.log(link);
+    //console.log(link);
 
     document.body.appendChild(link);
     link.click();

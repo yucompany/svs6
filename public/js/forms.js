@@ -1244,7 +1244,7 @@ const submitForm = function(){
 
             prepareExports()
             .then(() => {
-                console.log("Successfully prepared exports after repeated input! :-)");
+                //console.log("Successfully prepared exports after repeated input! :-)");
                 dispatchEvent(onEnd);
             })
         }
