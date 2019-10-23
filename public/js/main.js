@@ -498,14 +498,14 @@ function initialize(){
     function begin(){
       let bg = assets.background;
       let matte = assets.matte;
-          
-      bg.time(0);
-      matte.time(0);
 
       f = (framerate * START); gTime = clamp((f/tf)*DURATION, 0, DURATION);
       PROGRESS = clamp(f/tf, 0, 1);
       TOTALPROGRESS = 0.0;
       TARGETPROGRESS = 0.0;
+
+      bg.time(gTime);
+      matte.time(gTime);
 
       playing = true;
 
