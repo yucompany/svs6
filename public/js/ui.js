@@ -1,7 +1,7 @@
 'use strict';
 
 let DEEP_LINK_ID = "";
-const S3URL =  'https://s3-us-west-2.amazonaws.com/assets.dev.bethevalley.com/';
+const S3URL =  'https://s3-us-west-2.amazonaws.com/assets.prod.bethevalley.com/';
 
 // Exec on page load - Adding button action assignments.
 $(document).ready(() => {
