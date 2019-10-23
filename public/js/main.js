@@ -226,7 +226,7 @@ let playing = false;
 let f = (framerate * START);
 let tf = (framerate * DURATION);
 
-let gTime = 0.0;
+let gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
 let visible = false;
 
