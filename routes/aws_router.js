@@ -22,7 +22,7 @@ router.post('/s3upload', (req, res) => {
 
             const params = {
                 Bucket: process.env.AWS_BUCKET || 'social-sharing-install',
-                Key: req.body.videoFilePath.replace('.mp4', '.jpg'),
+                Key: 'tec-demo' + req.body.videoFilePath.replace('.mp4', '.jpg'),
                 Body: base64data
             };
 
@@ -41,7 +41,7 @@ router.post('/s3upload', (req, res) => {
 
                         const params = {
                             Bucket: process.env.AWS_BUCKET || 'social-sharing-install',
-                            Key: req.body.videoFilePath,
+                            Key: 'tec-demo' + req.body.videoFilePath,
                             Body: base64data
                         };
 
