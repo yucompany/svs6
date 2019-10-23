@@ -276,10 +276,10 @@ function draw(){
           SEEKED = true;
         }  
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 2 && matte.elt.readyState >= 2);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3);
 
 
-      SEQ = clamp((PROGRESS) * DURATION / 7.45833333, 0, 1);
+      SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
 
       blendMode(BLEND);
         
@@ -502,7 +502,7 @@ function initialize(){
       bg.time(0);
       matte.time(0);
 
-      gTime = 0; f = (framerate * START);
+      f = (framerate * START); gTime = clamp((f/tf)*DURATION, 0, DURATION);
       PROGRESS = clamp(f/tf, 0, 1);
       TOTALPROGRESS = 0.0;
       TARGETPROGRESS = 0.0;
