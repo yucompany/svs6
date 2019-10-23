@@ -120,10 +120,10 @@ function tryVideo(video){
 
 // Load all base assets here
 function preload(){
-  let bg = assets.background = createVideo(['../videos/bgfresh3.mp4'], () => {
+  let bg = assets.background = createVideo(['../videos/bgfresh4.mp4'], () => {
     bg.volume(0);
   });
-    bg.elt.src = '../videos/bgfresh3.mp4';
+    bg.elt.src = '../videos/bgfresh4.mp4';
     bg.elt.removeChild(bg.elt.childNodes[0]);
 
     bg.elt.addEventListener("loadeddata", () => {
