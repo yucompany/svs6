@@ -1,7 +1,7 @@
 'use strict';
 
 let DEEP_LINK_ID = "";
-const S3URL =  process.env.S3_URL || 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo';
+const S3URL = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo';
 
 // Exec on page load - Adding button action assignments.
 $(document).ready(() => {
