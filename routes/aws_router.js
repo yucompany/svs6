@@ -80,7 +80,7 @@ router.post('/s3cacheKey', (req, res) => {
 
         const params = {
             Bucket: process.env.AWS_BUCKET || 'social-sharing-install',
-            Key: s3Key
+            Key: 'tec-demo' + s3Key
         };
 
         s3.getObject(params, (err, data) => {
