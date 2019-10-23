@@ -4,7 +4,7 @@ const port              = process.env.PORT || 8080;
 const bodyParser        = require('body-parser');
 const tmp               = require('tmp');
 const fs                = require('fs');
-
+const cluster           = require('cluster');
 
 // Store all generated videos here.
 global.outputDir = __dirname + '/output';
@@ -39,6 +39,23 @@ app.use('/encoder/', encoderRouter);
 const awsRouter = require('./routes/aws_router.js');
 app.use('/aws/', awsRouter);
 
-const listener = app.listen(port, function() {
-    console.log('Your app is running on port ' + listener.address().port);
-});
+if (cluster.isMaster) {
+	cluster.fork();
+
+	cluster.on('exit', function(deadWorker, code, signal) {
+		// Restart the worker
+		const worker = cluster.fork();
+
+		// Note the process IDs
+		const newPID = worker.process.pid;
+		const oldPID = deadWorker.process.pid;
+
+		// Log the event
+		console.log('worker '+oldPID+' died.');
+		console.log('worker '+newPID+' started.');
+	});
+} else {
+    const listener = app.listen(port, function() {
+        console.log('Your app is running on port ' + listener.address().port);
+    });
+}
