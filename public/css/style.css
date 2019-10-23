@@ -152,6 +152,9 @@ button {
       border-bottom: 1px solid #dee2e6!important;
     }
 
+    #dlVideoIOSNote {
+      padding: 0 10vw !important;
+    }
     /*
     #shareurl {
       max-width: 150px;
@@ -173,7 +176,10 @@ button {
   #redo {
     max-width: 250px;
   }
-
+  
+  #dlVideoIOSNote {
+    padding: 0 1vw !important;
+  }
 }
 
 @media (min-width: 992px) {
