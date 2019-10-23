@@ -4,10 +4,7 @@ const port              = process.env.PORT || 8080;
 const bodyParser        = require('body-parser');
 const tmp               = require('tmp');
 const fs                = require('fs');
-const dotenv            = require('dotenv');
 
-
-dotenv.config();
 
 // Store all generated videos here.
 global.outputDir = __dirname + '/output';
