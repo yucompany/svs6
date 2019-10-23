@@ -261,6 +261,8 @@ function draw(){
     if(capturing){
       let t = gTime;
 
+      console.log(t);
+
       let bg = assets.background; 
       let matte = assets.matte; 
       let bgbf = bg.elt.buffered;
@@ -387,10 +389,7 @@ function draw(){
     }
     else
       requestAnimationFrame(render);
-}// Sequence variables
-var offset = 0.0;
-var center = {x:0, y:0};
-
+}
 
 const onReset = new Event("resetted");
 
@@ -498,14 +497,14 @@ function initialize(){
     function begin(){
       let bg = assets.background;
       let matte = assets.matte;
-          
-      bg.time(0);
-      matte.time(0);
 
       f = (framerate * START); gTime = clamp((f/tf)*DURATION, 0, DURATION);
       PROGRESS = clamp(f/tf, 0, 1);
       TOTALPROGRESS = 0.0;
       TARGETPROGRESS = 0.0;
+
+      bg.time(0);
+      matte.time(0);
 
       playing = true;
 
