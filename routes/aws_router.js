@@ -21,7 +21,7 @@ router.post('/s3upload', (req, res) => {
             const base64data = new Buffer.from(data, 'base64');
 
             const params = {
-                Bucket: `${process.env.AWS_BUCKET}`,
+                Bucket: 'AWSBUCKET',
                 Key: 'tec-demo' + req.body.videoFilePath.replace('.mp4', '.jpg'),
                 Body: base64data
             };
@@ -40,7 +40,7 @@ router.post('/s3upload', (req, res) => {
                         const base64data = new Buffer.from(data, 'binary');
 
                         const params = {
-                            Bucket: `${process.env.AWS_BUCKET}`,
+                            Bucket: 'AWSBUCKET',
                             Key: 'tec-demo' + req.body.videoFilePath,
                             Body: base64data
                         };
@@ -80,7 +80,7 @@ router.post('/s3cacheKey', (req, res) => {
         console.log('tec-demo' + s3Key);
 
         const params = {
-            Bucket: `${process.env.AWS_BUCKET}`,
+            Bucket: 'AWSBUCKET',
             Key: 'tec-demo' + s3Key
         };
 
@@ -111,7 +111,7 @@ router.post('/processId', (req, res) => {
 
     return new Promise((resolve, reject) => {
         const params = {
-            TableName : `${process.env.DDB_TABLE}`,
+            TableName : 'DDB_TABLE',
             KeyConditionExpression: '#deeplink_id = :deeplink_id',
             ExpressionAttributeNames: {
                 '#deeplink_id': 'deeplink_id'
@@ -155,7 +155,7 @@ function generateDeepLink(videoFile, imageFile) {
         const line2 = videoFile.split('output/')[1].split('~')[1].split('.mp4')[0];
 
         const paramsObj = {
-            TableName : `${process.env.DDB_TABLE}`,
+            TableName : 'DDB_TABLE',
             Item: {
                 deeplink_id: uniqueId,
                 line1: (line1 === '') ? undefined : line1,
