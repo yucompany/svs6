@@ -261,8 +261,6 @@ function draw(){
     if(capturing){
       let t = gTime;
 
-      console.log(t);
-
       let bg = assets.background; 
       let matte = assets.matte; 
       let bgbf = bg.elt.buffered;
