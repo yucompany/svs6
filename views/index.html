@@ -177,6 +177,38 @@
       $(document).ready(function() {
           //console.log("Time until DOMready: ", (Date.now()-timerStart)/1000);
       });
-  </script>
+    </script>
+    <script type="text/javascript">
+    
+      let keys = Object.keys(CHARTABLE);
+
+      function mock(){
+          let line_at = "";
+          let line_bt = "";
+
+          let len = keys.length;
+
+          /* Assign random characters to input fields from CHARTABLE */
+
+          let a = 0; let al = Math.floor(Math.random() * 7);
+          for(; a < 7; a++)
+              line_at += keys[Math.floor(Math.random() * len)];
+
+          let b = 0;
+          for(; b < 7; b++)
+              line_bt += keys[Math.floor(Math.random() * len)];
+          
+          $('#firstInput').val(line_at);
+          $('#lastInput').val(line_bt);
+
+          FIRSTNAME = line_at = line_at.replace(/^\s+|\s+$/gm,'');  // Format input for media submission
+          LASTNAME = line_bt = line_bt.replace(/^\s+|\s+$/gm,'');
+
+          construct(line_at, line_bt); // Send over input
+      }
+
+      //window.addEventListener("loadcomplete", mock); // CREATE INPUT AFTER VIDEO LOAD
+    
+    </script>
   </body>
 </html>

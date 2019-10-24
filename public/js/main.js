@@ -501,9 +501,6 @@ function initialize(){
       TOTALPROGRESS = 0.0;
       TARGETPROGRESS = 0.0;
 
-      //bg.time(0);
-      //matte.time(0);
-
       playing = true;
 
       capture.beginCapture(framerate);
