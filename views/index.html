@@ -21,8 +21,8 @@
     <meta name="description" content="Celebrate the final season of Silicon Valley on HBO by creating your own personalized title sequence. Get creative with it and share on Facebook & Twitter!">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta property="og:image" content="https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo/static/title_card.jpg">
-    <meta property="og:url" content="http://hbo-bethevalley.us-west-2.elasticbeanstalk.com">
+    <meta property="og:image" content="https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo/static/title_card.jpg">  <!-- NOTE: Should be replaced with CDN URL for title_card.jpg -->
+    <meta property="og:url" content="https://www.bethevalley.com">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Be The Valley">
     <meta property="og:description" content="Celebrate the final season with this custom title sequence generator.">
@@ -77,7 +77,7 @@
           <h3 class="text-center mt-1 m-sm-0 mx-5 pt-2 pt-sm-1">Don’t just watch Silicon Valley, BE the Valley.</h3>
           <p class="text-center mb-1 px-4 pt-0 pt-sm-1">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want... within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
-      <div id="content-holder" class="d-flex justify-content-center mx-lg-5 mx-0 order-2 order-sm-1 order-lg-3" style="max-width: 1024px">
+      <div id="content-holder" class="d-flex justify-content-center mx-lg-5 mx-0 order-2 order-sm-1 order-lg-3" style="max-width: 1024px; margin-top: -5px; overflow: hidden;">
           <div id="canvas-holder"></div>
           <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute">
             <img id="replay" class="hidden" src="../images/icons/button-replay.png">
@@ -86,7 +86,7 @@
           <div id="loading-holder" class="d-flex w-100 h-100 flex-column justify-content-center align-items-center zindex-tooltip position-absolute hidden">
             <img id="loading" class="" width="80" src="../images/icons/loading.gif"><div id="percentage" class="text-light font-weight-bold pt-1" style="font-size:1.2rem">37%</div>
           </div>
-          <video id="video-preview" class="hidden" style="width: 100%; height: auto; position: absolute; z-index: 9999 !important;" src="" controls></video>
+          <video id="video-preview" class="hidden" style="width: 100%; height: 100%; position: absolute; z-index: 9999 !important;" src="" controls></video>
      
       </div>
       <!-- p5 canvas goes here -->
