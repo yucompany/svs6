@@ -62,8 +62,10 @@ function writeFrameToDisk(fr){
 router.post('/addFrames', (req, res) => {
     let frames = req.body.frames;
 
+    console.log('FRAMES: ');
+
     frames.reduce((prev, next, index) => {
-        console.log("write frame " + index);
+        console.log("f" + index);
 
         return prev
           .then(() => {
@@ -72,7 +74,7 @@ router.post('/addFrames', (req, res) => {
     }, Promise.resolve())
 
     .then(() => {
-      console.log("wrote all frames to disk");
+      //console.log("wrote all frames to disk");
       res.status(200).send('done writing');
     })
     .catch((err) => {
@@ -84,6 +86,8 @@ router.post('/addFrames', (req, res) => {
 router.post('/screenshot', (req, res) => {
   const frame = req.body.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
   const dir = outputDir + '/' + req.body.fileName;
+
+  console.log('SCREENSHOT');
 
     fs.writeFile(dir, frame, 'base64', (err) => {
       if (err) {
@@ -98,7 +102,7 @@ router.post('/encode', (req, res) => {
     
     res.setHeader("Content-Type", "video/mp4");
 
-    console.log("xx: " + req.body.path)
+    console.log('ENCODE');
 
     var proc = new ffmpeg()
         .input(tempDir.name + '/frame-%03d.jpg').inputFPS(12)
