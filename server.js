@@ -28,7 +28,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve client
 app.get('/', (req, res) => {
-	console.log("open sesame");
     res.sendFile(__dirname + '/views/index.html');
 });
 
