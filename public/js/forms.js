@@ -1234,6 +1234,7 @@ const nameform = document.forms["nameform"];
 
 
 const submitForm = function(){
+    if(!VIDEOLOAD) return;
 
     const s3key = generateKeyFromInput();
 
