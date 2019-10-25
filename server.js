@@ -5,6 +5,7 @@ const bodyParser        = require('body-parser');
 const tmp               = require('tmp');
 const fs                = require('fs');
 const cluster           = require('cluster');
+const session           = require('express-session')
 
 // Store all generated videos here.
 global.outputDir = __dirname + '/output';
@@ -26,9 +27,20 @@ app.use(express.static('public'))
 app.use(bodyParser.json({ extended: true, limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
+app.use(session(
+	{
+		'secret' : '832646d6dsvggvssdd76ge',
+		'dir' : ''
+	}
+))
+
 // Serve client
 app.get('/', (req, res) => {
 	console.log('open');
+
+	let dir = req.session.dir = (tmp.dirSync({ unsafeCleanup: true })).name
+	console.log('temp: ' + dir);
+
     res.sendFile(__dirname + '/views/index.html');
 });
 
