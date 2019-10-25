@@ -33,21 +33,20 @@ class EncodeTasks(TaskSequence):
     def addFrames(self):
         print("add frames")
         res = self.client.post('/encoder/addFrames', data=json.dumps({ "frames" : frames}), headers={'content-type': 'application/json'}, catch_response=True)
-        #print(res)
         pass
 
-#   @seq_task(3)
-#   def screenshot():
-#       print("screenshot")
-#       self.client.post(/encoder/screenshot)
-#       pass
-#
-#   @seq_task(4)
-#   def encode(self):
-#       print("encode")
-#       self.client.post('/encoder/encode')
-#       pass
-#
+    @seq_task(3)
+    def screenshot():
+        print("screenshot")
+        self.client.post(/encoder/screenshot,  data=json.dumps({ "frames" : frames[84]}), headers={'content-type': 'application/json'}, catch_response=True)
+        pass
+
+    @seq_task(4)
+    def encode(self):
+        print("encode")
+        self.client.post('/encoder/encode')
+        pass
+
 #class AWSTasks(TaskSet):
 #
 #    @task
