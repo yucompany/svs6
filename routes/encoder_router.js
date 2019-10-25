@@ -44,6 +44,8 @@ function writeFrameToDisk(fr){
       const fName = sprintf('frame-%03d.jpg', parseInt(fr.index));
       const dir = tempDir.name + "/" + fName;
 
+      console.log(frame);
+
       fs.writeFile(dir, frame, 'base64', (err) => {
         if (err) {
           //console.log('there was an error writing file: ' + err);
