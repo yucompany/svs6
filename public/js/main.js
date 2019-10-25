@@ -126,7 +126,7 @@ function preload(){
     bg.elt.src = '../videos/bgfresh3.mp4';
     bg.elt.removeChild(bg.elt.childNodes[0]);
 
-    bg.elt.addEventListener("loadeddata", () => {
+    bg.elt.addEventListener("canplaythrough", () => {
       loadA = true;
       if(loadB)
         onload();
@@ -143,7 +143,7 @@ function preload(){
     matte.elt.src = '../videos/mattefresh3.mp4';
     matte.elt.removeChild(matte.elt.childNodes[0]);
 
-    matte.elt.addEventListener("loadeddata", () => {
+    matte.elt.addEventListener("canplaythrough", () => {
       loadB = true;
       if(loadA)
         onload();
