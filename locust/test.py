@@ -3,10 +3,14 @@ from locust import HttpLocust, TaskSet, TaskSequence, task, seq_task
 import pickle
 
 import os
+import math
+import random
 import json
 import base64
 
 loc = 'locust/' # declare subfolder
+
+letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", ".", "*", "-", "@"  ]
 
 # grab images from local folder
 frames = [];
@@ -14,12 +18,15 @@ for f in range(84):
     img = open(loc + 'frames/frame-' + str(f+36) + '.jpg', 'rb')
     rf = img.read()
    # byt = bytearray(rf)
-    frames.append( { 'dat': "data:image/jpeg;base64,/" + base64.b64encode(rf).decode("utf-8"), 'index': f }  )
+    frames.append( { 'dat': "data:image/jpeg;base64, " + base64.b64encode(rf).decode("utf-8"), 'index': f }  )
 
 #headers = {'content-type': 'application/json'}
 
 # your own custom task set
-class EncodeTasks(TaskSequence):
+class Process(TaskSequence):
+    lineA = ""
+    lineB = ""
+
     # your task
     @seq_task(1)
     @task(1)
@@ -36,16 +43,38 @@ class EncodeTasks(TaskSequence):
         pass
 
     @seq_task(3)
-    def screenshot():
+    def defineKey(self):
+        print("set key")
+
+        al = math.floor(random.random() * 7)
+        alt = ""
+        for a in range(al):
+            alt += letters[math.floor(random.random() * len(letters))]
+
+        bl = math.floor(random.random() * 7)
+        blt = ""
+        for b in range(bl):
+            blt += letters[math.floor(random.random() * len(letters))]
+
+        self.lineA = alt
+        self.lineB = blt
+
+        print(alt + ",  " + blt)
+
+    @seq_task(4)
+    def screenshot(self):
         print("screenshot")
-        self.client.post(/encoder/screenshot,  data=json.dumps({ "frames" : frames[84]}), headers={'content-type': 'application/json'}, catch_response=True)
+        self.client.post('/encoder/screenshot',  data=json.dumps({ "fileName" : self.lineA + "~" + self.lineB + ".jpg", "dat" : frames[83].get("dat")}), headers={'content-type': 'application/json'}, catch_response=True)
         pass
+
+    
 
     @seq_task(4)
     def encode(self):
         print("encode")
-        self.client.post('/encoder/encode')
+        self.client.post('/encoder/encode', data=json.dumps( { "path" : self.lineA + '~' + self.lineB } ), headers={'content-type': 'application/json'}, catch_response=True)
         pass
+
 
 #class AWSTasks(TaskSet):
 #
@@ -74,6 +103,6 @@ class EncodeTasks(TaskSequence):
 
 # task runner
 class LocustRunner(HttpLocust): 
-    task_set = EncodeTasks # add your set to the task runner
-    min_wait = 5000
-    max_wait = 15000
+    task_set = Process # add your set to the task runner
+    min_wait = 0
+    max_wait = 5000
