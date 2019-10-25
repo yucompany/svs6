@@ -40,6 +40,7 @@ router.post('/addFrames', (req, res) => {
 
     console.log('FRAMES: ');
     let dir = req.session.dir;
+    console.log("write to: " + dir);
 
     frames.reduce((prev, next, index) => {
         console.log("f" + index);

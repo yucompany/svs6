@@ -175,6 +175,7 @@ class Capture {
                 //console.log("sending " + encodes.length);
 
                 TARGETPROGRESS += PHASES[1];
+                console.log(TARGETPROGRESS);
                 
                 const fetchRequest = fetch('/encoder/addFrames', {
                     method: 'POST',
@@ -213,6 +214,7 @@ class Capture {
             //console.log('Begin encode');
 
             TARGETPROGRESS += PHASES[2];
+            console.log(TARGETPROGRESS);
 
             const fetchResponse = fetch('/encoder/encode', {
                 method: 'POST',
