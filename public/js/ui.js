@@ -150,7 +150,22 @@ function prepareExports(){
 
             if(!cached){  // NO => existing data on S3
 
-                capture.photo()
+                capture.generate()
+                .then((path) => { // with .mp4
+
+                    beginUploadToS3(path)
+                    .then((deeplink) => {
+                        window.history.replaceState(null, null, '?x=' + deeplink);
+                        resolve(deeplink); // Found cached media, return URL
+                    })
+                    .catch((err) => {
+                        console.log("Error uploading media to S3!")
+                        reject(err);
+                    })
+
+                })
+
+                /*capture.photo()
                 .then((imageFile) => {
 
                     capture.video()
@@ -176,7 +191,7 @@ function prepareExports(){
                 .catch((err) => {
                     console.log("Error creating photo..." + err);
                     reject(err);
-                })
+                })*/
 
             }
             else { // YES => existing data on S3

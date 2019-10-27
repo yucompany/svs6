@@ -20,8 +20,6 @@ function writeFrameToDisk(fr, path){
       const fName = sprintf('frame-%03d.jpg', parseInt(fr.index));
       const dir = path + "/" + fName;
 
-      //console.log(frame);
-
       fs.writeFile(dir, frame, 'base64', (err) => {
         if (err) {
           console.log('there was an error writing file: ' + err);
@@ -35,7 +33,75 @@ function writeFrameToDisk(fr, path){
   })
 }
 
-router.post('/addFrames', (req, res) => {
+function writeScreenshot(name, frame){
+  console.log("SCREENSHOT");
+
+  const fr = frame.dat.replace(/^data:image\/(png|jpeg);base64,/, "");
+  const dir = outputDir + '/' + name;
+
+  fs.writeFile(dir, fr, 'base64', (err) => {
+    if (err)
+      console.log('there was an error writing file: ' + err);
+  });
+}
+
+router.post('/generate', (req, res) => {
+  let frames = req.body.frames;
+
+  console.log('FRAMES: ');
+  let dir = req.session.dir;
+  console.log("write to: " + dir);
+
+  frames.reduce((prev, next, index) => {
+      console.log("f" + index);
+
+      return prev
+        .then(() => {
+          return writeFrameToDisk(next, dir);
+        })
+  }, Promise.resolve())
+
+  .then(() => {
+    console.log("wrote all frames to disk");
+    writeScreenshot(req.body.name + '.jpg', req.body.frame)
+
+
+    let oldTemp = req.session.dir;
+
+    console.log("ENCODE")
+    var proc = new ffmpeg()
+        .input(req.session.dir + '/frame-%03d.jpg').inputFPS(12)
+        .outputOptions([
+          '-framerate 12',
+          '-start_number 0',
+          '-refs 5',
+          '-c:v libx264',
+          '-crf 23',
+          '-b:v 2500'
+        ])
+        .output(outputDir + '/' + req.body.name + ".mp4")
+        .on('start', function(){
+          console.log("Begin render!");
+        })
+        .on('error', function(err) {
+          console.log('An error occurred: ' + err.message);
+        })
+        .on('end', function() {
+          console.log('End render!' + '/output/' + req.body.name + ".mp4");
+          
+          fse.emptyDirSync(oldTemp)
+          res.status(200).send('/output/' + req.body.name + ".mp4");
+        })
+        .run()
+
+        req.session.dir = (tmp.dirSync({unsafeCleanup: true})).name;
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+})
+
+/*router.post('/addFrames', (req, res) => {
     let frames = req.body.frames;
 
     console.log('FRAMES: ');
@@ -110,6 +176,6 @@ router.post('/encode', (req, res) => {
         .run()
 
         req.session.dir = (tmp.dirSync({unsafeCleanup: true})).name;
-});
+});*/
 
 module.exports = router;

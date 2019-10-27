@@ -98,6 +98,55 @@ class Capture {
         })
     }
 
+    generate() {
+        return new Promise((resolve, reject) => {
+            let captured = this.captured;
+
+            let f = FIRSTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
+            let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
+
+            let name = f + '~' + l;
+            console.log('Generating...  ' + name);
+
+            this.encodeFrames(captured)
+            .then(() => {
+
+                let encodes = this.encoded;
+                
+                const fetchRequest = fetch('/encoder/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        frame: encodes[encodes.length-1],
+                        frames: encodes
+                    })
+                });
+
+                fetchRequest
+                .then((url) => {
+                    url.text()
+                    .then((result) => {
+                        resolve(result);
+                    })
+                    .catch((err) => {
+                        console.log('Error parsing response');
+                        reject(err);
+                    });
+                })
+                .catch((err) => {
+                    console.log('Error communicating with server.');
+                    reject(err);
+                });
+
+
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        })
+    }
+
     video() {
 
         return new Promise((resolve, reject) => {
