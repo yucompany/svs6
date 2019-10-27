@@ -55,7 +55,7 @@ class Capture {
         });
     }
 
-    photo() {
+    /*photo() {
         return new Promise((resolve, reject) => {
             const captured = this.captured;
             const reader = new FileReader();
@@ -96,7 +96,7 @@ class Capture {
                 res(result);
             })
         })
-    }
+    }*/
 
     generate() {
         return new Promise((resolve, reject) => {
@@ -108,10 +108,13 @@ class Capture {
             let name = f + '~' + l;
             console.log('Generating...  ' + name);
 
+             PHASES[1];
+
             this.encodeFrames(captured)
             .then(() => {
 
                 let encodes = this.encoded;
+                TARGETPROGRESS += PHASES[1];
                 
                 const fetchRequest = fetch('/encoder/generate', {
                     method: 'POST',
@@ -127,6 +130,8 @@ class Capture {
                 .then((url) => {
                     url.text()
                     .then((result) => {
+                        TARGETPROGRESS += PHASES[2];
+                        
                         resolve(result);
                     })
                     .catch((err) => {
@@ -147,7 +152,7 @@ class Capture {
         })
     }
 
-    video() {
+    /*video() {
 
         return new Promise((resolve, reject) => {
             let captured = this.captured;
@@ -169,7 +174,7 @@ class Capture {
                 reject(err);
             });
         })
-    }
+    }*/
 
     encodeFrame(frame, index){
         return new Promise((resolve, reject) => {
@@ -210,7 +215,7 @@ class Capture {
         }, Promise.resolve()) // Send all encoded frames to resolve
     }
 
-    sendFrames() {
+    /*sendFrames() {
         let captured = this.captured;
 
         return this.encodeFrames(captured)
@@ -290,5 +295,5 @@ class Capture {
                 reject(err);
             });
         });
-    }
+    }*/
 }

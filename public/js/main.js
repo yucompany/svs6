@@ -240,7 +240,7 @@ function draw(){
 
 
   var TOTALPROGRESS = 0.0, TARGETPROGRESS = 0.0;
-  var PHASES = [.4, .2, .4];
+  var PHASES = [.4, .56, .04];
 
 
   var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;

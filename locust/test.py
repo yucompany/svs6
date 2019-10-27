@@ -24,6 +24,7 @@ for f in range(84):
 class Process(TaskSequence):
     lineA = ""
     lineB = ""
+    lines = ""
 
     output = ""
 
@@ -41,17 +42,6 @@ class Process(TaskSequence):
 
     @seq_task(2)
     @task(1)
-    def addFrames(self):
-        print("add frames")
-        res = self.client.post('/encoder/addFrames', data=json.dumps({ "frames" : frames}), headers={'content-type': 'application/json'}, catch_response=True)
-
-        if res.status_code == 200 :
-            res.success()
-        else :
-            res.failure("fail add frames")
-        pass
-
-    @seq_task(3)
     def defineKey(self):
         print("set key")
 
@@ -67,11 +57,27 @@ class Process(TaskSequence):
 
         self.lineA = alt
         self.lineB = blt
+        self.lines = alt + "~" + blt
         pass
 
+    @seq_task(3)
+    @task(1)
+    def generate(self):
+        print("add frames")
+        res = self.client.post('/encoder/generate', data=json.dumps({ "name" : self.lines, "frame" : frames[len(frames)-1], "frames" : frames}), headers={'content-type': 'application/json'}, catch_response=True)
+
+        if res.status_code == 200 :
+            res.success()
+        else :
+            res.failure("fail generate")
+        pass
+
+    
+
     @seq_task(4)
+    @task(1)
     def cacheKey(self):
-        s3 = "/output/" + self.lineA + "~" + self.lineB + ".mp4"
+        s3 = "/output/" + self.lines + ".mp4"
 
 
         print("cache key")
@@ -88,9 +94,10 @@ class Process(TaskSequence):
         pass
 
     @seq_task(5)
+    @task(1)
     def deeplink(self):
-        v = "/output/" + self.lineA + "~" + self.lineB + ".mp4"
-        p = "/output/" + self.lineA + "~" + self.lineB + ".jpg"
+        v = "/output/" + self.lines + ".mp4"
+        p = "/output/" + self.lines + ".jpg"
 
         print("cache key")
         res = self.client.post('/aws/deepLink',  data=json.dumps({ "videoFilePath" : v, "imageFilePath" : p }), headers={'content-type': 'application/json'}, catch_response=True)
@@ -103,31 +110,32 @@ class Process(TaskSequence):
 
         pass
 
-    @seq_task(6)
-    def screenshot(self):
-        print("screenshot")
-        res = self.client.post('/encoder/screenshot',  data=json.dumps({ "fileName" : self.lineA + "~" + self.lineB + ".jpg", "dat" : frames[83].get("dat")}), headers={'content-type': 'application/json'}, catch_response=True)
-        
-        if res.status_code == 200 :
-            res.success()
-        else :
-            res.failure("fail screenshot")
-        pass
+   #@seq_task(6)
+   #def screenshot(self):
+   #    print("screenshot")
+   #    res = self.client.post('/encoder/screenshot',  data=json.dumps({ "fileName" : self.lineA + "~" + self.lineB + ".jpg", "dat" : frames[83].get("dat")}), headers={'content-type': 'application/json'}, catch_response=True)
+   #    
+   #    if res.status_code == 200 :
+   #        res.success()
+   #    else :
+   #        res.failure("fail screenshot")
+   #    pass
 
-    @seq_task(7)
-    def encode(self):
-        print("encode")
-        res = self.client.post('/encoder/encode', data=json.dumps( { "path" : self.lineA + '~' + self.lineB } ), headers={'content-type': 'application/json'}, catch_response=True)
-        
-        if res.status_code == 200 :
-            res.success()
-        else :
-            res.failure("fail encode")
+   #@seq_task(7)
+   #def encode(self):
+   #    print("encode")
+   #    res = self.client.post('/encoder/encode', data=json.dumps( { "path" : self.lineA + '~' + self.lineB } ), headers={'content-type': 'application/json'}, catch_response=True)
+   #    
+   #    if res.status_code == 200 :
+   #        res.success()
+   #    else :
+   #        res.failure("fail encode")
 
-        self.output = res.content.decode('utf-8')
-        pass
+   #    self.output = res.content.decode('utf-8')
+   #    pass
 #
-    @seq_task(8)
+    @seq_task(6)
+    @task(1)
     def upload(self):
         print("upload")
         res = self.client.post('/aws/s3upload', data=json.dumps( { "videoFilePath": self.output, "imageFilePath" :  self.output.replace("mp4", "jpg", 1) } ), headers={'content-type': 'application/json'}, catch_response=True)
