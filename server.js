@@ -7,50 +7,25 @@ const fs                = require('fs');
 const cluster           = require('cluster');
 const session           = require('express-session')
 
-// Store all generated videos here.
-global.outputDir = __dirname + '/output';
-global.baseDir = __dirname;
-
-// Check for existence of output directory.
-if(!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir);
-}
 // Setup Express Server
 const app = express();
 
 app.use(express.static('public'))
    .use(express.static('assets'))
    .use(express.static('lib'))
-   .use('/output', express.static('output'));
-
-// Server options
-app.use(bodyParser.json({ extended: true, limit: '50mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
-
-app.use(session(
-	{
-		'secret' : '832646d6dsvggvssdd76ge',
-		'dir' : ''
-	}
-))
 
 // Serve client
 app.get('/', (req, res) => {
-	console.log('open');
-
-	let dir = req.session.dir = (tmp.dirSync({ unsafeCleanup: true })).name
-	console.log('temp: ' + dir);
-
     res.sendFile(__dirname + '/views/index.html');
 });
 
 /* ENCODER ROUTER */
-const encoderRouter = require('./routes/encoder_router.js');
-app.use('/encoder/', encoderRouter);
+//const encoderRouter = require('./routes/encoder_router.js');
+//app.use('/encoder/', encoderRouter);
 
 /* AWS ROUTER */
-const awsRouter = require('./routes/aws_router.js');
-app.use('/aws/', awsRouter);
+//const awsRouter = require('./routes/aws_router.js');
+//app.use('/aws/', awsRouter);
 
 if (cluster.isMaster) {
 	cluster.fork();
