@@ -25,7 +25,7 @@ $(document).ready(() => {
     const downloadPhoto = document.getElementById('dlPhoto');
     if (downloadPhoto) {
         downloadPhoto.addEventListener('click', () => {
-            triggerPhotoDownload(PHOTOURL);
+            triggerPhotoDownload();
         });
     }
 
@@ -83,17 +83,17 @@ function updateProgressBar(percent){
     progress.innerHTML = prg + "%";
 }
 
-const onPreview = new Event("previewed");
+function showPreview(){
+    //videoPreview.src = VIDEOURL
+    //videoPreview.load();
 
-videoPreview.oncanplay = () => {
-    dispatchEvent(onPreview);
-}
+    updateUIVisibility(loadingHolder, false);
+    updateUIVisibility(replay, false);
+    updateUIVisibility(exporting, true);
+    updateCanvasBlur(false);
 
-function showVideoPreview(){
-    videoPreview.src = VIDEOURL
-    videoPreview.load();
-
-    updateUIVisibility(videoPreview, true);
+    previewing = true;
+    //updateUIVisibility(videoPreview, true);
 }
 
 
@@ -140,9 +140,8 @@ function showEmailShare(){
     document.body.removeChild(link);
 }
 
-function prepareExports(){
+function prepareExports(arr){
     const s3Key = generateKeyFromInput();
-
     return checkIfKeyExists(s3Key)
     .then((cached) => {
 
@@ -164,35 +163,6 @@ function prepareExports(){
                     })
 
                 })
-
-                /*capture.photo()
-                .then((imageFile) => {
-
-                    capture.video()
-                    .then((videoFile) => {
-
-                        beginUploadToS3(videoFile)
-                        .then((deeplink) => {
-                            window.history.replaceState(null, null, '?x=' + deeplink);
-                            resolve(deeplink); // Found cached media, return URL
-                        })
-                        .catch((err) => {
-                            console.log("Error uploading media to S3!")
-                            reject(err);
-                        })
-
-                    })
-                    .catch((err) => {
-                        console.log("Error creating video..." + err);
-                        reject(err);
-                    })
-
-                })
-                .catch((err) => {
-                    console.log("Error creating photo..." + err);
-                    reject(err);
-                })*/
-
             }
             else { // YES => existing data on S3
 
@@ -344,11 +314,12 @@ function triggerVideoDownload(videoFile) {
 }
 
 // Starts a photo download.
-function triggerPhotoDownload(imageFile) {
+function triggerPhotoDownload() {
     const link = document.createElement('a');
 
     // We'll want to replace this with the client's S3 bucket address.
-    link.href = imageFile;
+    let url = previews[previews.length-1];
+    link.href = url.src; console.log(url)
 
     // File name for downloaded file.
     link.download = `${$('#firstInput').val().toUpperCase().trim()}~${$('#lastInput').val().toUpperCase().trim()}~VALLEY.jpg`
@@ -406,8 +377,10 @@ const checkUIVisibility = function(e){
 
 addEventListener('started', () => {
     updateTitleCardImage(true);
-    updateUIVisibility(document.getElementById("defaultCanvas0"), true);
     updateUIVisibility(title, false);
+
+    updateUIVisibility(document.getElementById("defaultCanvas0"), true);
+    updateCanvasBlur(true);
 
     updateUIVisibility(loadingHolder, true);
 
@@ -415,10 +388,8 @@ addEventListener('started', () => {
     toTop();
 });
 
-addEventListener('ended', () => {
-    updateUIVisibility(loadingHolder, false);
-
-    showVideoPreview();
+addEventListener('queued', () => {
+    showPreview();
 });
 
 addEventListener('loadcomplete', () => {
@@ -426,9 +397,8 @@ addEventListener('loadcomplete', () => {
 })
 
 addEventListener('previewed', () => {
-    updateUIVisibility(document.getElementById("defaultCanvas0"), false);
-    updateUIVisibility(exporting, true);
-
+   // updateUIVisibility(document.getElementById("defaultCanvas0"), false);
+    updateUIVisibility(replay, true);
 });
 
 addEventListener('resetted', () => {
@@ -436,7 +406,8 @@ addEventListener('resetted', () => {
     updateUIVisibility(title, true);
 
     updateUIVisibility(exporting, false);
-    updateUIVisibility(videoPreview, false);
+    updateUIVisibility(replay, false);
+    //updateUIVisibility(videoPreview, false);
     
     // Clear form
     nameform.reset();
@@ -447,11 +418,22 @@ addEventListener('resetted', () => {
     }, 1000);
 })
 
+addEventListener('restarted', () => {
+    updateUIVisibility(replay, false);
+})
+
 function updateTitleCardImage(blurred, shown){
     if(blurred)
         title.src = "../images/misc/title card blurred.jpg";
     else
         title.src = "../images/misc/title_card.jpg";
+}
+
+function updateCanvasBlur(blurred){
+    if(blurred)
+        canvas.elt.style.filter = `blur(20px)`;
+    else
+        canvas.elt.style.filter = `blur(0px)`;
 }
 
 var footerHolder;

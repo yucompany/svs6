@@ -6,19 +6,20 @@ const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  /
      // console.log("Firefox detected!");
    // else
     //  console.log("Firefox NOT detected!");
-const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+/*const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     if(IS_IOS){
       //console.log("iOS is detected!");
     }
     else {
       dlVideoIOSNote.style.display = "none";
       //console.log("iOS NOT detected!");
-    }
+    }*/
 
 // Global variables
 var FIRSTNAME, LASTNAME;
 
 const framerate = 12;
+const step = (1.0 / framerate);
 
 const START = 3.0;
 var DURATION = 10.0;
@@ -220,6 +221,13 @@ function setup(){
 
 let ready = false;
 let capturing = false;
+let previewing = false, previewed = false;
+
+
+
+    var previews = []; 
+    var previewer = 0;
+    var previewStep = 0.0;
 
 let playing = false;
 
@@ -251,13 +259,19 @@ function draw(){
   var center = {x:0, y:0};
 
  function render(){
-    TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
+  TOTALPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf))*.99;
     updateProgressBar(TOTALPROGRESS);
 
     //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
 
     gTime = clamp((f/tf)*DURATION, 0, DURATION);
 
+    t1 = Date.now();
+    dt = (t1 - t0) / 1000;
+    t0 = t1;
+
+    
+    
     if(capturing){
       let t = gTime;
 
@@ -351,8 +365,7 @@ function draw(){
               })
                 
               .then(function(fr){
-                  if(fr) 
-                    capture.addFrame(fr);
+                  if(fr) capture.addFrame(fr);
 
                   if(f < tf)
                     f += 1.0;
@@ -366,7 +379,7 @@ function draw(){
                       capturing = false;
                   }
                   else 
-                    TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
+                    TOTALPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf));
 
                     requestAnimationFrame(render);
               })
@@ -385,8 +398,42 @@ function draw(){
         requestAnimationFrame(render);
       }
     }
+    else if(previewing){
+      preview(previews[previewer]);
+      
+      if(previewStep >= step) {
+        if(previewer >= previews.length-1) {
+          previewer = 0;
+          previewStep = 0;
+
+          if(!previewed) {
+            previewing = false;
+            previewed = true;
+
+            dispatchEvent(onPreview);
+          }
+        } else {
+          ++previewer;
+          previewStep -= step;
+        }
+      }
+      else
+        previewStep += dt*2;
+
+      requestAnimationFrame(render);
+    }
     else
       requestAnimationFrame(render);
+}
+
+const onPreview = new Event("previewed");
+
+function preview(frame){
+  blendMode(BLEND);
+
+  let ctx = canvas.elt.getContext('2d');
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+  ctx.drawImage(frame, 0, 0)
 }
 
 const onReset = new Event("resetted");
@@ -404,6 +451,12 @@ function reset(){
     TOTALPROGRESS = 0.0;
     TARGETPROGRESS = 0.0;
 
+    previews = [];
+    previewer = 0;
+    previewStep = 0;
+    previewing = false;
+    previewed = false;
+
     playing = false;
 
     elements.line1.clear();
@@ -416,19 +469,13 @@ function reset(){
 const onRestart = new Event("restarted");
 
 function restart(){
-  let bg = assets.background;
-  let matte = assets.matte;
-
-  bg.time(0);
-  matte.time(0);
-
-  gTime = 0.0;
-  f = (framerate * START);
+    previewer = 0;
+    previewStep = 0;
+    previewing = true;
+    previewed = false;
 
     elements.line1.reset();
     elements.line2.reset();
-
-    playing = true;
 
     dispatchEvent(onRestart);
 }
@@ -516,7 +563,7 @@ function initialize(){
 }
 
 // Exec on page load
-$(document).ready(() => {
+/*$(document).ready(() => {
     setTimeout(() => {
         const urlParams = getAllUrlParams(window.location.href);
 
@@ -567,7 +614,7 @@ $(document).ready(() => {
             submitForm();
         }
     }, 1200);
-});
+});*/
 
 // Checks if we already have a generated video stored in S3. Returns boolean.
 function checkDeepLinkId(id) {
@@ -601,7 +648,6 @@ function checkDeepLinkId(id) {
 
   });
 }
-  
 
 // Get params from URL
 function getAllUrlParams(url) {

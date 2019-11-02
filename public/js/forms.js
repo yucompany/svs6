@@ -1235,9 +1235,9 @@ const nameform = document.forms["nameform"];
 
 const submitForm = function(){
     if(!VIDEOLOAD) return;
+    verifyName();
 
-    const s3key = generateKeyFromInput();
-
+    /*const s3key = generateKeyFromInput();
      checkIfKeyExists(s3key)
     .then((cacheVideo) => {
         if(cacheVideo){  // If video exists on server, display immediately
@@ -1251,7 +1251,7 @@ const submitForm = function(){
         }
         else
             verifyName();
-    });
+    });*/
 }
 
 const verifyName = function(){
