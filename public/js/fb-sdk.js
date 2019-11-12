@@ -1,3 +1,8 @@
+/*     
+    Drives Facebook sharing
+*/
+
+
 window.fbAsyncInit = function () {
   FB.init({
     appId: '2804751129557151',

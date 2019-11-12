@@ -1,44 +1,55 @@
 "use strict";
 
 
-var PHOTOURL = "";
-var VIDEOURL = "";
+var PHOTOURL = ""; // Path to global photo url (AWS)
+var VIDEOURL = ""; // Path to global video url (AWS)
 
+
+/*     
+    Class that drives the capture of intro
+        1. Captures frames from canvas
+        2. Bundles frames into array
+        3. Sends bundle to server to be encoded
+        4. Resolves with path for video in temp storage
+*/
 
 class Capture {
     constructor(name, duration, format){
-    this.name = name;
+        this.name = name; // Name of media file
 
-    if(duration)
-        this.duration = duration;
-    else
-        this.duration = 1;
+        if(duration)
+            this.duration = duration; // Duration of video
+        else
+            this.duration = 1;
 
-    if(format)
-        this.format = format;
-    else
-        this.format = 'jpg';
+        if(format)
+            this.format = format; // File extension for frames
+        else
+            this.format = 'jpg';
 
-    //this.capturing = false;
-    this.encoding = false;
+        //this.capturing = false;
+        this.encoding = false; // In the process of encoding?
 
-    this.frames = 0;
-    this.totalFrames = 0;
+        this.frames = 0;
+        this.totalFrames = 0;
 
-    this.captured = [];
-    this.encoded = [];
+        this.captured = [];  // Raw frames captured
+        this.encoded = [];  // Encoded frame URLs
     }
 
+    // Clear out previous sequence and begin capture
     beginCapture(fps){
         capturing = true;
         this.captured = [];
         this.encoded = [];
     }
 
+    // Adds captured frame to sequence
     addFrame(frame){
         this.captured.push(frame);
     }
 
+    // Returns canvas image as blob
     captureFrame(dt){
         return new Promise(function(res, rej){
            // setTimeout(function(){
@@ -47,82 +58,40 @@ class Capture {
         })
     }
 
+    // On stop capture immediately prepare to retrieve video (AWS) or encode
     stopCapture(){
         prepareExports()
         .then(() => {
             //console.log("Successfully prepared exports after capture! :-)");
-            dispatchEvent(onEnd);
+            dispatchEvent(onEnd); // Has retrieved encoded video
         });
     }
-
-    /*photo() {
-        return new Promise((resolve, reject) => {
-            const captured = this.captured;
-            const reader = new FileReader();
-
-            reader.onload = () => {
-                const dataUrl = reader.result;
-                resolve(dataUrl);
-            };
-
-            reader.onerror = (err) => {
-                console.log('Issue reading file');
-                reject(err);
-            };
-
-            reader.readAsDataURL(captured[captured.length-1]);
-        })
-        .then((buffer) => {
-            let f = FIRSTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
-            let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
-
-            const fetchRequest = fetch('/encoder/screenshot', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    dat: buffer,
-                    fileName: f + '~' + l + '.jpg'
-                })
-            });
-
-            return fetchRequest;
-        })
-        .then((response) => {
-            return response.text();
-        })
-        .then((result) => {
-            //console.log(result);
-            return new Promise(function(res, rej){
-                res(result);
-            })
-        })
-    }*/
 
     generate() {
         return new Promise((resolve, reject) => {
             let captured = this.captured;
 
+            // Format first and last name in acceptable format for URL --> remove whitespace, # --> . , + --> *
             let f = FIRSTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
             let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
 
-            let name = f + '~' + l;
+            let name = f + '~' + l;  // Combine first and last
             console.log('Generating...  ' + name);
 
-             PHASES[1];
-
-            this.encodeFrames(captured)
+            this.encodeFrames(captured)  // Encode all frames in captured array
             .then(() => {
 
                 let encodes = this.encoded;
-                TARGETPROGRESS += PHASES[1];
+                TARGETPROGRESS += PHASES[1]; // Increment progress bar
                 
+                // Make fetch request to express to encode frames to video
                 const fetchRequest = fetch('/encoder/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        name: name,
-                        frame: encodes[encodes.length-1],
-                        frames: encodes
+                        name: name, // File name
+                        frame: encodes[encodes.length-1], // Last frame for image export
+                        frames: encodes // Frame sequence to be encoded
                     })
                 });
 
@@ -130,9 +99,9 @@ class Capture {
                 .then((url) => {
                     url.text()
                     .then((result) => {
-                        TARGETPROGRESS += PHASES[2];
+                        TARGETPROGRESS += PHASES[2]; // Increment progress bar
                         
-                        resolve(result);
+                        resolve(result); // Return temp path to video file
                     })
                     .catch((err) => {
                         console.log('Error parsing response');
@@ -152,36 +121,13 @@ class Capture {
         })
     }
 
-    /*video() {
-
-        return new Promise((resolve, reject) => {
-            let captured = this.captured;
-
-            let f = FIRSTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
-            let l = LASTNAME.trim().split(' ').join('_').replace(/#/g, '.').replace(/\+/g, '*');
-
-            let name = f + '~' + l;
-            //console.log('Sending frames... ' + captured.length);
-
-            this.sendFrames(captured)
-            .then(() => {
-                this.encode(name)
-                .then((url) => {
-                    resolve(url);
-                })
-            })
-            .catch((err) => {
-                reject(err);
-            });
-        })
-    }*/
-
+    // Constructs a data URL for a frame to be added to encode sequence
     encodeFrame(frame, index){
         return new Promise((resolve, reject) => {
 
             const reader = new FileReader();
 
-                reader.onload = () => {
+                reader.onload = () => {  // Reader has finished constructing URL
                     const dataUrl = reader.result;
 
                     let frame = {
@@ -190,7 +136,7 @@ class Capture {
                     };
 
                     //console.log("wrote frame " + index);
-                    resolve(frame);
+                    resolve(frame); // Return frame
                 };
 
                 reader.onerror = (err) => {
@@ -202,98 +148,17 @@ class Capture {
         });
     }
 
+    // Returns promise chain for encoding all frames
     encodeFrames(frames){
         let encoded = [];
 
         return frames.reduce((prev, curr, index) => {
             return prev
                 .then((frame) => {
-                    if(frame != undefined)
+                    if(frame != undefined)  // If frame is not undefined, add to encoded sequence
                         this.encoded.push(frame);
                     return this.encodeFrame(frames[index], index);
                 })
         }, Promise.resolve()) // Send all encoded frames to resolve
     }
-
-    /*sendFrames() {
-        let captured = this.captured;
-
-        return this.encodeFrames(captured)
-    
-        .then(() => {
-            return new Promise((resolve, reject) => {
-
-                let encodes = this.encoded;
-
-                //console.log(encodes);
-                //console.log("sending " + encodes.length);
-
-                TARGETPROGRESS += PHASES[1];
-                console.log(TARGETPROGRESS);
-                
-                const fetchRequest = fetch('/encoder/addFrames', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        frames: encodes
-                    })
-                });
-
-                fetchRequest
-                .then((response) => {
-                    response.text()
-                    .then((result) => {
-                        resolve(result);
-                    })
-                    .catch((err) => {
-                        console.log('Error parsing response');
-                        reject(err);
-                    });
-                })
-                .catch((err) => {
-                    console.log('Error communicating with server.');
-                    reject(err);
-                });                
-
-            })
-        
-        })
-        .catch((err) => {
-            console.log("Error when sending frames: " + err);
-        })
-    }
-
-    encode(filename) {
-        return new Promise((resolve, reject) => {
-            //console.log('Begin encode');
-
-            TARGETPROGRESS += PHASES[2];
-            console.log(TARGETPROGRESS);
-
-            const fetchResponse = fetch('/encoder/encode', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    path: filename
-                })
-            });
-
-            fetchResponse
-            .then((response) => {
-                response.text()
-                .then((result) => {
-                    //console.log('Done encoding ' + result);
-                    resolve(result);
-                })
-                .catch((err) => {
-                    console.log('Error parsing response');
-                    reject(err);
-                });
-            })
-            .catch((err) => {
-                console.log('Error communicating with server.');
-                reject(err);
-            });
-        });
-    }*/
 }

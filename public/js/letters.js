@@ -2,6 +2,7 @@
 
 // SQ = Square , TTR = Top-strong Trapezoid, BTR = Bottom-strong Trapezoid
 
+// Table with size information and relative spacing multipliers for each character
 const CHARTABLE = {
   "A" : { shape: "BTR", size: 1, e: { F: 1.5, P: 1.5, J: 1, L: 1.1 } },
   "B" : { shape: "SQ", size: .85, e: { F: 1.2, P: 1.2 , J: 1.2, L: 1.2} },
@@ -37,10 +38,11 @@ const CHARTABLE = {
   " " : { shape: "SQ", size: .35, e: { F: 1.2, P: 1.2, J: 1.2, L: 1.2 } }
 }
 
-const NUMCHARS = 6.0;
-const CHARSIZE = .67 * (6.0 / NUMCHARS); 
-const SPACING = CHARSIZE * (.87);
+const NUMCHARS = 6.0; // Base characters per line
+const CHARSIZE = .67 * (6.0 / NUMCHARS);  // Base character size
+const SPACING = CHARSIZE * (.87); // Base spacing size
 
+// Table with kerning rules between principal character shapes, with exceptions (L, J, I)
 const Kerning = {
   "SQSQ"   : 1,
   "SQTTR"  : .9,
@@ -86,61 +88,67 @@ const Kerning = {
 }
 
 
+// Loads all letter images (frames for build sequence) from static assets
 function loadLetter(letter, callback){
     let letters = assets.letters;
-    if(letters.hasOwnProperty(letter)){
+    if(letters.hasOwnProperty(letter)){ // If already loaded letter
       callback(letters[letter])
     }
     else {
       let path = "/images/letters/";
-      if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/"
+      if(letter == "@" || letter == "#" || letter == "+" || letter == "-") path += "SPECIAL/" // Append subfolder if special character
   
       let lt = letter;
+
+      // Translate special characters to path in subfolder
       if(letter == "@") lt = "AT";
       else if(letter == "#") lt = "HASH";
       else if(letter == "+") lt = "PLUS";
       else if(letter == "-") lt = "SUB";
   
-      let letterPath = path + lt + "12f";
+      let letterPath = path + lt + "12f"; // Construct full path to sequence images
   
       let loaded = 0;
       let letterImages = [];
-        for(let i = 0; i < 12; i++) letterImages.push(null);
+        for(let i = 0; i < 12; i++) letterImages.push(null); // Populate array with empty objects
       
       for(let i = 0; i < 12; i++) loadImage(letterPath + "/" + i + ".png", function(image){
         pushImage(i, image);
       });
       
+      // Add loaded image to array of images
       function pushImage(i, image){
         ++loaded;
         letterImages[i] = image;
   
+        // Has loaded all letters? Add key to lookup
         if(loaded >= 11){
-          letters[letter] = letterImages;
-          callback(letterImages);
+          letters[letter] = letterImages; 
+          callback(letterImages); // Has loaded all letter images
         }
       }
     }
   }
   
+  // Loads all letters for a string
   function loadName(name, callback){
-    if(name.length <= 0)
+    if(name.length <= 0) // String was empty, has loaded
       callback();
     else{
       let loaded = 0; let len = name.length;
   
-      function onLoadLetter(){
+      function onLoadLetter(){ // Callback for when letter images have been loaded
         ++loaded;
         if(loaded >= len)
-          callback();
+          callback(); // Has loaded name!
       }
   
       for(let i = 0; i < name.length; i++){
         let char = name[i];
         if(char != " ")
-           loadLetter(char, onLoadLetter);
+           loadLetter(char, onLoadLetter); // Load individual letter
         else
-          onLoadLetter();
+          onLoadLetter(); // Letter was empty, has loaded
       }
     }
   }

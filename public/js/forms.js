@@ -1,10 +1,12 @@
 "use strict";
 
+// Whitelist
 var ACCEPTED = [
     "hello"
 ]
 var ACCEPTIGEX = new RegExp(ACCEPTED.join("|", "i"));
 
+// CAUTION: Prohibited words list from client
 var PROHIBITED = [
     "_96WasntEnough", 
     "_H1tIer", 
@@ -1227,20 +1229,20 @@ var PROHIBITED = [
 var PROHIBIGEX = new RegExp(PROHIBITED.join("|"), "i");
 
 
-const nameform = document.forms["nameform"];
-    const firstname = nameform["firstname"];
-    const lastname = nameform["lastname"];
+const nameform = document.forms["nameform"]; // Form that user submits
+    const firstname = nameform["firstname"]; // First field in form
+    const lastname = nameform["lastname"]; // Second field in form
 
 
-
+// Generates AWS key from input and verifies acceptable input (!empty, !prohibited, !invalid characters, !greater than 7 characters per line)
 const submitForm = function(){
-    if(!VIDEOLOAD) return;
+    if(!VIDEOLOAD) return; // Don't allow input until video assets have loaded
 
-    const s3key = generateKeyFromInput();
+    const s3key = generateKeyFromInput(); // Create AWS key from input
 
-     checkIfKeyExists(s3key)
+     checkIfKeyExists(s3key) // Check for key in AWS
     .then((cacheVideo) => {
-        if(cacheVideo){  // If video exists on server, display immediately
+        if(cacheVideo){  // Video exists on server, return cached file
             dispatchEvent(onStart);
 
             prepareExports()
@@ -1249,7 +1251,7 @@ const submitForm = function(){
                 dispatchEvent(onEnd);
             })
         }
-        else
+        else  // Video does NOT exist, verify input and construct sequence
             verifyName();
     });
 }
@@ -1274,6 +1276,7 @@ const verifyName = function(){
         alert("Oops! You tried to submit more than 7 characters per line. Try again!");
     }
 
+    // Trim all whitespace from input, convert to uppercase
     let first = firstname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
     let last = lastname.value.toUpperCase().replace(/^\s+|\s+$/gm,'');
 
@@ -1336,11 +1339,11 @@ const verifyName = function(){
         return;
     }
 
-    // Passes character table test, profanity filter
+    // Passes all tests!
     throwAccept(first, last);
 }
 
-$('#nameform').submit(function(e){
+$('#nameform').submit(function(e){  // Call submit form when user presses submit
     e.preventDefault();
     submitForm();
 
