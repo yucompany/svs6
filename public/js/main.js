@@ -317,35 +317,39 @@ function draw(){
 
 
       
-      if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){
+      if(VIDEOLOAD && VIDEOREADY && VIDEOPLAY && SEEKED){ // Video has arrived at target seek position
         let buffer = elements.buffer;
-          buffer.clear();
+          buffer.clear(); // Clear out buffer where lines are drawn
 
-        let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ);
-        let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ);
+        let dx = lerp(ORIGIN.x, ORIGIN.y, SEQ); // Calculate change in x
+        let dy = lerp(DESTINATION.x, DESTINATION.y, SEQ); // Calculate change in y
 
-        offset = lerp(.66, .97, SEQ);
+        offset = lerp(.66, .97, SEQ); // Calculate scale in sequence
         
+        // Calculate center point between lines
         center.x = ((offset * lineOrigins[1].x) + dx)*SFW;
         center.y = ((offset * lineOrigins[1].y) + dy)*SFH;
 
+        // Render line if not empty
         if(lineA.active){
           let line1 = elements.line1;
-            line1.x = ((offset * lineA.origin.x) + dx)*SFW;
+            line1.x = ((offset * lineA.origin.x) + dx)*SFW; // Calculate line position on path
             line1.y = ((offset * lineA.origin.y) + dy)*SFH;
-            line1.scale = offset;
-            line1.render(buffer, 1, t);
+            line1.scale = offset; // Update line scale
+            line1.render(buffer, 1, t); // Render line
         }
 
+        // Render line if not empty
         if(lineB.active){
           let line2 = elements.line2;
-              line2.x = ((offset * lineB.origin.x) + dx)*SFW;
+              line2.x = ((offset * lineB.origin.x) + dx)*SFW; // Calculate line position on path
               line2.y = ((offset * lineB.origin.y) + dy)*SFH;
-              line2.scale = offset;
-              line2.render(buffer, 1, t);
+              line2.scale = offset; // Update line scale
+              line2.render(buffer, 1, t); // Render line
         }
 
-          
+        /* Calculate area of buffer to mask */
+
         let mx = 127;
         let my = 67;
 
@@ -354,50 +358,50 @@ function draw(){
 
         
         let mask = elements.mask;
-        mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now())
-              .then(function(dt){ 
+        mask.mask(Math.floor(center.x - mw/3), Math.floor(center.y - 2*mh/3), Math.floor(center.x + 2*mw/3), Math.floor(center.y + mh/3), Date.now()) // Mask the line buffer, anchored to the line center position
+              .then(function(dt){ // Buffer has been masked from matte video
                   let buffer = elements.buffer;
                   image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
                 
-                  blendMode(SCREEN);
+                  blendMode(SCREEN); // Adjust blendmode to 'screen'
 
                   let fx = elements.fx;
-                      image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+                      image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  // Draw optical flares on top of frame
 
-                    return capture.captureFrame(dt);
+                    return capture.captureFrame(dt); // Capture current canvas state
               })
                 
               .then(function(fr){
                   if(fr) 
-                    capture.addFrame(fr);
+                    capture.addFrame(fr); // Add frames to sequence array
 
                   if(f < tf)
-                    f += 1.0;
+                    f += 1.0; // Move to next frame in sequence
 
-                  gTime = clamp((f/tf)*DURATION, 0, DURATION);
+                  gTime = clamp((f/tf)*DURATION, 0, DURATION); // Update time in total sequence from frames
                   SEEKED = false;
 
-                  PROGRESS = clamp(f/tf, 0, 1);
-                  if(PROGRESS >= 1.0){
-                      capture.stopCapture();
+                  PROGRESS = clamp(f/tf, 0, 1); // Update total progress of sequence stepthrough
+                  if(PROGRESS >= 1.0){ // Has stepped through entire sequence, end capture
+                      capture.stopCapture(); 
                       capturing = false;
                   }
                   else 
-                    TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0];
+                    TARGETPROGRESS = ((PROGRESS - (START*framerate / tf))/(1.0 - START*framerate/tf)) * PHASES[0]; // Update progress for step with stepthrough progress
 
                     requestAnimationFrame(render);
               })
       }
-      else {
+      else { // Video has NOT arrived at target seek position, render old frame
         //console.log("not ready");
         
         let buffer = elements.buffer;
         image(buffer, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw buffer to canvas
 
-        blendMode(SCREEN);
+        blendMode(SCREEN); // Update blend mode to 'screen'
 
         let fx = elements.fx;
-            image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  
+            image(fx, WIDTH2, HEIGHT2, WIDTH, HEIGHT);  // Draw optical flares
 
         requestAnimationFrame(render);
       }
@@ -406,16 +410,16 @@ function draw(){
       requestAnimationFrame(render);
 }
 
-const onReset = new Event("resetted");
+const onReset = new Event("resetted"); // Global event for when user restarts generation (returns to name input)
 
 function reset(){
     let bg = assets.background;
-        bg.time(0);
+        bg.time(0); // Set background time to beginning
     let matte = assets.matte;
-        matte.time(0);
+        matte.time(0); // Set matte time to beginning
         
-
-    f = (framerate * START);
+    /* Reset progress and position in stepthrough to beginning */
+    f = (framerate * START); 
     gTime = clamp((f/tf)*DURATION, 0, DURATION);
     PROGRESS = clamp(f/tf, 0, 1);
     TOTALPROGRESS = 0.0;
@@ -423,43 +427,48 @@ function reset(){
 
     playing = false;
 
+    // Clear out line inputs and reset letters
     elements.line1.clear();
     elements.line2.clear();
-    $('#shareurl').val('');
+    $('#shareurl').val(''); // Clear deeplink url 
 
     dispatchEvent(onReset);
 }
 
-const onRestart = new Event("restarted");
+const onRestart = new Event("restarted"); // Global event for when user restarts video `OLD
 
 function restart(){
   let bg = assets.background;
   let matte = assets.matte;
 
-  bg.time(0);
-  matte.time(0);
+  bg.time(0); // Reset background
+  matte.time(0); // Reset matte
 
   gTime = 0.0;
-  f = (framerate * START);
+  f = (framerate * START); // Set time to start
 
+    // Reset lines
     elements.line1.reset();
     elements.line2.reset();
 
     playing = true;
 
-    dispatchEvent(onRestart);
+    dispatchEvent(onRestart); // Trigger event for restart
 }
 
+/*
+    Constructs lines with letters from form input
+*/
 function construct(first, last){
   FIRSTNAME = first;
   LASTNAME = last;
   
   let loaded = 0;
-  loadName(first, loadedLine);
+  loadName(first, loadedLine); // Load all letter images from assets
   loadName(last, loadedLine);
 
 
-  if(first != '' && last != ''){
+  if(first != '' && last != ''){  // If there is input for both lines, position lines normally
     lineA.origin = lineOrigins[0];
     lineB.origin = lineOrigins[2];
 
@@ -469,7 +478,7 @@ function construct(first, last){
     lineA.active = true;
     lineB.active = true;
   }
-  else{
+  else{ // If only one line has input, position line in center
     if(first == ''){
       lineB.origin = lineOrigins[1];
       lineB.time = lineTimes[0];
@@ -486,33 +495,38 @@ function construct(first, last){
     }
   }
 
-
+  // Has loaded letter images for line 
   function loadedLine(){
     ++loaded;
     if(loaded <= 1)
       return;
 
-      initialize();
+      initialize(); // Begin generation
   }
 }
 
+/*
+    Begins sequence generation
+*/
 function initialize(){
     let char = "";
     let letter;
     let container;
 
+    // Create line objects from input
     container = lineA.object;
     container.clear();
-    container.populate(FIRSTNAME, lineA.time);
+    container.populate(FIRSTNAME, lineA.time); // Add input
 
     container = lineB.object;
     container.clear();
-    container.populate(LASTNAME, lineB.time);
+    container.populate(LASTNAME, lineB.time); // Add input
 
     function begin(){
       let bg = assets.background;
       let matte = assets.matte;
 
+      // Reset progress and stepthrough position to beginning
       f = (framerate * START); gTime = clamp((f/tf)*DURATION, 0, DURATION);
       PROGRESS = clamp(f/tf, 0, 1);
       TOTALPROGRESS = 0.0;
@@ -520,16 +534,16 @@ function initialize(){
 
       playing = true;
 
-      capture.beginCapture(framerate);
+      capture.beginCapture(framerate); // Start capturing frames
       dispatchEvent(onStart); // Fire initialized event
     }
 
     function attemptStart(){
-      playVideos()
+      playVideos() // Try to play video assets
       .then(begin)
-      .catch(attemptStart)
+      .catch(attemptStart) // Failed to play videos, try again
     }
-    attemptStart();
+    attemptStart(); // Initial attempt to play videos
 }
 
 // Exec on page load
