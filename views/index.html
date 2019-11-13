@@ -53,21 +53,21 @@
 
     <script src="js/main.js" defer></script>
 
-
-    <script type="text/javascript">
-      var timerStart = Date.now();
-    </script>
   </head>
-  
+
   <body>
     <div class="d-flex flex-column justify-content-center align-items-center">
+      <!-- Header -->
       <div id="header" class="mt-0 mt-lg-3 p-4 p-sm-3 p-lg-2 w-50 order-1 order-sm-2 order-lg-1" style="max-width: 576px">
         <img src="../images/misc/logo.png" class="img-fluid">
       </div>
+      <!-- Body copy -->
       <div id="bodytext" class="container pt-2 pt-lg-1 pb-0 px-4 py-sm-0 pb-lg-3 w-100 w-sm-75  order-3 order-sm-3 order-lg-2" >
           <h3 class="text-center mt-1 m-sm-0 mx-5 pt-2 pt-sm-1">Don’t just watch Silicon Valley, BE the Valley.</h3>
           <p class="text-center mb-1 px-4 pt-0 pt-sm-1">Celebrate the final season with this custom title sequence generator. Add your name (or whatever you want... within reason) and share your creation by downloading or sharing directly to Facebook or Twitter.</p>
       </div>
+
+      <!-- Main content -->
       <div id="content-holder" class="d-flex justify-content-center mx-lg-5 mx-0 order-2 order-sm-1 order-lg-3" style="max-width: 1024px">
           <div id="canvas-holder"></div>
           <div id="replay-holder" class="d-flex w-100 h-100 justify-content-center align-items-center zindex-tooltip position-absolute">
@@ -80,9 +80,11 @@
           <video id="video-preview" class="hidden" style="width: 100%; height: 100%; position: absolute; z-index: 9999 !important;" src="" controls></video>
      
       </div>
-      <!-- p5 canvas goes here -->
 
+      <!-- Actionable items -->
       <div id="actionables" class="w-100 w-lg-40 pt-3 pt-sm-4 pt-lg-4 pb-5 flex-fill d-flex justify-content-center position-relative order-4 overflow-hidden">
+
+          <!-- Form -->
           <div id="submission" class="d-flex position-absolute justify-content-center w-100 h-auto flex-fill hidden">
               <div id="namefield" class="px-0 w-100">
                 <form id="nameform" name="nameform">
@@ -114,6 +116,7 @@
               </div>
           </div>
 
+          <!-- Exports (Photo, video)  -->
           <div id="exports" class="d-flex justify-content-center flex-fill mb-4 pt-2 row hidden">
             <div id="downloading" class="has-border col-10 col-sm-4 col-lg-5 flex-fill pt-2 pb-4 px-4 pl-sm-4 pr-sm-1 pl-md-4 pr-md-2 pl-lg-5 pr-lg-3">
                 <h2 class="text-center text-lg-left mx-3 mx-lg-3  mb-1">Download your creation</h2>
@@ -130,6 +133,7 @@
                 </div>
             </div>
 
+            <!-- Sharing (Facebook, Twitter, e-mail) -->
             <div id="sharing" class="has-border col-10 col-sm-5 col-md-4 col-lg-4 flex-fill justify-content-center py-4 px-4 px-sm-2 d-flex ">
               <div class="col-12 my-auto mx-0 align-self-center">
                 <h2 class="text-center text-lg-left">Share</h2>
@@ -147,6 +151,8 @@
                 </div>
               </div>
             </div>
+
+            <!-- Redo -->
             <div id="redo-container" class="col-10 text-center col-sm-3 col-md-4 col-lg-3 flex-fill d-flex justify-content-center justify-content-lg-end align-self-center my-2 py-4 px-2 pl-lg-2 pr-lg-5">
               <button id="redo" class="btn rounded-lg btn-primary  mr-sm-2 mr-md-4 mt-2 text-uppercase px-0 pt-3 pb-2">Redo</button>
             </div>
@@ -154,7 +160,9 @@
           </div>
       </div>
       
-      <div id="footerChecker" class="d-flex order-5"></div>
+      <div id="footerChecker" class="d-flex order-5"></div> <!-- Used for calculating footer position -->
+
+      <!-- Footer -->
       <div id="footer-holder" class="d-flex w-100 align-items-end order-6 position-relative" style="height: 150px">
         <div id="footer" class="footer position-absolute container-fluid d-flex flex-column justify-content-center align-items-center mt-0" style="bottom:0">
           <div id="hbo" class="mt-0"> 
@@ -172,43 +180,5 @@
       
     </div>
     
-
-    <script type="text/javascript">
-      $(document).ready(function() {
-          //console.log("Time until DOMready: ", (Date.now()-timerStart)/1000);
-      });
-    </script>
-    <script type="text/javascript">
-    
-      let keys = Object.keys(CHARTABLE);
-
-      function mock(){
-          let line_at = "";
-          let line_bt = "";
-
-          let len = keys.length;
-
-          /* Assign random characters to input fields from CHARTABLE */
-
-          let a = 0; let al = Math.floor(Math.random() * 7);
-          for(; a < 7; a++)
-              line_at += keys[Math.floor(Math.random() * len)];
-
-          let b = 0;
-          for(; b < 7; b++)
-              line_bt += keys[Math.floor(Math.random() * len)];
-          
-          $('#firstInput').val(line_at);
-          $('#lastInput').val(line_bt);
-
-          FIRSTNAME = line_at = line_at.replace(/^\s+|\s+$/gm,'');  // Format input for media submission
-          LASTNAME = line_bt = line_bt.replace(/^\s+|\s+$/gm,'');
-
-          construct(line_at, line_bt); // Send over input
-      }
-
-      //window.addEventListener("loadcomplete", mock); // CREATE INPUT AFTER VIDEO LOAD
-    
-    </script>
   </body>
 </html>
