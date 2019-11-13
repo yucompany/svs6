@@ -1,7 +1,7 @@
 'use strict';
 
-let DEEP_LINK_ID = "";
-const S3URL = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo';
+let DEEP_LINK_ID = ""; // Deeplink to be appended to URL
+const S3URL = 'https://social-sharing-install.s3-us-west-2.amazonaws.com/tec-demo'; // Base URL for where to look for encoded videos on AWS
 
 // Exec on page load - Adding button action assignments.
 $(document).ready(() => {
@@ -53,19 +53,12 @@ $(document).ready(() => {
         });
     }
 
+    // Share to Email Button
     const emailShare = document.getElementById('shareEmail');
     if(emailShare){
         emailShare.addEventListener('click', () => {
             showEmailShare();
         });
-    }
-
-    if(videoPreview){
-        /*videoPreview.addEventListener('click', () => {
-            videoPreview.pause();
-            videoPreview.currentTime = '0';
-            videoPreview.play();
-        });*/
     }
 });
 
@@ -75,25 +68,27 @@ const loading = document.getElementById("loading");
 const loadingHolder = document.getElementById("loading-holder");
 const progress = document.getElementById("percentage");
 
+// Updates the percentage value displayed from progress to retrieve encoded video
 function updateProgressBar(percent){
     if(progress == undefined)
         return;
 
     let prg = Math.floor(percent*100);
-    progress.innerHTML = prg + "%";
+    progress.innerHTML = prg + "%"; // Set display text
 }
 
-const onPreview = new Event("previewed");
+const onPreview = new Event("previewed"); // Has previewed the encoded video
 
+// When video can be played past first frame, show preview
 videoPreview.oncanplay = () => {
     dispatchEvent(onPreview);
 }
 
 function showVideoPreview(){
-    videoPreview.src = VIDEOURL
+    videoPreview.src = VIDEOURL // Set video source to AWS URL
     videoPreview.load();
 
-    updateUIVisibility(videoPreview, true);
+    updateUIVisibility(videoPreview, true); // Show video preview
 }
 
 
@@ -124,7 +119,9 @@ function showTwitterShare() {
     window.open(shareURL, '', 'left=0,top=0,width=550,height=450,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
 }
 
+// Helper function for Email sharing
 function showEmailShare(){
+    // Sets subject line and body copy for email
     const params = {
         subject: "Be The Valley",
         body: `Here is a link to your video: ${VIDEOURL}`
@@ -135,27 +132,37 @@ function showEmailShare(){
     link.href = `mailto:test@example.com?subject=${params.subject}&body=${params.body}`;
     link.setAttribute('target', '_blank'); //Trigger download in new window
 
+    // Trigger email URL (opens new window*)
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
-function prepareExports(){
-    const s3Key = generateKeyFromInput();
 
-    return checkIfKeyExists(s3Key)
+/*
+    Creates video and photo exports for sequence 
+      1. Check for key in AWS table
+      2. If exists, fetch video from s3 storage
+         If not, generate video with capture 
+      3. Set video and photo URLs
+      4. Resolve with deeplink
+*/
+function prepareExports(){
+    const s3Key = generateKeyFromInput(); // Generate custom key for input
+
+    return checkIfKeyExists(s3Key) // Check if key exists in AWS table
     .then((cached) => {
 
         return new Promise(function(resolve, reject){
 
             if(!cached){  // NO => existing data on S3
 
-                capture.generate()
-                .then((path) => { // with .mp4
+                capture.generate() // Generate video frames in controlled sequence
+                .then((path) => { // Resolve with path to video file
 
-                    beginUploadToS3(path)
-                    .then((deeplink) => {
-                        window.history.replaceState(null, null, '?x=' + deeplink);
+                    beginUploadToS3(path) // Upload video and photo to AWS S3
+                    .then((deeplink) => { // Receive deeplink
+                        window.history.replaceState(null, null, '?x=' + deeplink); // Replace window URL with deeplink
                         resolve(deeplink); // Found cached media, return URL
                     })
                     .catch((err) => {
@@ -165,39 +172,12 @@ function prepareExports(){
 
                 })
 
-                /*capture.photo()
-                .then((imageFile) => {
-
-                    capture.video()
-                    .then((videoFile) => {
-
-                        beginUploadToS3(videoFile)
-                        .then((deeplink) => {
-                            window.history.replaceState(null, null, '?x=' + deeplink);
-                            resolve(deeplink); // Found cached media, return URL
-                        })
-                        .catch((err) => {
-                            console.log("Error uploading media to S3!")
-                            reject(err);
-                        })
-
-                    })
-                    .catch((err) => {
-                        console.log("Error creating video..." + err);
-                        reject(err);
-                    })
-
-                })
-                .catch((err) => {
-                    console.log("Error creating photo..." + err);
-                    reject(err);
-                })*/
-
             }
             else { // YES => existing data on S3
 
-                let videoFile = s3Key + ".mp4";
+                let videoFile = s3Key + ".mp4"; // Full video path
 
+                // Generate deeplink from input
                 const fetchResponse = fetch('aws/deepLink', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -208,7 +188,7 @@ function prepareExports(){
                 });
 
                 fetchResponse
-                .then((response) => {
+                .then((response) => { // Received deeplink
                     response.text()
                     .then((link) => {
                         //console.log("Successfully fetched deeplink = " + link);
@@ -232,18 +212,18 @@ function prepareExports(){
         if(deeplink){
             //console.log("Successfully bound exports!");
 
-            PHOTOURL = S3URL + s3Key + ".jpg";
-            VIDEOURL = S3URL + s3Key + ".mp4";
+            PHOTOURL = S3URL + s3Key + ".jpg"; // Set global photo path on S3
+            VIDEOURL = S3URL + s3Key + ".mp4"; // Set global video path on S3
 
-            DEEP_LINK_ID = deeplink;
-            $('#shareurl').val(window.location.origin + '?x=' + deeplink);
+            DEEP_LINK_ID = deeplink; // Set deeplink
+            $('#shareurl').val(window.location.origin + '?x=' + deeplink); // Update the deeplink in sharing
         }
     })
 
 
 }
 
-// Begins upload to S3
+// Uploads video and photo to S3 Bucket, resolves with deeplink
 function beginUploadToS3(videoFile) {
     return new Promise((resolve, reject) => {
         //console.log('Note to dev: Show Loading in UI...');
@@ -337,6 +317,7 @@ function triggerVideoDownload(videoFile) {
         // File name for downloaded file.
         link.download = `${$('#firstInput').val().toUpperCase().trim()}_${$('#lastInput').val().toUpperCase().trim()}~VALLEY.mp4`;
 
+        // Open video URL, triggers download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -354,6 +335,7 @@ function triggerPhotoDownload(imageFile) {
     link.download = `${$('#firstInput').val().toUpperCase().trim()}~${$('#lastInput').val().toUpperCase().trim()}~VALLEY.jpg`
     //console.log(link);
 
+    // Open video URL, triggers download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -373,11 +355,12 @@ const title = document.getElementById("titlecard");
 const submit = document.getElementById("submission");
 const exporting = document.getElementById("exports");
 
+// Shared function for updating visibility of UI element with classes (shown/hidden)
 const updateUIVisibility = function(e, visible){
     if(e == null) return;
 
     if(visible){
-      if(e.classList.contains("shown")) return;
+      if(e.classList.contains("shown")) return; // Already shown
 
       if(e.classList.contains("hidden"))
         e.classList.remove("hidden");
@@ -386,7 +369,7 @@ const updateUIVisibility = function(e, visible){
 
     }
     else{
-      if(e.classList.contains("hidden")) return;
+      if(e.classList.contains("hidden")) return; // Already hidden
 
       if(e.classList.contains("shown"))
         e.classList.remove("shown");
@@ -397,6 +380,7 @@ const updateUIVisibility = function(e, visible){
     updateFooterPos();
 }
 
+// Check if UI element is shown/hidden
 const checkUIVisibility = function(e){
     if(e.classList.contains("hidden"))
         return false;
@@ -404,49 +388,55 @@ const checkUIVisibility = function(e){
     return true;
 }
 
+// When sequence generation starts
 addEventListener('started', () => {
-    updateTitleCardImage(true);
-    updateUIVisibility(document.getElementById("defaultCanvas0"), true);
-    updateUIVisibility(title, false);
+    updateTitleCardImage(true); // Blur title card
+    updateUIVisibility(document.getElementById("defaultCanvas0"), true); // Show canvas
+    updateUIVisibility(title, false); // Hide title card
 
-    updateUIVisibility(loadingHolder, true);
+    updateUIVisibility(loadingHolder, true); // Show loader
 
-    updateUIVisibility(submit, false);
+    updateUIVisibility(submit, false); // Hide submit form
     toTop();
 });
 
+// When sequence generation ends
 addEventListener('ended', () => {
-    updateUIVisibility(loadingHolder, false);
+    updateUIVisibility(loadingHolder, false); // Hide loader
 
-    showVideoPreview();
+    showVideoPreview(); // Show preview
 });
 
+// When video assets have loaded
 addEventListener('loadcomplete', () => {
-    updateUIVisibility(submit, true);
+    updateUIVisibility(submit, true); // Show submit form
 })
 
+// When video preview has loaded
 addEventListener('previewed', () => {
-    updateUIVisibility(document.getElementById("defaultCanvas0"), false);
-    updateUIVisibility(exporting, true);
+    updateUIVisibility(document.getElementById("defaultCanvas0"), false); // Hide canvas
+    updateUIVisibility(exporting, true); // Show export options
 
 });
 
+// When experience has been reset to the beginning (name input)
 addEventListener('resetted', () => {
-    updateTitleCardImage(false);
-    updateUIVisibility(title, true);
+    updateTitleCardImage(false); // Unblur title card
+    updateUIVisibility(title, true); // Show title
 
-    updateUIVisibility(exporting, false);
-    updateUIVisibility(videoPreview, false);
+    updateUIVisibility(exporting, false); // Hide export options
+    updateUIVisibility(videoPreview, false); // Hide preview
     
     // Clear form
     nameform.reset();
 
-    updateUIVisibility(title, true);
+    updateUIVisibility(title, true); // Show title
     setTimeout(function(){
-        updateUIVisibility(submit, true);
+        updateUIVisibility(submit, true); // Wait 1 second until show submit form
     }, 1000);
 })
 
+// Sets the title card image asset to normal/blur
 function updateTitleCardImage(blurred, shown){
     if(blurred)
         title.src = "../images/misc/title card blurred.jpg";
@@ -455,6 +445,8 @@ function updateTitleCardImage(blurred, shown){
 }
 
 var footerHolder;
+
+//update footer position per screen size (especially height) since hidden elements still have heights
 const updateFooterPos = function(){
     const actabs = document.getElementById('actionables');
     actabs.style.height = "fit-content";
@@ -464,15 +456,19 @@ const updateFooterPos = function(){
     var shownH = 5;
     let i = 0;
     while (actabs.children[i]) {
+        //getting height of current showing elements
         if (actabs.children[i].classList.contains("shown")) {
             let tempH = 0;
+            //mobile view, buttons are laying down vertically
             if (window.innerWidth < 576) {
                 for (let j = 0; actabs.children[i].children[j]; j += 1) {
                     tempH += actabs.children[i].children[j].clientHeight;
                 }
             }
+            //for other views buttons are laying down horizontally
             else {
                 for (let j = 0; actabs.children[i].children[0].children[j]; j += 1) {
+                    //go in one more level to ensure hight wont be effect by it's parent
                     tempH += actabs.children[i].children[0].children[j].clientHeight;
                 }
                 tempH += 25;
@@ -481,50 +477,32 @@ const updateFooterPos = function(){
         }
         i += 1;
     }
-
     var height = window.innerHeight ? window.innerHeight : $(window).height();
-
     actabs.style.height = String(shownH + 65) + "px";
     var hboFooterPos = hboFooter.getBoundingClientRect();
+    //occupy whole reaming height if screen is too high
     if (hboFooter.offsetTop + 150 < window.innerHeight) {
         footerHolder.style.height = String(window.innerHeight - hboFooter.offsetTop) + "px";
-        
     }
+    //default height of footer
     else{
         footerHolder.style.height = "150px";
     }
 }
 
+// When window resizes, update footer
 window.addEventListener("resize", () => {
     if (window.innerWidth != windowWidth) {
         updateFooterPos();
     }
 });
 
+// Show footer when DOM loads
 window.addEventListener("DOMContentLoaded", () => {
     updateUIVisibility(footerHolder, true);
 }); 
 
+// Move window to top during sequence
 function toTop() {
-   
-    //window.scrollTo(0, 0);
     window.scrollTo({top: 0, behavior: 'smooth'});
 }
-/*var t1 = 0;
-window.onscroll = scroll1;
-
-function scroll1() {
-  var toTop = document.getElementById('toTop');
-  window.scrollY > 0 ? toTop.style.display = 'Block' : toTop.style.display = 'none';
-}
-
-function abcd() {
-  var y1 = window.scrollY;
-  y1 = y1 - 1000;
-  window.scrollTo(0, y1);
-  if (y1 > 0) {
-    t1 = setTimeout("abcd()", 100);
-  } else {
-    clearTimeout(t1);
-  }
-}*/

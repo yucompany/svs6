@@ -1,5 +1,10 @@
 "use strict";
 
+
+/*
+    Base class for all elements in scene, has x-coordinate, y-coordinate and scale
+*/
+
 class SceneElement {
   constructor(x, y, scale){
     this.x = x;
@@ -15,15 +20,23 @@ class SceneElement {
     let scale = this.scale;
     let m = 1;
 
-    if(mult)
+    if(mult) // If being rendered at a larger scale (zoomed)
       m = mult;
 
-    if(buffer)
+    // Draw ellipse by default
+    if(buffer) // Drawn to buffer
       buffer.ellipse(x, y, 50*scale*m, 50*scale*m);
-    else
-      ellipse(x, y, 50*scale*m, 50*scale*m);
+    else // Drawn to canvas
+      ellipse(x, y, 50*scale*m, 50*scale*m); 
   }
 }
+
+/*
+    Class for a letter element 
+      1. Has a sequence of images to move through
+      2. Assigned a character
+      3. Constructed at a specific time
+*/
 
 class Letter extends SceneElement {
   constructor(x, y, scale, images, char, timing){
@@ -31,63 +44,71 @@ class Letter extends SceneElement {
 
     this.char = char;
     this.images = images;
-    let empty = this.empty = (images == null || images.length <= 0);
+    let empty = this.empty = (images == null || images.length <= 0); // Check if letter is empty, has no images in sequence
     
-    this.width = LINEWIDTH/NUMCHARS; this.height = LINEWIDTH/NUMCHARS;
+    this.width = LINEWIDTH/NUMCHARS; this.height = LINEWIDTH/NUMCHARS; // Set width and height of letter based on base number of characters and line width
     this.built = true;
-    this.buildings = [];
+    this.buildings = []; // Timing for each step in build sequence
     
     if(!empty){
-      let img = this.image = images[images.length-1];
+      let img = this.image = images[images.length-1]; // Final image in sequence
 
+      // Set width and height of object from image height/width
       if(img != null){
         this.width = img.width;
         this.height = img.height;
       }
       
+      // Has a specific timing to be constructed at, not empty
       if(timing >= 0){
         this.built = false;
         for(let i = 0; i < images.length; i++){
           this.buildings.push(timing);
-          timing += (Math.random() * .1);
+          timing += (Math.random() * .1); // Increment base timing with added offset
         }
       }
     }
 
-    this.index = -1;
+    this.index = -1; // Set index outside of array
   }
 
+  // Moves animated sequence for letter building forward by step
   next(){
     let images = this.images;
     let index = this.index;
-    if(index < (images.length - 1)){
+    if(index < (images.length - 1)){ // Has not finished building
       let i = ++this.index;
-      this.image = images[i];
+      this.image = images[i]; // Set image to draw to frame in sequence
     }
     else
-      this.built = true;
+      this.built = true; // Has moved through sequence
   }
 
+  // Reset animation sequence index
   reset(){
     this.index = -1;
 
     let images = this.images;
     if(images != null)
-      this.image = images[images.length-1];
+      this.image = images[images.length-1]; // Set animation to final frame (on end sequence)
 
     this.built = false;
   }
 
   render(buffer, mult, t){
     let built = this.built;
-    if(!built){
-       if(t > this.buildings[this.index+1])
+    if(!built){ // Has not moved through sequence
+       if(t > this.buildings[this.index+1]) // Move to next frame in sequence if time has passed building step time
         this.next();
     }
 
+    // If started sequence, previously -1
     if(this.index >= 0){
       let empty = this.empty;
+
+      // Letter is not an empty space
       if(!empty){
+
         let x = this.x;
         let y = this.y;
         let scale = this.scale;
@@ -98,20 +119,28 @@ class Letter extends SceneElement {
         let w = this.width * scale * m;
         let h = this.height * scale * m;
 
-        let x1 = x + (w * .275);
+        // Set anchor for image
+        let x1 = x + (w * .275); 
         let y1 = y - (h * .2);
 
+        // Draw image to buffer/canvas
         if(buffer)
           buffer.image(img, x1 - w/2, y1 - h/2, w, h);
         else
           image(img, x1 - w/2, y1 - h/2, w, h);
+
       }
     }
-
-    //super.render(buffer, mult);  //debug position
   }
 }
 
+
+/*
+    Class for a line element
+      1. Draws a series of letters along a curve
+      2. Drives the building of letters over time
+      3. Adjusts the kerning of letters along line
+*/
 class Line extends SceneElement {
 
   constructor(x, y, dx, dy, length, scale, charSize, buildTime){
@@ -122,16 +151,16 @@ class Line extends SceneElement {
     this.length = length;
     
     this.charSize = charSize;
-    this.charModifier = 1;
+    this.charModifier = 1; // Adjust size of characters
 
-    this.letters = [];
-    this.spaces = [];
-    this.sizes = [];
+    this.letters = []; // Letters along line
+    this.spaces = []; // Spaces between letters
+    this.sizes = []; // Sizes of letters
 
-    this.stretch = length;
-    this.segment = length / NUMCHARS;
+    this.stretch = length; // Length of line
+    this.segment = length / NUMCHARS; // Length of individual segment (split between letters)
 
-    this.buildTime = buildTime;
+    this.buildTime = buildTime; // Time to construct all letters
   }
 
   populate(letters, time){
@@ -143,50 +172,50 @@ class Line extends SceneElement {
 
     let len = 0.0; let s = 0; let k=0;
     for(let i = 0; i < letters.length; i++){
-      s = CHARTABLE[letters[i]].size;
+      s = CHARTABLE[letters[i]].size; // Fetch size of character from table
       this.sizes.push(s);
 
       if(i < letters.length-1){
-        k = Kerning[CHARTABLE[letters[i]].shape + CHARTABLE[letters[i+1]].shape] * (CHARTABLE[letters[i]].size*2+CHARTABLE[letters[i+1]].size)/3; // Append shape constants to lookup kerning in table
-        if(CHARTABLE[letters[i]].e.hasOwnProperty(letters[i+1]))
+        // Calculate kerning for letter, using current and next character sizes with weighted average
+        k = Kerning[CHARTABLE[letters[i]].shape + CHARTABLE[letters[i+1]].shape] * (CHARTABLE[letters[i]].size*2+CHARTABLE[letters[i+1]].size)/3;
+        if(CHARTABLE[letters[i]].e.hasOwnProperty(letters[i+1])) // Look for kerning exception, apply
           k *= CHARTABLE[letters[i]].e[letters[i+1]];
       }
       else
         k = 0;
-      this.spaces.push(k);
+      this.spaces.push(k); // Add to spaces array
 
-      len += (s*CHARSIZE+k*SPACING)*seg;
+      len += (s*CHARSIZE+k*SPACING)*seg; // Add to total length (+ character size + spacing)
     }
 
       if(len > 0)
-        len = this.charModifier = clamp(this.length / len, 0, 1); //Rescale letters if over total allowance
+        len = this.charModifier = clamp(this.length / len, 0, 1); // Rescale letters if over total allowance
       else 
         len = this.charModifier = 1;
-
-        //console.log("char mod: " + len);
 
     for(let i = 0; i < letters.length; i++){
       char = letters[i];
 
-      if(assets.letters.hasOwnProperty(char)){
+      if(assets.letters.hasOwnProperty(char)){  // Construct CHARACTER letter
         letter = new Letter(0, 0, 1, assets.letters[char], char, this.buildTime + Math.random());
       }
-      else
+      else // Construct EMPTY letter
         letter = new Letter(0, 0, 1, null, char, -1);      
       
         
-      let sz = this.sizes[i] * CHARSIZE * this.segment * len * SFW;
-      let kz = this.spaces[i] * SPACING * this.segment * len * SFW;
+      let sz = this.sizes[i] * CHARSIZE * this.segment * len * SFW; // Size delta
+      let kz = this.spaces[i] * SPACING * this.segment * len * SFW; // Kerning delta
 
-      this.stretch += (sz+kz);
+      this.stretch += (sz+kz); // Add to total length from size and kerning
 
       this.sizes[i] = sz;
       this.spaces[i] = kz;
 
-      this.letters.push(letter);
+      this.letters.push(letter); // Add constructed letter
     }
   }
 
+  // Destroy all letters, reset length and segment
   clear(){ 
     this.letters = []; 
 
@@ -196,6 +225,7 @@ class Line extends SceneElement {
     this.sizes = [];
   }
 
+  // Reset letters to final frame of respective sequences
   reset(){
     let letters = this.letters;
     for(let i = 0; i < letters.length; i++){
@@ -221,8 +251,8 @@ class Line extends SceneElement {
       let sizes = this.sizes;
       let segment = this.segment;
 
-      let ox = -(length/2.0);
-      let oy = -(length/2.0);
+      let ox = -(length/2.0); // Origin (x)
+      let oy = -(length/2.0); // Origin (y)
       
       let sx = 0;
       let sy = 0;
@@ -231,15 +261,17 @@ class Line extends SceneElement {
       for(let i = 0; i < letters.length; i++){
         l = letters[i];
 
+        // Calculate letter draw position on line, origin + delta
         l.x = x + (ox + sx)*dx*scale;
         l.y = y + (oy + sy)*dy*scale;
 
+        // Append to overall delta (from origin)
         sx += (sizes[i] + spaces[i]);
         sy += (sizes[i] + spaces[i]);
 
         
 
-        letters[i].render(buffer, scale * SFW * 2.0 * m * CHARSIZE * this.charModifier, t);
+        letters[i].render(buffer, scale * SFW * 2.0 * m * CHARSIZE * this.charModifier, t);  // Render letter
       }
     }
 
@@ -248,6 +280,11 @@ class Line extends SceneElement {
 
 }
 
+
+/*
+    Class for a mask element 
+      1. Sets the alpha channel of destination from source pixels
+*/
 class Mask extends SceneElement {
   constructor(x, y, src, dest){
     super(x, y);
@@ -261,21 +298,22 @@ class Mask extends SceneElement {
     let dest = this.dest;
 
     return new Promise(function(res, rej){
+      // Load all pixels on frame
       source.loadPixels();
       dest.loadPixels();
 
       for(let i = x1; i < x2; i++){
         for(let j = y1; j < y2; j++){
-          let ind = (j * WIDTH + i) * 4;
+          let ind = (j * WIDTH + i) * 4; // Calculate pixel position in 1D array
 
-          let s = source.pixels[ind];
+          let s = source.pixels[ind]; // Get color (R value) at position
           if(s > 128)
-            dest.pixels[ind + 3] = 0;
+            dest.pixels[ind + 3] = 0; // If Red channel is > 128 (out of 255), hide pixel in destination
         }
       }
 
       dest.updatePixels();
-      res((Date.now() - t)*2);
+      res((Date.now() - t)*2); // Resolve with time it took to mask
     });
     
   }

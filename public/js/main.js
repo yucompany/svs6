@@ -1,11 +1,15 @@
 'use strict';
 
 
+// Check for Firefox, affects drawing operations
+
 const IS_FIREFOX = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;  // Detect Firefox, disable extra graphics buffers if so
    // if(IS_FIREFOX)
      // console.log("Firefox detected!");
    // else
     //  console.log("Firefox NOT detected!");
+
+// Check for iOS, affects download video option
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     if(IS_IOS){
       //console.log("iOS is detected!");
@@ -15,33 +19,35 @@ const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       //console.log("iOS NOT detected!");
     }
 
-// Global variables
-var FIRSTNAME, LASTNAME;
+var FIRSTNAME, LASTNAME; // Accepted form submission
 
 const framerate = 12;
 
-const START = 3.0;
-var DURATION = 10.0;
+const START = 3.0; // Start time in sequence (seconds)
+var DURATION = 10.0; // Duration of sequence (seconds)
 
+// Dimensions of canvas, video assets
 const WIDTH = 854.0;
 const HEIGHT = 480.0;
 
+// Calculate multiplier from original 1280x720 implementation
 const SFW = (WIDTH / 1280.0);
 const SFH = (HEIGHT / 720.0);
 
 const WIDTH2 = WIDTH/2;
 const HEIGHT2 = HEIGHT/2;
 
+// Start and end positions of letter movement during sequence (pixels)
 const ORIGIN = { x: 744.0, y: 117.0 };
 const DESTINATION = { x: 262.0, y: 713.0 };
 
-const LINEWIDTH = 240.0;
+const LINEWIDTH = 240.0; // Total line width (pixels)
 
 // Core elements
-
 var canvas; const canvasHolder = document.getElementById('canvas-holder');
-const capture = new Capture("svs6", 10, 'jpg'); // Duration of capture at framerate
+const capture = new Capture("svs6", 10, 'jpg'); // Create new capture object with name, duration, extension
 
+// Assets being loaded
 var assets = {
   background : "",
   matte: "",
@@ -50,6 +56,7 @@ var assets = {
   letters: {}
 }
 
+// Assets being drawn to canvas
 var elements = {
   bg : "",
   buffer: "",
@@ -64,24 +71,24 @@ var elements = {
   bBuffer: ""
 }
 
-// Global events
 
-const onStart = new Event("started");
-const onEnd = new Event("ended");
-const onLoad = new Event("loadcomplete");
+const onStart = new Event("started"); // Sequence generation started
+const onEnd = new Event("ended"); // Sequence generation ended
+const onLoad = new Event("loadcomplete"); // Loaded all assets
 
-p5.disableFriendlyErrors = true;
+p5.disableFriendlyErrors = true; // Optimization
 
-var VIDEOLOAD = false;
-var loadA = false, loadB = false;
+var VIDEOLOAD = false; // Loaded all videos?
+var loadA = false, loadB = false; // Load checks for matte and background videos
 
 function onload(){
   if(!VIDEOLOAD){
     VIDEOLOAD = true;
-    dispatchEvent(onLoad);
+    dispatchEvent(onLoad); // Trigger loaded
   }
 }
 
+// Play all video assets
 function playVideos(){
   let played = 0;
   let videos = [];  
@@ -90,9 +97,9 @@ function playVideos(){
 
   return new Promise((resolve, reject) => {
     tryVideo(videos[0])
-    .then(() => {
+    .then(() => { // Has played background
       tryVideo(videos[1])
-      .then(() => {
+      .then(() => { // Has played matte
         resolve();
       })
       .catch((err) => {
@@ -106,6 +113,7 @@ function playVideos(){
   
 }
 
+// HTML Media Element play implementation (with promise)
 function tryVideo(video){
     return video.play()
 
@@ -121,41 +129,44 @@ function tryVideo(video){
 // Load all base assets here
 function preload(){
   let bg = assets.background = createVideo(['../videos/bgfresh3.mp4'], () => {
-    bg.volume(0);
+    bg.volume(0); // Ensure muted
   });
     bg.elt.src = '../videos/bgfresh3.mp4';
-    bg.elt.removeChild(bg.elt.childNodes[0]);
+    bg.elt.removeChild(bg.elt.childNodes[0]); // Remove source object
 
     bg.elt.addEventListener("canplaythrough", () => {
-      loadA = true;
+      loadA = true; // Has loaded background
       if(loadB)
-        onload();
+        onload(); // Has loaded both videos
     })
     bg.elt.load();
 
+    // Hide video
     bg.hide();
     bg.hideControls();
   
 
   let matte = assets.matte = createVideo(['../videos/mattefresh3.mp4'], () => {
-    matte.volume(0);
+    matte.volume(0); // Ensure muted
   });
     matte.elt.src = '../videos/mattefresh3.mp4';
-    matte.elt.removeChild(matte.elt.childNodes[0]);
+    matte.elt.removeChild(matte.elt.childNodes[0]); // Remove source object
 
     matte.elt.addEventListener("canplaythrough", () => {
-      loadB = true;
+      loadB = true; // Has loaded matte
       if(loadA)
-        onload();
+        onload(); // Has loaded both videos
     });
     matte.elt.load();
 
+  // Hide video
   matte.hide();
   matte.hideControls();
 
-  let flares = assets.flares = loadImage("../images/misc/optics.png");
+  let flares = assets.flares = loadImage("../images/misc/optics.png"); // Load optical flares
 }
 
+// Origins for three possible line placements [TOP, BOTTOM, MIDDLE (one input)]
 const lineOrigins = 
 [
   {x: 540, y:-290},
@@ -163,21 +174,25 @@ const lineOrigins =
   {x: 400, y:-220}
 ];
 
+// When to construct the letters of each line (timed with intro)
 const lineTimes = 
 [
   3.625,
   5.08
 ]
 
+// Line objects
 var lineA = { origin: "", time: 0, active: true, object: "" }
 var lineB = { origin: "", time: 0, active: true, object: "" }
 var lines = [ lineA, lineB ];
 
+// Used for delta between frames
 let t0 = Date.now();
 let t1 = 0;
 let dt = 0;
 
 function setup(){
+  // Set core p5 drawing attributes
   pixelDensity(1);
   background(0);
   stroke(255);
@@ -186,16 +201,16 @@ function setup(){
 
   canvas = createCanvas(WIDTH, HEIGHT);
            canvas.parent(canvasHolder);
-           canvas.class('w-100 h-100');
+           canvas.class('w-100 h-100'); // Ensure fills up container
 
   let bg = elements.bg = assets.background; 
   let matte = assets.matte;
   
-  let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT);
+  let buffer = elements.buffer = createGraphics(WIDTH, HEIGHT); // Create offscreen buffer for masking
       
   if(IS_FIREFOX){
-    elements.aBuffer = createGraphics(WIDTH, HEIGHT);
-    elements.bBuffer = createGraphics(WIDTH, HEIGHT);
+    elements.aBuffer = createGraphics(WIDTH, HEIGHT); // Create background buffer
+    elements.bBuffer = createGraphics(WIDTH, HEIGHT); // Create matte buffer
   }
 
   // Set mask buffer to extra buffer IF FIREFOX
@@ -203,12 +218,14 @@ function setup(){
   if(IS_FIREFOX)
     maskBuffer = elements.bBuffer;
 
-  let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer);
+  let mask = elements.mask = new Mask(0, 0, maskBuffer, elements.buffer); // Create mask object with matte source and destination
   let fx = elements.fx = assets.flares;       
 
+  // Create line objects with core parameters
   let line1 = elements.line1 = lineA.object = new Line(lineA.origin.x, lineA.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 3.625);
   let line2 = elements.line2 = lineB.object = new Line(lineB.origin.x, lineB.origin.y, 2, 1, LINEWIDTH, .1, CHARSIZE, 5.08);
 
+  // Set video attributes for HTML Media Element
   bg.attribute('playsinline', '');
   bg.attribute('autoplay', '');
   bg.attribute('muted', '');
@@ -218,19 +235,20 @@ function setup(){
   matte.attribute('muted', '');
 }
 
-let ready = false;
-let capturing = false;
+let ready = false; // Ready for sequence to be generated
+let capturing = false; // Currently grabbing frames
 
-let playing = false;
+let playing = false; // Videos are playing still
 
-let f = (framerate * START);
-let tf = (framerate * DURATION);
+let f = (framerate * START); // Frame to start on
+let tf = (framerate * DURATION); // Frame to end on
 
-let gTime = clamp((f/tf)*DURATION, 0, DURATION);
+let gTime = clamp((f/tf)*DURATION, 0, DURATION); // Get time in sequence from frames
 
 let visible = false;
 
 
+// Trigger render loop with native p5 draw
 function draw(){
   if(!ready){
     render();
@@ -239,24 +257,24 @@ function draw(){
 }
 
 
+  // Progress in generation attributes
   var TOTALPROGRESS = 0.0, TARGETPROGRESS = 0.0;
   var PHASES = [.4, .56, .04];
 
-
-  var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false;
-  var PROGRESS = clamp(f/tf, 0, 1), SEQ = 0.0;
+  var VIDEOREADY = false, VIDEOPLAY = false, SEEKED = false; // Video stepping attributes
+  var PROGRESS = clamp(f/tf, 0, 1), SEQ = 0.0; // Get total progress [0-1] in sequence generation
 
   // Sequence variables
   var offset = 0.0;
   var center = {x:0, y:0};
 
  function render(){
-    TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033;
-    updateProgressBar(TOTALPROGRESS);
+    TOTALPROGRESS += (TARGETPROGRESS - TOTALPROGRESS)*.033; // Move progress forward towards target
+    updateProgressBar(TOTALPROGRESS); // Update progress display
 
-    //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`;
+    //canvas.elt.style.filter = `blur(${(1.0 - TOTALPROGRESS) * 20.0}px)`; DEBUG* unblur canvas over time
 
-    gTime = clamp((f/tf)*DURATION, 0, DURATION);
+    gTime = clamp((f/tf)*DURATION, 0, DURATION); // Calculate position in sequence time
 
     if(capturing){
       let t = gTime;
@@ -267,6 +285,7 @@ function draw(){
       let mbf = matte.elt.buffered;
       
 
+      // Check if video has buffered enough to be seeked
       VIDEOREADY = (bgbf.length > 0 && bgbf.end(0) >= t) && (mbf.length > 0 && mbf.end(0) >= t);
       if(VIDEOLOAD && VIDEOREADY && !SEEKED){
         if(playing){
@@ -276,12 +295,12 @@ function draw(){
           SEEKED = true;
         }  
       }
-      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3);
+      VIDEOPLAY = (!bg.elt.seeking && !matte.elt.seeking && bg.elt.readyState >= 3 && matte.elt.readyState >= 3); // Check if video has loaded data for buffered position
 
 
-      SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1);
+      SEQ = clamp(PROGRESS * DURATION / 7.45833333, 0, 1); // Position in movement of letters from start --> stop (full sequence hangs on end)
 
-      blendMode(BLEND);
+      blendMode(BLEND); // Set blend mode
         
       // Draw buffers IF FIREFOX
       if(IS_FIREFOX){
@@ -289,12 +308,12 @@ function draw(){
         let bBuffer = elements.bBuffer;
 
         aBuffer.image(bg, 0, 0, WIDTH, HEIGHT);
-        image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT);
+        image(aBuffer, WIDTH2 , HEIGHT2, WIDTH, HEIGHT); // Draw background to buffer
 
-        bBuffer.image(matte, 0, 0, WIDTH, HEIGHT);
+        bBuffer.image(matte, 0, 0, WIDTH, HEIGHT); // Draw matte to buffer
       }
       else 
-        image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT);
+        image(bg, WIDTH2, HEIGHT2, WIDTH, HEIGHT); // Draw background normally
 
 
       
@@ -326,8 +345,6 @@ function draw(){
               line2.render(buffer, 1, t);
         }
 
-
-        //console.log("ready");
           
         let mx = 127;
         let my = 67;
